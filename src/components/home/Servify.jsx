@@ -2,7 +2,7 @@ import Image from 'next/image'
 import React from 'react'
 import servifyimg from '../../../public/Badges.svg'
 import servifyimg1 from '../../../public/Badges (1).svg'
-import hand_mobile from '../../../public/hand_with_mobile.svg'
+import hand_mobile from '../../../public/mobile_wiht_hand.svg'
 import Link from 'next/link'
 
 const Servify = () => {
