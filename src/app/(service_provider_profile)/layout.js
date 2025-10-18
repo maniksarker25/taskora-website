@@ -92,7 +92,7 @@ const ServiceProviderProfileLayout = ({ children }) => {
 
             {/* Content */}
             <main className="flex-1 bg-white shadow-inner rounded-r-lg">
-              <div className="pt-16 lg:pt-0 h-full">
+              <div className="lg:pt-0 h-full">
                 {children}
               </div>
             </main>

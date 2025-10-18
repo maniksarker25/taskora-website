@@ -50,12 +50,12 @@ const ProfileLayout = ({ children }) => {
                 p-3 rounded-xl shadow-lg hover:shadow-xl
                 transition-all duration-300 ease-in-out
                 transform hover:scale-105 active:scale-95
-                border border-gray-200
+                border border-gray-200 mt-16
               `}
               aria-label={open ? "Close menu" : "Open menu"}
             >
               <div
-                className={`transition-transform duration-300 ease-in-out ${
+                className={`transition-transform duration-300 ease-in-out  ${
                   open ? "rotate-180" : "rotate-0"
                 }`}
               >
@@ -98,7 +98,7 @@ const ProfileLayout = ({ children }) => {
 
             {/* Content */}
             <main className="flex-1 bg-white shadow-inner rounded-r-lg">
-              <div className=" lg:pt-0 h-full">{children}</div>
+              <div className="lg:pt-0 h-full">{children}</div>
             </main>
           </div>
         </div>
