@@ -10,9 +10,9 @@ const ServiceProfileInfo = () => {
       <div className="max-w-7xl mx-auto lg:px-8 py-4 lg:py-6">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6 lg:mb-8">
-          <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors lg:p-0 lg:hover:bg-transparent">
+          <Link href='/' className="p-2 hover:bg-gray-100 rounded-lg transition-colors lg:p-0 lg:hover:bg-transparent">
             <ArrowLeft className="w-5 h-5 text-gray-600 cursor-pointer hover:text-gray-800 transition-colors" />
-          </button>
+          </Link>
           <h2 className="font-semibold text-gray-800 text-lg sm:text-xl lg:text-2xl">
             Profile Info
           </h2>
