@@ -83,9 +83,9 @@ const Navbar = () => {
       <Link href="/service-listing" className={getLinkClass("/service-listing")}>
         Browse Services
       </Link>
-      <Link href="/list_my_service" className={getLinkClass("/list_my_service")}>
+      {/* <Link href="/list_my_service" className={getLinkClass("/list_my_service")}>
         List A Service
-      </Link>
+      </Link> */}
     </div>
   );
 
