@@ -94,9 +94,9 @@ const Contact = () => {
 
 
         <div className="p-8 lg:p-20">
-           <h3 className="text-4xl font-semibold text-center lg:text-start">Get in Touch with <span className="text-[#E5B92E]">BetWise</span></h3>
+           <h3 className="text-4xl font-semibold text-center lg:text-start">Taskalley  <span className="text-[#E5B92E]"></span></h3>
 
-           <p className="text-base font-semibold mt-2 text-[#111928] text-center lg:text-start">Reach out to our team anytime — whether it's a query about subscriptions, technical support, or partnership opportunities.</p>
+           <p className="text-base font-semibold text-[#111928] text-center lg:text-start mt-8">Reach out to our team anytime — whether it's a query about subscriptions, technical support, or partnership opportunities.</p>
 
 
            <form className="mt-12" >
