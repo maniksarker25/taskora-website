@@ -29,8 +29,8 @@ const FormNavigation = ({
     </button>
 
     <button
-      // onClick={onNext}
-      onClick={handleSubmit}
+      onClick={onNext}
+      // onClick={handleSubmit}
       className="bg-[#115E59] hover:bg-teal-700 text-white px-6 py-2 rounded-lg font-medium transition-colors w-full sm:w-auto order-1 sm:order-2 cursor-pointer"
     >
       {currentStep === totalSteps - 1 ? finalLabel : nextLabel}

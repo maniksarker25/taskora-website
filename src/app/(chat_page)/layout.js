@@ -12,11 +12,11 @@ const ChatLayout = ({ children }) => {
   return (
     <html lang="en">
       <body className="min-h-screen">
-        <div className="mb-16">
+        <div className="mb-8">
           <Navbar />
         </div>
            <button
-            className="md:hidden absolute top-20 left-6 z-50 p-2 rounded-lg bg-[#00786f] shadow "
+            className="md:hidden absolute top-24 left-6 z-50 p-2 rounded-lg bg-[#00786f] shadow "
             onClick={() => setOpen(!open)}
           >
             <Menu className="w-6 h-6 text-white" />
