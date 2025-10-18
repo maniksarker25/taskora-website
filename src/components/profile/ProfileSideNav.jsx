@@ -23,7 +23,7 @@ const sidebarLinks = [
     href: "/security_settings",
     icon: <IoIosSettings />,
   },
-  { name: "Refer & Discounts", href: "/refer_discounts", icon: <TbDiscount /> },
+  { name: "Referrals & Discounts", href: "/refer_discounts", icon: <TbDiscount /> },
   { name: "Home", href: "/", icon: <FaHome /> },
 ];
 
