@@ -29,7 +29,7 @@ const Register = () => {
                 <div className="w-full">
                   <div className="p-6 sm:p-8 ">
                      <Link 
-                     href="/"
+                     href="/manage-dispute"
                      className="flex justify-center items-center mb-12">
                                          <Image src={main_logo} alt="main_logo" className="w-44"/>
                                        </Link>

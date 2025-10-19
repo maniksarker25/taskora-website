@@ -7,15 +7,16 @@ import image3 from "../../../../public/img3.png";
 import image4 from "../../../../public/img4.png";
 import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import roketAnimation from "@/../public/rocket launch.json";
-import main_logo from "../../../../public/main_logo.svg";
+import main_logo from "../../../../public/main_logo_svg.svg";
 import HowWorks from "@/components/home/HowWorks";
 import Lottie from "lottie-react";
 import PopularService from "@/sharred/popularService";
-import cta_image from "../../../../public/cta.png";
 import Hero from "../../../../public/laptop.svg";
 
 import all_icon from "../../../../public/all_icon.png";
 import Link from "next/link";
+import { baseUrl } from "../../../../utils/baseUrl";
+import Swal from "sweetalert2";
 
 const faqs = [
   {
@@ -67,17 +68,12 @@ const faqs = [
 
 const TaskAlleyLaunch = () => {
   const [openIndex, setOpenIndex] = useState(null);
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
   };
-
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     setCounter((prev) => (prev > 0 ? prev - 1 : 0));
-  //   }, 1000);
-  //   return () => clearInterval(interval);
-  // }, []);
 
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -126,12 +122,48 @@ const TaskAlleyLaunch = () => {
     return () => clearInterval(interval);
   }, []);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = {
+      email: email,
+      phone: phone,
+    };
+
+    try {
+      const response = await fetch(`${baseUrl()}/subscriber/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      console.log(response);
+      if (response.ok) {
+        Swal.fire({
+          position: "top-end",
+          icon: "success",
+          title: "Thank You For Subscribed!",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+        setEmail("");
+        setPhone("");
+      } else {
+        alert("Something went wrong!");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Server Error!");
+    }
+  };
+
   return (
     <div className="bg-[#F9FAFB]">
       {/* navbar */}
       <nav className="shadow-2xl py-3 ">
-        <div className="project_container py-2 px-2 lg:px-4">
-          <Image alt="main_logo" src={main_logo} />
+        <div className=" py-2  max-w-[1340px] px-10 mx-auto ">
+          <Image alt="main_logo" src={main_logo} className="h-12 w-40"/>
         </div>
       </nav>
       {/* navbar */}
@@ -345,43 +377,74 @@ const TaskAlleyLaunch = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gray-50 py-16 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between ">
+      <section className="bg-gray-50 py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-stretch justify-between rounded-lg overflow-hidden shadow-lg">
           {/* Left Side */}
-          <div className="relative flex-1 bg-teal-700 text-white rounded-l-lg p-10 shadow-lg overflow-hidden lg:py-32">
+          <div className="relative flex-1 bg-teal-700 text-white p-8 sm:p-10 lg:p-12 flex items-center justify-center">
             {/* Background Shapes */}
-            <div className="absolute -top-20 -left-28 w-96 h-96 bg-teal-800 rounded-full opacity-30"></div>
-            <div className="absolute -bottom-20 -right-20 w-80 h-80 bg-teal-500 rounded-full opacity-40"></div>
+            <div className="absolute hidden md:block -top-20 -left-28 w-80 sm:w-96 h-80 sm:h-96 bg-teal-800 rounded-full opacity-30"></div>
+            <div className="absolute hidden md:block -bottom-20 -right-0 w-64 sm:w-80 h-64 sm:h-80 bg-teal-500 rounded-full opacity-40"></div>
 
-            <div className="relative z-10">
-              <h2 className="text-3xl md:text-4xl font-bold leading-snug">
+            <div className="relative z-10 text-center md:text-left">
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold leading-snug">
                 Start Posting Tasks for Free
               </h2>
-              <p className="mt-4 text-base md:text-lg text-gray-100">
+              <p className="mt-3 sm:mt-4 text-base sm:text-lg text-gray-100">
                 Subscribe today and unlock smarter ways to get work done.
               </p>
             </div>
           </div>
 
           {/* Right Side */}
-          <div className="flex-1 bg-white rounded-r-lg shadow-md p-8 w-full lg:py-30">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-6">
+          <div className="flex-1 bg-white p-6 sm:p-8 md:p-10 flex flex-col justify-center">
+            <h3 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-5 sm:mb-6 text-center md:text-left">
               Subscribe Now
             </h3>
-            <form className="flex flex-col sm:flex-row items-center gap-4">
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="flex-1 px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                required
-              />
+
+            <form
+              className="flex flex-col gap-4 w-full"
+              onSubmit={handleSubmit}
+            >
+              {/* Email Input */}
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="flex-1 w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+
+              {/* Phone Input */}
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                <input
+                  type="tel"
+                  placeholder="Enter your phone number"
+                  className="flex-1 w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 transition"
+                  required
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </div>
+
+              {/* Submit Button */}
               <button
                 type="submit"
-                className="bg-[#115e59] hover:bg-teal-800 text-white px-6 py-3 rounded-md font-medium transition"
+                className="bg-[#115e59] hover:bg-teal-800
+                 text-white px-8 py-3 rounded-md font-medium
+                 cursor-pointer
+                  transition w-full sm:w-auto mx-auto sm:mx-0 shadow-md"
               >
                 Submit
               </button>
             </form>
+
+            {/* Small Note */}
+            <p className="text-gray-500 text-sm mt-4 text-center md:text-left">
+              * We’ll never share your email or phone number.
+            </p>
           </div>
         </div>
       </section>
@@ -391,7 +454,7 @@ const TaskAlleyLaunch = () => {
       <section className="bg-black py-4 mt-20">
         <div className="project_container px-6 flex flex-wrap items-center  justify-between">
           <div>
-            <Image src={main_logo} alt="main logg" />
+            <Image src={main_logo} alt="main logg" className="h-16 w-40"/>
           </div>
           <div className="text-white">Copyright 2025 TaskAlley.com</div>
           <div className="flex gap-2">

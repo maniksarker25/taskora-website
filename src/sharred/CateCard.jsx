@@ -2,7 +2,7 @@ import Image from 'next/image'
 import React from 'react'
 
 const CateCard = ({item}) => {
-    console.log(item)
+
   return (
     <div className='border-2 border-[#115E59] rounded-lg p-4 flex items-center hover:shadow-lg transition transform duration-300 hover:scale-101 cursor-pointer pl-8 py-8 gap-4'>
         <div>
