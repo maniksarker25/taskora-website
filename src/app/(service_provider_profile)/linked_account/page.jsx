@@ -65,7 +65,7 @@ const LinkdedAccount = () => {
           </button>
           <div>
             <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
-              Linked Account
+              Manage Account
             </h1>
           </div>
         </div>

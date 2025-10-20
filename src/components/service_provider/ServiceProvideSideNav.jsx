@@ -17,7 +17,7 @@ const sidebarLinks = [
     href: "/service_provider_notification",
     icon: <IoIosNotifications />,
   },
-  { name: "Linked Account", href: "/linked_account", icon: <FaMoneyBillTransfer /> },
+  { name: "Manage Account", href: "/linked_account", icon: <FaMoneyBillTransfer /> },
   { name: "Earning", href: "/earning", icon: <FaMoneyBillTransfer /> },
   {
     name: "Security Settings",
@@ -64,7 +64,7 @@ const ServiceProvideSideNav = ({ open, onClose }) => {
           className="rounded-full shadow"
         />
         <h2 className="font-semibold text-gray-800">Wade Warren</h2>
-        <p className="text-xs text-gray-600">Manage Account</p>
+        <p className="text-xs text-gray-600">Service Provider</p>
       </div>
 
       {/* Navigation */}
