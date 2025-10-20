@@ -62,7 +62,7 @@ const ProfileSideNav = ({ open, onClose }) => {
           className="rounded-full shadow"
         />
         <h2 className="font-semibold text-gray-800">Wade Warren</h2>
-        <p className="text-xs text-gray-600">Manage Account</p>
+        <p className="text-xs text-gray-600">Task Provider</p>
       </div>
 
       {/* Navigation */}
