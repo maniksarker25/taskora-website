@@ -5,6 +5,8 @@ import TransactionFilterTabs from "./TransactionFilterTabs";
 import DateNavigation from "./DateNavigation";
 import TransactionTable from "./TransactionTable";
 import Link from "next/link";
+import { IoIosNotifications } from "react-icons/io";
+import { FaMoneyBillTransfer } from "react-icons/fa6";
 
 const sampleTransactions = [
   {
@@ -127,19 +129,17 @@ const TransactionHistory = () => {
 
  const transactions = getTransactions();
   return (
-    <div className=" mx-auto p-4 lg:p-6">
+    <div className="max-w-7xl mx-auto lg:px-8 py-4 lg:py-6 mt-12">
 
       {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <Link 
-        href="/notifications"
-        className="w-8 h-8  rounded-lg flex items-center justify-center">
-          <ArrowLeft className="w-5 h-5 text-gray-600 cursor-pointer" />
-        </Link>
-        <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">
-          My Transaction History
-        </h1>
-      </div>
+    <div className="flex items-center gap-3 mb-6 lg:mb-8">
+            <button className=" hover:bg-gray-100 rounded-lg transition-colors lg:p-0 lg:hover:bg-transparent">
+              <FaMoneyBillTransfer className="text-2xl text-gray-600 cursor-pointer hover:text-gray-800 transition-colors" />
+            </button>
+            <h2 className="font-semibold text-gray-600 text-lg sm:text-xl lg:text-2xl">
+              My Transaction
+            </h2>
+          </div>
 
       {/* Filter Tabs */}
       <TransactionFilterTabs

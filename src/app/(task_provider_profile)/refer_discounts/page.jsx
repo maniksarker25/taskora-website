@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { ArrowLeft, Copy, Share, Check } from "lucide-react";
 import Link from "next/link";
+import { IoIosNotifications } from "react-icons/io";
+import { TbDiscount } from "react-icons/tb";
 
 const ReferDiscounts = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState("my-discounts");
@@ -71,18 +73,15 @@ const ReferDiscounts = ({ onBack }) => {
   };
 
   return (
-    <div className="bg-white p-4 sm:p-6 lg:p-8">
+    <div className="max-w-7xl mx-auto lg:px-8 py-4 lg:py-6 mt-12 h-screen ">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <Link
-          href="/security_settings"
-          className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5 text-gray-600" />
-        </Link>
-        <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">
-          Referrals & Discounts
-        </h1>
+    <div className="flex items-center gap-3 mb-6 lg:mb-8">
+        <button className=" hover:bg-gray-100 rounded-lg transition-colors lg:p-0 lg:hover:bg-transparent">
+          <TbDiscount className="text-2xl text-gray-600 cursor-pointer hover:text-gray-800 transition-colors" />
+        </button>
+        <h2 className="font-semibold text-gray-600 text-lg sm:text-xl lg:text-2xl">
+         Referrals & Discounts
+        </h2>
       </div>
 
       {/* Tabs */}
