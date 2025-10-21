@@ -14,7 +14,7 @@ import { PiSignOutBold } from "react-icons/pi";
 const Navbar = () => {
   const pathname = usePathname();
   // "service_provider", "guest", "task_provider"
-  const [role, setRole] = useState("task_provider");
+  const [role, setRole] = useState("guest");
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -121,10 +121,10 @@ const Navbar = () => {
       </Link>
       <Link
         href="/register"
-        className={`px-6 py-2.5 rounded-md transition hover:scale-105 ${
+        className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${
           pathname === "/register"
-            ? "bg-[#0d4a42] text-white shadow-md"
-            : "bg-[#115e59] text-white hover:bg-[#0d4a42]"
+            ? "bg-[#115e59] text-white"
+            : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
         }`}
       >
         Register
