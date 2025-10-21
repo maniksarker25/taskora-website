@@ -67,7 +67,7 @@ const LinkdedAccount = () => {
             <MdManageAccounts className="text-3xl text-gray-600 cursor-pointer hover:text-gray-800 transition-colors" />
           </button>
           <div>
-            <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-gray-900">
+            <h1 className="text-xl md:text-2xl lg:text-2xl font-bold text-gray-600">
               Manage Account
             </h1>
           </div>
