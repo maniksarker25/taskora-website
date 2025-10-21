@@ -9,7 +9,7 @@ import Link from "next/link";
 const Register = () => {
   return (
      <section className="overflow-y-scroll">
-      <div className="max-w-[1800px] mx-auto md:h-[1200px] flex items-center justify-center max-h-screen  ">
+      <div className="max-w-7xl mx-auto flex items-center justify-center max-h-screen mt-12 mb-12 ">
         <div className="flex items-center justify-center gap-8 bg-[#F8FAFC] rounded-sm overflow-clip shadow-2xl">
           {/* Left Side - Images */}
           <div className="hidden md:block overflow-hidden w-full h-full">

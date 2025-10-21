@@ -3,13 +3,14 @@ import main_logo from "../../../../public/main_logo_svg.svg";
 import React from "react";
 import Image from "next/image";
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebookF } from "react-icons/fa6";
+import { FaApple, FaFacebookF } from "react-icons/fa6";
 import Link from "next/link";
+import { Apple, AppleIcon } from "lucide-react";
 
 const Login = () => {
   return (
     <section className="">
-      <div className="max-w-[1100px] mx-auto h-[1200px] flex items-center justify-center max-h-screen  ">
+      <div className="max-w-7xl mx-auto flex items-center justify-center max-h-screen mt-12 mb-12">
         <div className="flex items-center justify-center gap-8 bg-[#F8FAFC] rounded-sm overflow-clip shadow-2xl">
           {/* Left Side - Images */}
           <div className="hidden md:block overflow-hidden w-full h-full">
@@ -135,7 +136,7 @@ const Login = () => {
                         <FcGoogle className="text-2xl" />
                       </button>
                       <button className="border-1 border-[#115E59] p-3.5 rounded-sm transition transform duration-300 hover:scale-101 cursor-pointer">
-                        <FaFacebookF className="text-2xl text-blue-500" />
+                        <FaApple className="text-2xl text-blue-500" />
                       </button>
                     </div>
                   </div>
