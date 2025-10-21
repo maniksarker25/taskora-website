@@ -24,7 +24,7 @@ const sidebarLinks = [
     icon: <IoIosSettings />,
   },
   { name: "Referrals & Discounts", href: "/refer_discounts", icon: <TbDiscount /> },
-  { name: "Home", href: "/", icon: <FaHome /> },
+  // { name: "Home", href: "/", icon: <FaHome /> },
 ];
 
 const ProfileSideNav = ({ open, onClose }) => {
