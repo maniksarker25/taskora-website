@@ -24,8 +24,8 @@ const sidebarLinks = [
     href: "/service_security",
     icon: <IoIosSettings />,
   },
-  { name: "Referrals & Discounts", href: "/service_discount", icon: <TbDiscount /> },
-  { name: "Home", href: "/", icon: <FaHome /> },
+  { name: "Referrals & Discounts", href: "/service_discount", icon: <TbDiscount /> }
+  // { name: "Home", href: "/", icon: <FaHome /> },
 ];
 
 const ServiceProvideSideNav = ({ open, onClose }) => {
