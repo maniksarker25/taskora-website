@@ -195,7 +195,7 @@ const Navbar = () => {
           </Link>
         )}
 
-        <Link className="flex items-center gap-2 text-lg hover:bg-red-50 hover:text-red-600 px-3 py-2 rounded-md transition-colors" href="/">
+        <Link className="flex items-center gap-2 text-lg hover:bg-red-50 hover:text-red-600 px-3 py-2 rounded-md transition-colors" href="/login">
           <PiSignOutBold className="text-red-500" /> Sign Out
         </Link>
       </ul>
