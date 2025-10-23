@@ -1,6 +1,6 @@
 "use client";
 import registration_img from "../../../../public/login_page_image.png";
-import main_logo from "../../../../public/main_logo.svg";
+import main_logo from "../../../../public/main_logo_svg.svg";
 import customer from "../../../../public/customer.svg"
 import service_provider from "../../../../public/service_providers.svg"
 import React from "react";
@@ -28,14 +28,14 @@ const page = () => {
           <div className="flex w-full items-center justify-center p-6">
             <div className="max-w-xl rounded-2xl p-8">
               {/* Logo */}
-              <div className="flex justify-center mb-6">
+              <div className="flex items-center justify-center mb-6 w-full">
                 <span className="text-xl font-bold text-[#115e59]">
-                  <Image src={main_logo} alt="main logo"/>
+                  <Image src={main_logo} alt="main logo "className="w-44"/>
                 </span>
               </div>
 
               {/* Title */}
-              <h2 className="text-3xl font-semibold text-center mb-2">
+              <h2 className="text-2xl font-semibold text-center mb-2">
                 Choose Your Role to Get Started
               </h2>
               <p className="text-center text-gray-500 mb-6 text-sm">
@@ -46,8 +46,8 @@ const page = () => {
               {/* Options */}
               <div className="space-y-4 space-x-2">
                 <Link
-                  href='login'
-                  className="w-full flex items-center gap-4 border rounded-lg py-3 px-4 text-xl md:text-4xl transition border-[#878b92] bg-white font-semibold" 
+                  href='register'
+                  className="w-full flex items-center gap-4 border rounded-lg py-3 px-4 text-xl md:text-2xl transition border-[#878b92] bg-white font-semibold" 
               
                 >
                  <Image src={customer} alt="customer" className="w-20"/>
@@ -55,7 +55,7 @@ const page = () => {
                 </Link>
                 <Link
                  href='register'
-                  className="w-full flex items-center gap-4 border rounded-lg py-3 px-4 transition border-[#878b92] bg-white text-xl md:text-4xl font-semibold">
+                  className="w-full flex items-center gap-4 border rounded-lg py-3 px-4 transition border-[#878b92] bg-white text-xl md:text-2xl font-semibold">
                  <Image src={service_provider} alt="customer"  className="w-20"/>
                   Service Provider
                 </Link>
