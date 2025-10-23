@@ -14,7 +14,7 @@ import { PiSignOutBold } from "react-icons/pi";
 const Navbar = () => {
   const pathname = usePathname();
   // "service_provider", "guest", "task_provider"
-  const [role, setRole] = useState("service_provider");
+  const [role, setRole] = useState("guest");
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
@@ -107,30 +107,32 @@ const Navbar = () => {
   );
 
   // Auth buttons with active states
-  const guestAuthButtons = (
-    <div className="flex flex-col lg:items-center lg:flex-row gap-3">
-      <Link
-        href="/login"
-        className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${
-          pathname === "/login"
-            ? "bg-[#115e59] text-white"
-            : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
-        }`}
-      >
-        Log In
-      </Link>
-      <Link
-        href="/register"
-        className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${
-          pathname === "/register"
-            ? "bg-[#115e59] text-white"
-            : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
-        }`}
-      >
-        Register
-      </Link>
-    </div>
-  );
+const guestAuthButtons = (
+  <div className="flex flex-col lg:items-center lg:flex-row gap-3">
+    <Link
+      href="/login"
+      className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${
+        pathname === "/login"
+          ? "bg-[#115e59] text-white"
+          : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
+      }`}
+    >
+      Log In
+    </Link>
+
+    <Link
+      href="/role"
+      className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${
+        pathname !== "/login"
+          ? "bg-[#115e59] text-white"
+          : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
+      }`}
+    >
+      Register
+    </Link>
+  </div>
+);
+
 
   // Profile dropdown link class
   const getProfileLinkClass = (path) => {
