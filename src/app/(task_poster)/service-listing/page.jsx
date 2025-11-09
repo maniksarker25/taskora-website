@@ -23,7 +23,7 @@ const ServiceListing = () => {
   
   const { data: servicesData, isLoading: servicesLoading, error } = useGetAllServicesQuery({
     page: currentPage,
-    limit: limit,
+    // limit: limit,
     searchTerm: debouncedSearch,
     category: selectedCategory !== "all" ? selectedCategory : "", 
     sortBy: selectedSortBy,
@@ -32,7 +32,7 @@ const ServiceListing = () => {
   useEffect(() => {
     console.log(" DEBUG - API Call Parameters:", {
       page: currentPage,
-      limit: limit,
+      // limit: limit,
       searchTerm: debouncedSearch,
       category: selectedCategory !== "all" ? selectedCategory : "",
       sortBy: selectedSortBy

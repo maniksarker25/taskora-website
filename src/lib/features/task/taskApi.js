@@ -52,33 +52,7 @@ const taskApi = createApi({
 
     getTaskById: builder.query({
       query: (id) => ({
-        url: `/task/${id}`,
-        method: "GET",
-      }),
-      providesTags: ["Task"],
-    }),
-
-    updateTask: builder.mutation({
-      query: ({ id, ...taskData }) => ({
-        url: `/task/update-task/${id}`,
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: taskData,
-      }),
-      invalidatesTags: ["Task"],
-    }),
-
-    deleteTask: builder.mutation({
-      query: (id) => ({
-        url: `/task/delete-task/${id}`,
-        method: "DELETE",
-      }),
-      invalidatesTags: ["Task"],
-    }),
-
-    getUserTasks: builder.query({
-      query: () => ({
-        url: "/task/my-tasks",
+        url: `/task/single-task/${id}`, // Fixed URL
         method: "GET",
       }),
       providesTags: ["Task"],
@@ -89,10 +63,7 @@ const taskApi = createApi({
 export const {
   useCreateTaskMutation,
   useGetAllTasksQuery,
-  useGetTaskByIdQuery,
-  useUpdateTaskMutation,
-  useDeleteTaskMutation,
-  useGetUserTasksQuery,
+  useGetTaskByIdQuery
 } = taskApi;
 
 export default taskApi;

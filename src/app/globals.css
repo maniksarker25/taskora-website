@@ -129,7 +129,7 @@ body {
   color: #115e59;
 }
 .border-color{
-  color: #115e59;
+   border-color: #115e59;
 }
 .hover-white:hover { color: #fff !important; } 
 

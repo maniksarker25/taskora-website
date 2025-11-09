@@ -9,10 +9,12 @@ import Image from "next/image";
 import InfoProvider from "@/components/serviceprovider/InfoProvider";
 import ServiceTabs from "@/components/serviceprovider/ServiceTabs";
 import BookingCard from "@/components/serviceprovider/BookingCard";
+import clsx from "clsx";
 
-const ServiceDetails = () => {
+const ServiceDetails = ({service}) => {
   const [activeTab, setActiveTab] = useState("Description");
-
+  
+ console.log(service)
   return (
     <div className="project_container mx-auto lg:p-6 overflow-clip">
       {/* Header */}

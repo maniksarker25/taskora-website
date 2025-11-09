@@ -10,9 +10,13 @@ import Link from "next/link";
 import { useGetAllTasksQuery } from "@/lib/features/task/taskApi";
 
 const AllServicePage = () => {
-  const { data: tasksData, isLoading, error } = useGetAllTasksQuery({
+  const {
+    data: tasksData,
+    isLoading,
+    error,
+  } = useGetAllTasksQuery({
     page: 1,
-    limit: 10,
+    limit: 100,
   });
 
   const formatTaskData = (task) => {
@@ -27,12 +31,12 @@ const AllServicePage = () => {
       calenderIcon: <SlCalender />,
       city: task.city || "City not specified",
       monthIcon: <IoTimerOutline />,
-      month: task.preferredDate 
-        ? new Date(task.preferredDate).toLocaleDateString('en-US', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric'
-          }) + (task.preferredTime ? ` ${task.preferredTime}` : '')
+      month: task.preferredDate
+        ? new Date(task.preferredDate).toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }) + (task.preferredTime ? ` ${task.preferredTime}` : "")
         : "Schedule not set",
       open: task.status === "OPEN_FOR_BID" ? "open" : "closed",
       close: task.status === "OPEN_FOR_BID" ? "close" : "closed",
@@ -47,7 +51,10 @@ const AllServicePage = () => {
     return (
       <div className="w-full pl-4 md:w-[350px] lg:w-[500px] flex flex-col gap-4 max-h-[850px] overflow-y-auto">
         {[...Array(5)].map((_, index) => (
-          <div key={index} className="flex flex-col gap-4 shadow-xl rounded-md p-6 bg-gray-100 animate-pulse">
+          <div
+            key={index}
+            className="flex flex-col gap-4 shadow-xl rounded-md p-6 bg-gray-100 animate-pulse"
+          >
             <div className="flex justify-between items-center">
               <div className="h-6 bg-gray-300 rounded w-1/2"></div>
               <div className="h-6 bg-gray-300 rounded w-1/4"></div>
@@ -75,7 +82,9 @@ const AllServicePage = () => {
       <div className="w-full pl-4 md:w-[350px] lg:w-[500px] flex items-center justify-center max-h-[850px]">
         <div className="text-red-500 text-center">
           <p>Error loading tasks</p>
-          <p className="text-sm">{error?.data?.message || "Please try again later"}</p>
+          <p className="text-sm">
+            {error?.data?.message || "Please try again later"}
+          </p>
         </div>
       </div>
     );
@@ -96,11 +105,11 @@ const AllServicePage = () => {
 
   return (
     <div className="">
-      <div className="w-full pl-4 md:w-[350px] lg:w-[500px] flex flex-col gap-4 max-h-[850px] overflow-y-auto"> 
+      <div className="w-full pl-4 md:w-[350px] lg:w-[500px] flex flex-col gap-4 max-h-[850px] overflow-y-auto">
         {tasks.map((task) => (
           <div key={task._id}>
-            <Link href={`/browseservice/${task._id}`}>
-              <ServiceCard data={formatTaskData(task)} />
+            <Link href={`/browseservice/${task?._id}`}>
+              <ServiceCard  task={task} />
             </Link>
           </div>
         ))}
