@@ -5,7 +5,6 @@ import {
   CheckCircle,
   Calendar,
   DollarSign,
-  Image,
 } from "lucide-react";
 import MultiStepForm from "@/components/task_post/MultiStepForm";
 import FormNavigation from "@/components/task_post/FormNavigation";
@@ -13,7 +12,9 @@ import StepHeader from "@/components/task_post/StepHeader";
 import FormSelect from "@/components/task_post/FormSelect";
 import FormInput from "@/components/task_post/FormInput";
 import RadioGroup from "@/components/task_post/RadioGroup";
-import { DatePicker, Form, TimePicker } from "antd";
+import LocationSearch from "@/components/task_post/LocationSearch";
+import FileUpload from "@/components/task_post/FileUpload";
+import { DatePicker, TimePicker } from "antd";
 import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useGetAllCategoriesQuery } from "@/lib/features/category/categoryApi";
@@ -38,11 +39,13 @@ const TaskCreationApp = () => {
     taskDescription: "",
     taskType: "in-person",
     location: "",
+    locationCoordinates: null,
     taskTiming: "fixed-date",
     preferredDate: "",
     preferredTime: "",
     budget: "",
     agreedToTerms: false,
+    taskAttachments: [],
   });
 
   const steps = [
@@ -101,23 +104,20 @@ const TaskCreationApp = () => {
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error 
     if (formErrors[field]) {
       setFormErrors(prev => ({ ...prev, [field]: "" }));
     }
+  };
+
+  const handleFileChange = (files) => {
+    setFormData((prev) => ({ ...prev, taskAttachments: files }));
   };
 
   const handleNext = () => {
     if (validateStep(currentStep)) {
       setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
     } else {
-      toast.error("Please fill all required fields", {
-        style: {
-          backgroundColor: "#fee2e2",
-          color: "#991b1b",
-          borderLeft: "6px solid #dc2626",
-        }
-      });
+      toast.error("Please fill all required fields");
     }
   };
 
@@ -127,18 +127,17 @@ const TaskCreationApp = () => {
 
   const handleSubmit = async () => {
     if (!validateStep(3)) {
-      toast.error("Please fill all required fields", {
-        style: {
-          backgroundColor: "#fee2e2",
-          color: "#991b1b",
-          borderLeft: "6px solid #dc2626",
-        }
-      });
+      toast.error("Please fill all required fields");
       return;
     }
 
     try {
-      console.log("Form data to submit:", formData);
+      const formDataToSend = new FormData();
+
+      // Add files to FormData
+      formData.taskAttachments.forEach((file) => {
+        formDataToSend.append('task_attachments', file);
+      });
 
       const taskPayload = {
         title: formData.taskTitle,
@@ -146,6 +145,10 @@ const TaskCreationApp = () => {
         description: formData.taskDescription,
         budget: parseInt(formData.budget),
         address: formData.location || "",
+        location: {
+          type: "Point",
+          coordinates: formData.locationCoordinates || [90.4125, 23.8103]
+        },
         scheduleType: formData.taskTiming === "fixed-date" ? "FIXED_DATE_AND_TIME" : "FLEXIBLE",
         ...(formData.taskTiming === "fixed-date" && {
           preferredDate: formData.preferredDate ? dayjs(formData.preferredDate).format("YYYY-MM-DD") : null,
@@ -159,32 +162,28 @@ const TaskCreationApp = () => {
         taskPayload.preferredTime = `0${taskPayload.preferredTime}`;
       }
 
+      formDataToSend.append('data', JSON.stringify(taskPayload));
+
       console.log("Sending to API:", taskPayload);
 
-      const result = await createTask(taskPayload).unwrap();
+      const result = await createTask(formDataToSend).unwrap();
       
-      console.log("Task created successfully:", result);
-      
-      toast.success("Task created successfully!", {
-        style: {
-          backgroundColor: "#d1fae5",
-          color: "#065f46",
-          borderLeft: "6px solid #10b981",
-        }
-      });
+      toast.success("Task created successfully!");
 
-      //  form reseeet
+      // Reset form
       setFormData({
         taskTitle: "",
         taskCategory: "",
         taskDescription: "",
         taskType: "in-person",
         location: "",
+        locationCoordinates: null,
         taskTiming: "fixed-date",
         preferredDate: "",
         preferredTime: "",
         budget: "",
         agreedToTerms: false,
+        taskAttachments: [],
       });
       
       localStorage.removeItem("formData");
@@ -193,13 +192,7 @@ const TaskCreationApp = () => {
 
     } catch (error) {
       console.error("Failed to create task:", error);
-      toast.error(error?.data?.message || "Failed to create task. Please try again.", {
-        style: {
-          backgroundColor: "#fee2e2",
-          color: "#991b1b",
-          borderLeft: "6px solid #dc2626",
-        }
-      });
+      toast.error(error?.data?.message || "Failed to create task. Please try again.");
     }
   };
 
@@ -207,11 +200,13 @@ const TaskCreationApp = () => {
     const savedStep = localStorage.getItem("currentStep");
     const savedForm = localStorage.getItem("formData");
 
-    if (savedStep) {
-      setCurrentStep(Number(savedStep));
-    }
+    if (savedStep) setCurrentStep(Number(savedStep));
     if (savedForm) {
-      setFormData(JSON.parse(savedForm));
+      const parsedForm = JSON.parse(savedForm);
+      setFormData({
+        ...parsedForm,
+        taskAttachments: []
+      });
     }
   }, []);
 
@@ -220,7 +215,8 @@ const TaskCreationApp = () => {
   }, [currentStep]);
 
   useEffect(() => {
-    localStorage.setItem("formData", JSON.stringify(formData));
+    const { taskAttachments, ...formDataWithoutFiles } = formData;
+    localStorage.setItem("formData", JSON.stringify(formDataWithoutFiles));
   }, [formData]);
 
   const renderStepContent = () => {
@@ -282,12 +278,15 @@ const TaskCreationApp = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-3">
-                Attachments (optional)
+                Attachments
               </label>
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-teal-800">
-                <Image className="mx-auto w-8 h-8 text-gray-400 mb-2" />
-                <p className="text-sm text-gray-600">Upload Images (Coming Soon)</p>
-              </div>
+              <FileUpload
+                files={formData.taskAttachments}
+                onChange={handleFileChange}
+                multiple={true}
+                maxFiles={5}
+                maxSizeMB={5}
+              />
             </div>
           </div>
         );
@@ -308,11 +307,14 @@ const TaskCreationApp = () => {
             />
             {formData.taskType === "in-person" && (
               <div>
-                <FormInput
-                  label="Where to Go *"
-                  placeholder="e.g. 123 Main Avenue"
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Where to Go *
+                </label>
+                <LocationSearch
                   value={formData.location}
-                  onChange={(e) => handleInputChange("location", e.target.value)}
+                  onChange={(value) => handleInputChange("location", value)}
+                  placeholder="Search for your location..."
+                  required
                 />
                 {formErrors.location && (
                   <p className="text-red-500 text-sm mt-1">{formErrors.location}</p>
@@ -363,7 +365,6 @@ const TaskCreationApp = () => {
                     format="HH:mm"
                     value={formData.preferredTime ? dayjs(formData.preferredTime, "HH:mm") : null}
                     onChange={(time, timeString) => {
-                      console.log("Time selected:", timeString); 
                       handleInputChange("preferredTime", timeString);
                     }}
                   />
