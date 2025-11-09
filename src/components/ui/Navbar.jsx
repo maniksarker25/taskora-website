@@ -308,7 +308,7 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-2">
           {role === "guest" && guestLinks}
           {role === "customer" && taskProviderLinks}
-          {role === "service_provider" && serviceProviderLinks}
+          {role === "provider" && serviceProviderLinks}
         </div>
 
         {/* Right Side */}
