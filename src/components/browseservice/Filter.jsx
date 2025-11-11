@@ -1,13 +1,32 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import CategorySelect from "./CategorySelect";
 import Location from "./Location";
 import PriceRange from "./PriceRange";
 import Sort from "./Sort";
 
-const Filter = () => {
+const Filter = ({ onFilterChange }) => {
+  const [filters, setFilters] = useState({
+    search: "",
+    category: "",
+    location: "",
+    minPrice: "",
+    maxPrice: "",
+    sort: ""
+  });
+
+  const handleFilterChange = (key, value) => {
+    const newFilters = {
+      ...filters,
+      [key]: value
+    };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+  };
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 items-center mb-6 gap-3 md:gap-10">
-      {/* searchbar */}
+      {/* Search Bar */}
       <div>
         <div className="flex items-center px-4 py-3 rounded-md border border-[#6B7280] overflow-hidden max-w-md mx-auto">
           <div className="border-r mr-2">
@@ -21,18 +40,36 @@ const Filter = () => {
             </svg>
           </div>
           <input
-            type="email"
+            type="text"
             placeholder="Search for a task"
             className="w-full outline-none bg-transparent text-gray-600 text-sm"
+            value={filters.search}
+            onChange={(e) => handleFilterChange("search", e.target.value)}
           />
         </div>
       </div>
 
-      {/* category */}
-      <CategorySelect />
-      <Location/>
-      <PriceRange/>
-      <Sort/>
+      {/* Filter Components */}
+      <CategorySelect
+        value={filters.category}
+        onChange={(value) => handleFilterChange("category", value)}
+      />
+      <Location
+        value={filters.location}
+        onChange={(value) => handleFilterChange("location", value)}
+      />
+      <PriceRange
+        minPrice={filters.minPrice}
+        maxPrice={filters.maxPrice}
+        onChange={(min, max) => {
+          handleFilterChange("minPrice", min);
+          handleFilterChange("maxPrice", max);
+        }}
+      />
+      <Sort
+        value={filters.sort}
+        onChange={(value) => handleFilterChange("sort", value)}
+      />
     </div>
   );
 };

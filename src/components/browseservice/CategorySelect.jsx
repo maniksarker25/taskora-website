@@ -1,24 +1,37 @@
 "use client";
-import React, { useState } from "react";
+import { useGetAllCategoriesQuery } from "@/lib/features/category/categoryApi";
+import React from "react";
 
-const CategorySelect = () => {
-  const [selected, setSelected] = useState("");
+const CategorySelect = ({ value, onChange }) => {
+  const { data, isLoading, error } = useGetAllCategoriesQuery();
+  const categories = data?.data?.result;
+  console.log(error)
+  console.log(categories)
+
+  if (isLoading) {
+    return (
+      <div className="w-full max-w-sm">
+        <select className="w-full px-4 py-2 pr-10 border border-[#6B7280] rounded-lg shadow-sm text-[#6B7280]">
+          <option>Loading...</option>
+        </select>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full max-w-sm">
-      
-
       <select
         id="category"
-        value={selected}
-        onChange={(e) => setSelected(e.target.value)}
-        className="w-full px-4 py-2 pr-10 border border-[#6B7280] rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#6B7280] focus:border-[#6B7280] text-[#6B7280]
-        "
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full px-4 py-2 pr-10 border border-[#6B7280] rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#6B7280] focus:border-[#6B7280] text-[#6B7280]"
       >
-        <option  value="">Category</option>
-        <option value="design">Furniture</option>
-        <option value="development">Cleaning</option>
-        <option value="marketing">Wash</option>
-        <option value="writing">Gardening</option>
+        <option value="">All Categories</option>
+        {categories?.map((cat) => (
+          <option key={cat._id} value={cat._id}>
+            {cat.name}
+          </option>
+        ))}
       </select>
     </div>
   );
