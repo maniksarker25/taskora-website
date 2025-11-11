@@ -7,7 +7,7 @@ import { IoTimerOutline } from "react-icons/io5";
 import Image from "next/image";
 import userImage from "../../../public/task_img.png";
 
-const ServiceCard = ({ task }) => {
+const ServiceCard = ({ task, isActive = false }) => {
   const formatTaskData = (task) => {
     return {
       id: task?._id,
@@ -34,7 +34,7 @@ const ServiceCard = ({ task }) => {
   const taskData = formatTaskData(task);
 
   return (
-    <div className="flex flex-col gap-4  rounded-md p-6 cursor-pointer border-[1px] hover:border-[#115e59] transition-all duration-400 ease-in-out bg-white ">
+    <div className={`flex flex-col gap-4 rounded-md p-6 cursor-pointer border-2 transition-all duration-400 ease-in-out bg-white ${isActive ? 'border-[#115e59] ring-2 ring-[#115e59] ring-opacity-50 shadow-md' : 'border-gray-200 hover:border-[#115e59]'}`}>
       {/* Header Section */}
       <div className="flex justify-between items-center">
         <span className="text-xs font-medium text-white bg-[#115e59] px-2 py-1 rounded-full">

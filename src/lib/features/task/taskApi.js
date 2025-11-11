@@ -27,32 +27,46 @@ const taskApi = createApi({
       invalidatesTags: ["Task"],
     }),
 
-    getAllTasks: builder.query({
-      query: ({
-        page = 1,
-        limit = 10,
-        searchTerm = "",
-        category = "",
-        sortBy = "",
-      }) => {
-        const params = new URLSearchParams();
-        params.append("page", page);
-        params.append("limit", limit);
-        if (searchTerm) params.append("searchTerm", searchTerm);
-        if (category) params.append("category", category);
-        if (sortBy) params.append("sortBy", sortBy);
+getAllTasks: builder.query({
+  query: ({
+    page = 1,
+    limit = 10,
+    searchTerm = "",
+    category = "",
+    sortBy = "",
+    location = ""
+  }) => {
+    const params = new URLSearchParams();
+    params.append("page", page);
+    params.append("limit", limit);
+    if (searchTerm) params.append("searchTerm", searchTerm);
+    if (category) params.append("category", category);
+    if (location) params.append("location", location);
+    
+    // Handle sort parameter
+    if (sortBy) {
+      if (sortBy === 'price_low_high') {
+        params.append("sortBy", "budget");
+        params.append("sortOrder", "asc");
+      } else if (sortBy === 'price_high_low') {
+        params.append("sortBy", "budget");
+        params.append("sortOrder", "desc");
+      } else {
+        params.append("sortBy", sortBy);
+      }
+    }
 
-        return {
-          url: `/task/all-task?${params.toString()}`,
-          method: "GET",
-        };
-      },
-      providesTags: ["Task"],
-    }),
+    return {
+      url: `/task/all-task?${params.toString()}`,
+      method: "GET",
+    };
+  },
+  providesTags: ["Task"],
+}),
 
     getTaskById: builder.query({
       query: (id) => ({
-        url: `/task/single-task/${id}`, // Fixed URL
+        url: `/task/single-task/${id}`, 
         method: "GET",
       }),
       providesTags: ["Task"],

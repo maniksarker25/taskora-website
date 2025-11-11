@@ -32,7 +32,6 @@ const ServiceListing = () => {
   useEffect(() => {
     console.log(" DEBUG - API Call Parameters:", {
       page: currentPage,
-      // limit: limit,
       searchTerm: debouncedSearch,
       category: selectedCategory !== "all" ? selectedCategory : "",
       sortBy: selectedSortBy
