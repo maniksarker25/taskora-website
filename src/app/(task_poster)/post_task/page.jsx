@@ -291,7 +291,9 @@ const TaskCreationApp = () => {
               <textarea
                 rows={4}
                 value={formData.taskDescription}
-                onChange={(e) => handleInputChange("taskDescription", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("taskDescription", e.target.value)
+                }
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-800 resize-none"
                 placeholder="Describe your task in detail..."
               />
@@ -440,6 +442,7 @@ const TaskCreationApp = () => {
                 className="w-4 h-4 cursor-pointer"
                 style={{ accentColor: "#115e59" }}
               />
+
               <p className="text-sm text-gray-600">
                 I confirm this task complies with all rules. *
               </p>

@@ -13,17 +13,19 @@ const AuthLayout = ({ children }) => {
   const hideLayout = pathname === "/taskalley_launch";
 
   return (
-    <div>
-      <Toaster position="top-right" richColors />
+    <html>
+      <body>
+        <Toaster position="top-right" richColors />
 
-      {/* Navbar conditionally show */}
-      {!hideLayout && <Navbar />}
+        {/* Navbar conditionally show */}
+        {!hideLayout && <Navbar />}
 
-      <div>{children}</div>
+        <div>{children}</div>
 
-      {/* Footer conditionally show */}
-      {!hideLayout && <Footer />}
-    </div>
+        {/* Footer conditionally show */}
+        {!hideLayout && <Footer />}
+      </body>
+    </html>
   );
 };
 
