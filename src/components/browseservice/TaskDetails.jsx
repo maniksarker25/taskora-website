@@ -17,22 +17,31 @@ import BidModal from "@/components/browseservice/BidModal";
 import {
   useAcceptBidMutation,
   useCreateBidMutation,
+  useGetBidsByTaskIdQuery,
 } from "@/lib/features/bidApi/bidApi";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
 
 const TaskDetails = ({ task }) => {
   const [contentTab, setContentTab] = useState("Bids");
   const [newQuestion, setNewQuestion] = useState("");
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
-  const [bids, setBids] = useState([]);
+  const role = useSelector((state) => state?.auth?.user?.role);
+  console.log("rollle", role)
 
-  // RTK Query mutations
   const [createBid, { isLoading: isSubmittingBid }] = useCreateBidMutation();
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
 
-  console.log("Task Details Props:", task);
+  const {
+    data: bidsData,
+    isLoading: isLoadingBids,
+    error: bidsError,
+    refetch: refetchBids
+  } = useGetBidsByTaskIdQuery(task?._id);
 
-  // Use actual task data
+  console.log("Task Details Props:", task);
+  console.log("Bids Data:", bidsData);
+
   const taskData = {
     title: task?.title || "Task Title",
     poster: {
@@ -42,10 +51,10 @@ const TaskDetails = ({ task }) => {
     location: task?.city || task?.address || "Location not specified",
     dueDate: task?.preferredDate
       ? new Date(task.preferredDate).toLocaleDateString("en-US", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }) + (task.preferredTime ? ` ${task.preferredTime}` : "")
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }) + (task.preferredTime ? ` ${task.preferredTime}` : "")
       : "Schedule not set",
     budget: task?.budget?.toString() || "0",
     description: task?.description || "No description available.",
@@ -57,33 +66,8 @@ const TaskDetails = ({ task }) => {
       : "Recently",
   };
 
-  // Sample bids data (in real app, this would come from API)
-  const sampleBids = [
-    {
-      id: 1,
-      user: "John Doe",
-      rating: "4.8",
-      reviewCount: "203",
-      bidAmount: 850,
-      message:
-        "I have 5 years of experience in similar tasks. Can complete within 2 days.",
-      timeAgo: "1 hour ago",
-      profileImage: client,
-    },
-    {
-      id: 2,
-      user: "Sarah Wilson",
-      rating: "4.9",
-      reviewCount: "156",
-      bidAmount: 920,
-      message:
-        "Professional service with all tools provided. Available immediately.",
-      timeAgo: "2 hours ago",
-      profileImage: client,
-    },
-  ];
+  const bids = bidsData?.data || [];
 
-  // Sample questions data
   const questions = [
     {
       id: 1,
@@ -99,7 +83,6 @@ const TaskDetails = ({ task }) => {
 
   const contentTabs = ["Bids", "Questions"];
 
-  // Handle bid submission
   const handleBidSubmit = async (bidData) => {
     try {
       const result = await createBid(bidData).unwrap();
@@ -115,6 +98,8 @@ const TaskDetails = ({ task }) => {
           duration: 3000,
         });
         setIsBidModalOpen(false);
+
+        refetchBids();
       }
     } catch (error) {
       console.error("Failed to submit bid:", error);
@@ -123,7 +108,7 @@ const TaskDetails = ({ task }) => {
         {
           style: {
             backgroundColor: "#fee2e2",
-            color: "#991b1b", 
+            color: "#991b1b",
             borderLeft: "6px solid #ef4444",
           },
           duration: 3000,
@@ -132,7 +117,6 @@ const TaskDetails = ({ task }) => {
     }
   };
 
-  // Handle bid acceptance
   const handleAcceptBid = async (bidId) => {
     if (!confirm("Are you sure you want to accept this bid?")) return;
 
@@ -141,27 +125,39 @@ const TaskDetails = ({ task }) => {
 
       if (result.success) {
         console.log("Bid accepted successfully:", result);
-        alert("Bid accepted! The task has been assigned.");
-
-        // In a real app, you might want to refetch bids and task status here
-        // await refetchBids();
-        // await refetchTask();
+        toast.success("Bid accepted successfully!", {
+          style: {
+            backgroundColor: "#d1fae5",
+            color: "#065f46",
+            borderLeft: "6px solid #10b981",
+          },
+          duration: 3000,
+        });
+        refetchBids();
       }
     } catch (error) {
       console.error("Failed to accept bid:", error);
-      alert(error?.data?.message || "Failed to accept bid. Please try again.");
+      toast.error(
+        error?.data?.message || "Failed to accept bid. Please try again.",
+        {
+          style: {
+            backgroundColor: "#fee2e2",
+            color: "#991b1b",
+            borderLeft: "6px solid #ef4444",
+          },
+          duration: 3000,
+        }
+      );
     }
   };
 
   const handleQuestionSubmit = () => {
     if (newQuestion.trim()) {
       console.log("New question:", newQuestion);
-      // Here you would typically send the question to your API
       setNewQuestion("");
     }
   };
 
-  // Dynamic status configuration
   const getStatusConfig = (status) => {
     const statusConfigs = {
       OPEN_FOR_BID: {
@@ -196,10 +192,20 @@ const TaskDetails = ({ task }) => {
 
   const currentStatusConfig = getStatusConfig(taskData.status);
 
-  // Use sample bids for now - in real app, use useGetTaskBidsQuery
-  useEffect(() => {
-    setBids(sampleBids);
-  }, []);
+  // Format date function
+  const formatTimeAgo = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours === 1) return "1 hour ago";
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays === 1) return "1 day ago";
+    return `${diffInDays} days ago`;
+  };
 
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -250,7 +256,7 @@ const TaskDetails = ({ task }) => {
           <div>
             <p className="text-xs text-gray-500">Posted by</p>
             <p className="text-sm font-medium text-gray-900">
-              {task?.provider?.name}
+              {taskData.poster.name}
             </p>
           </div>
         </div>
@@ -297,17 +303,20 @@ const TaskDetails = ({ task }) => {
               ₦{parseInt(taskData.budget).toLocaleString()}
             </p>
             <p className="text-sm text-gray-500 mt-1">
-              {taskData.totalOffer} bids received
+              {bids.length} bids received
             </p>
           </div>
 
           <div>
-            <button
-              onClick={() => setIsBidModalOpen(true)}
-              className="bg-[#115E59] hover:bg-teal-700 cursor-pointer text-white py-3 px-8 rounded-lg font-medium transition-colors"
-            >
-              Submit A Bid
-            </button>
+            {
+              role === "provider" ? (<button
+                onClick={() => setIsBidModalOpen(true)}
+                className="bg-[#115E59] hover:bg-teal-700 cursor-pointer text-white py-3 px-8 rounded-lg font-medium transition-colors"
+              >
+                Submit A Bid
+              </button>) : (<></>)
+            }
+
           </div>
         </div>
       </div>
@@ -318,11 +327,10 @@ const TaskDetails = ({ task }) => {
           <button
             key={tab}
             onClick={() => setContentTab(tab)}
-            className={`flex-1 py-4 px-4 text-sm font-medium transition-colors ${
-              contentTab === tab
+            className={`flex-1 py-4 px-4 text-sm font-medium transition-colors ${contentTab === tab
                 ? "text-white bg-[#115E59] cursor-pointer border-b-2 border-[#115E59]"
                 : "text-gray-600 hover:text-gray-900 cursor-pointer hover:bg-gray-50"
-            }`}
+              }`}
           >
             {tab}
           </button>
@@ -332,78 +340,109 @@ const TaskDetails = ({ task }) => {
       {/* Content Area */}
       {contentTab === "Bids" ? (
         <div>
-          {/* Bids List */}
-          {bids.map((bid) => (
-            <div
-              key={bid.id}
-              className="flex gap-4 p-4 bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors"
-            >
-              <Image
-                src={bid.profileImage}
-                alt={bid.user}
-                width={64}
-                height={64}
-                className="w-16 h-16 rounded-full object-cover"
-              />
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-gray-900">{bid.user}</h3>
-                  <span className="text-xs text-gray-400">{bid.timeAgo}</span>
-                </div>
-
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-medium text-gray-900">
-                      {bid.rating}
-                    </span>
-                  </div>
-                  <span className="text-xs text-gray-500">
-                    ({bid.reviewCount} Reviews)
-                  </span>
-                </div>
-
-                <p className="text-sm text-gray-600 leading-relaxed mb-3">
-                  {bid.message}
-                </p>
-
-                {/* Bid Amount and Actions */}
-                <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                  <div>
-                    <span className="text-lg font-bold text-[#115e59]">
-                      ₦{bid.bidAmount.toLocaleString()}
-                    </span>
-                    <span className="text-xs text-gray-500 ml-2">
-                      Bid Amount
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleAcceptBid(bid.id)}
-                      disabled={isAcceptingBid}
-                      className={`px-4 py-2 text-sm rounded-lg font-medium transition-colors ${
-                        isAcceptingBid
-                          ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          : "bg-[#115e59] text-white hover:bg-teal-700 cursor-pointer"
-                      }`}
-                    >
-                      {isAcceptingBid ? "Accepting..." : "Accept Bid"}
-                    </button>
-                    <button className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors font-medium cursor-pointer">
-                      Message
-                    </button>
-                  </div>
-                </div>
-              </div>
+          {/* Loading State */}
+          {isLoadingBids && (
+            <div className="flex items-center justify-center h-32">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
             </div>
-          ))}
+          )}
 
-          {/* View More Button */}
-          <div className="p-4 bg-white">
-            <button className="w-full bg-[#115E59] hover:bg-teal-700 cursor-pointer text-white py-3 px-4 rounded-lg font-medium transition-colors">
-              Load More Bids
-            </button>
-          </div>
+          {/* Error State */}
+          {bidsError && (
+            <div className="text-center py-8">
+              <p className="text-gray-600">Failed to load bids.</p>
+              <button
+                onClick={refetchBids}
+                className="mt-2 px-4 py-2 bg-[#115E59] text-white rounded-lg hover:bg-teal-700 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {/* Bids List */}
+          {!isLoadingBids && !bidsError && (
+            <>
+              {bids.length === 0 ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">No bids yet. Be the first to bid on this task!</p>
+                </div>
+              ) : (
+                bids.map((bid) => (
+                  <div
+                    key={bid._id}
+                    className="flex gap-4 p-4 bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    <Image
+                      src={bid?.provider?.profile_image || client}
+                      alt={bid?.provider?.name || "Provider"}
+                      width={64}
+                      height={64}
+                      className="w-16 h-16 rounded-full object-cover"
+                    />
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <h3 className="font-medium text-gray-900">
+                          {bid?.provider?.name || "Anonymous"}
+                        </h3>
+                        <span className="text-xs text-gray-400">
+                          {formatTimeAgo(bid.createdAt)}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-1">
+                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                          <span className="text-sm font-medium text-gray-900">
+                            {bid?.provider?.rating || "0"}
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-500">
+                          ({bid?.provider?.reviewCount || "0"} Reviews)
+                        </span>
+                      </div>
+
+                      <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                        {bid.details || "No message provided."}
+                      </p>
+
+                      {/* Bid Amount and Actions */}
+                      <div className="flex justify-between items-center pt-3 border-t border-gray-100">
+                        <div>
+                          <span className="text-lg font-bold text-[#115e59]">
+                            ₦ {parseInt(bid.price).toLocaleString()}
+                          </span>
+                          <span className="text-xs text-gray-500 ml-2">
+                            Bid Amount
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          {
+                            role === "customer" ? (
+                              <button
+                                onClick={() => handleAcceptBid(bid._id)}
+                                disabled={isAcceptingBid || bid.status === "ACCEPTED"}
+                                className={`px-4 py-2 text-sm rounded-lg font-medium transition-colors ${isAcceptingBid || bid.status === "ACCEPTED"
+                                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                    : "bg-[#115e59] text-white hover:bg-teal-700 cursor-pointer"
+                                  }`}
+                              >
+                                {bid.status === "ACCEPTED" ? "Accepted" : isAcceptingBid ? "Accepting..." : "Accept Bid"}
+                              </button>
+                            ) : (<></>)
+                          }
+
+                          <button className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors font-medium cursor-pointer">
+                            Message
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </>
+          )}
         </div>
       ) : (
         <div className="bg-white">
@@ -429,11 +468,10 @@ const TaskDetails = ({ task }) => {
                   <button
                     onClick={handleQuestionSubmit}
                     disabled={!newQuestion.trim()}
-                    className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                      newQuestion.trim()
+                    className={`px-6 py-2 rounded-lg font-medium transition-colors ${newQuestion.trim()
                         ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
+                      }`}
                   >
                     Send Question
                   </button>
@@ -501,13 +539,6 @@ const TaskDetails = ({ task }) => {
                 </div>
               </div>
             ))}
-          </div>
-
-          {/* View More Button for Questions */}
-          <div className="p-4 bg-white">
-            <button className="w-full bg-[#115e59] hover:bg-teal-700 text-white py-3 px-4 rounded-lg font-medium transition-colors">
-              Load More Questions
-            </button>
           </div>
         </div>
       )}

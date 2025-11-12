@@ -118,3 +118,4 @@ const PriceRange = ({ minPrice, maxPrice, onChange }) => {
 };
 
 export default PriceRange;
+

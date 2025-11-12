@@ -2,8 +2,8 @@ import Image from "next/image";
 import React from "react";
 import { Clock, Home, MapPin } from "lucide-react";
 
-const MyTaskCard = ({ service, activeTab }) => {
-  console.log(service);
+const MyTaskCard = ({ service }) => {
+  console.log("serrrrrvvvviiiiccceee",service);
   return (
     <div className="bg-white shadow rounded-lg p-4 sm:p-6 mb-4 border border-gray-200">
       {/* Top row */}
@@ -36,11 +36,11 @@ const MyTaskCard = ({ service, activeTab }) => {
         <div className="flex justify-between items-center  pt-4 mb-4">
           <div className="flex items-center gap-3">
             <Image
-              src={service.image.src}
+              src={service.image}
               alt="Category"
               width={50}
               height={50}
-              className="rounded-md object-cover w-20"
+              className="rounded-md object-cover w-8"
             />
             <div>
               <p className="text-sm font-medium text-gray-800">

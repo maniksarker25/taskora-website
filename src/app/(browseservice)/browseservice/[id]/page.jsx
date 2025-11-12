@@ -8,7 +8,6 @@ const TaskDetailPage = () => {
   const params = useParams();
   const taskId = params.id;
 
-  console.log("🔄 Task ID from URL:", taskId);
 
   const { 
     data: taskData, 

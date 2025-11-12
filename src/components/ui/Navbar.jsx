@@ -142,15 +142,12 @@ const Navbar = () => {
       : "flex items-center gap-2 text-lg hover:text-[#115e59] px-3 py-2 hover:border-b-2 hover:border-[#115e59] transition-all";
   };
 
-  // Determine role safely
   const role = mounted && isAuthenticated ? user?.role : "guest";
 
-  // Don't render anything until mounted to avoid hydration mismatch
   if (!mounted) {
     return (
       <nav className="w-full bg-white shadow-sm sticky top-0 z-50 py-2">
         <div className="max-w-[1240px] mx-auto px-6 py-3 flex items-center justify-between">
-          {/* Static logo for initial render */}
           <Link href="/" className="flex items-center gap-2">
             <div className="h-10 lg:h-12 w-32 bg-gray-200 animate-pulse rounded"></div>
           </Link>
@@ -160,7 +157,6 @@ const Navbar = () => {
     );
   }
 
-  //  Desktop profile (daisyUI)
   const desktopProfileDropdown = (
     <div className="dropdown dropdown-end hidden lg:block">
       <div

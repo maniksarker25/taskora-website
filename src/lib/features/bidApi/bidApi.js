@@ -29,9 +29,17 @@ const bidApi = createApi({
       invalidatesTags: ["Bid"],
     }),
 
-    getTaskBids: builder.query({
+    // getTaskBids: builder.query({
+    //   query: (taskId) => ({
+    //     url: `/bid/bids-by-task-id/${taskId}`,
+    //     method: "GET",
+    //   }),
+    //   providesTags: ["Bid"],
+    // }),
+
+     getBidsByTaskId: builder.query({
       query: (taskId) => ({
-        url: `/bid/task-bids/${taskId}`,
+        url: `/bid/bids-by-task-id/${taskId}`,
         method: "GET",
       }),
       providesTags: ["Bid"],
@@ -49,7 +57,7 @@ const bidApi = createApi({
 
 export const { 
   useCreateBidMutation, 
-  useGetTaskBidsQuery, 
+  useGetBidsByTaskIdQuery, 
   useAcceptBidMutation 
 } = bidApi;
 
