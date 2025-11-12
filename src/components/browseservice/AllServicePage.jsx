@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 
 const AllServicePage = ({ filters }) => {
   const pathname = usePathname();
-  const currentTaskId = pathname.split('/').pop(); // Extract task ID from URL
+  const currentTaskId = pathname.split('/').pop(); 
   const {
     data: tasksData,
     isLoading,
@@ -21,13 +21,11 @@ const AllServicePage = ({ filters }) => {
     sortBy: filters.sort || "",
   });
 
-  // Filter tasks by price range on client side
   const filteredTasks = React.useMemo(() => {
     if (!tasksData?.data?.result) return [];
     
     let tasks = tasksData.data.result;
     
-    // Filter by price range
     if (filters.minPrice || filters.maxPrice) {
       tasks = tasks.filter(task => {
         const taskBudget = task.budget || 0;
@@ -38,7 +36,6 @@ const AllServicePage = ({ filters }) => {
       });
     }
     
-    // Filter by location
     if (filters.location) {
       tasks = tasks.filter(task => 
         task.city?.includes(filters.location) || 
@@ -49,7 +46,6 @@ const AllServicePage = ({ filters }) => {
     return tasks;
   }, [tasksData, filters]);
 
-  // ... rest of your existing code (formatTaskData, loading, error states)
 
   const formatTaskData = (task) => {
     return {
@@ -79,13 +75,11 @@ const AllServicePage = ({ filters }) => {
     };
   };
 
-  if (isLoading) {
-    // Your loading state
-  }
+  // if (isLoading) {
+  // }
 
-  if (error) {
-    // Your error state
-  }
+  // if (error) {
+  // }
 
   const tasks = filteredTasks;
 

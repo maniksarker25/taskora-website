@@ -37,10 +37,10 @@ const TaskCreationApp = () => {
     taskTitle: "",
     taskCategory: "",
     taskDescription: "",
-    taskType: "in-person",
+    taskType: "in-person", // frontend value
     location: "",
     locationCoordinates: null,
-    taskTiming: "fixed-date",
+    taskTiming: "fixed-date", // frontend value
     preferredDate: "",
     preferredTime: "",
     budget: "",
@@ -48,12 +48,32 @@ const TaskCreationApp = () => {
     taskAttachments: [],
   });
 
+  console.log("formdata", formData);
+
   const steps = [
     { id: 0, title: "Task Overview" },
     { id: 1, title: "Task Details" },
     { id: 2, title: "Date & Time" },
     { id: 3, title: "Budget" },
   ];
+
+  const mapToBackendValues = (frontendData) => {
+    const taskTypeMap = {
+      "in-person": "IN_PERSON",
+      "online": "ONLINE"
+    };
+
+    const scheduleTypeMap = {
+      "fixed-date": "FIXED_DATE_AND_TIME",
+      "flexible": "FLEXIBLE"
+    };
+
+    return {
+      ...frontendData,
+      taskType: taskTypeMap[frontendData.taskType] || "IN_PERSON",
+      taskTiming: scheduleTypeMap[frontendData.taskTiming] || "FLEXIBLE"
+    };
+  };
 
   const validateStep = (step) => {
     const errors = {};
@@ -133,38 +153,41 @@ const TaskCreationApp = () => {
 
     try {
       const formDataToSend = new FormData();
+      console.log("FormData object:", formDataToSend);
 
-      // Add files to FormData
+      // Append files
       formData.taskAttachments.forEach((file) => {
         formDataToSend.append('task_attachments', file);
       });
 
+      const mappedData = mapToBackendValues(formData);
+
       const taskPayload = {
-        title: formData.taskTitle,
-        category: formData.taskCategory,
-        description: formData.taskDescription,
-        budget: parseInt(formData.budget),
-        address: formData.location || "",
+        title: mappedData.taskTitle,
+        category: mappedData.taskCategory,
+        description: mappedData.taskDescription,
+        budget: parseInt(mappedData.budget),
+        address: mappedData.location || "",
         location: {
           type: "Point",
-          coordinates: formData.locationCoordinates || [90.4125, 23.8103]
+          coordinates: mappedData.locationCoordinates || [90.4125, 23.8103]
         },
-        scheduleType: formData.taskTiming === "fixed-date" ? "FIXED_DATE_AND_TIME" : "FLEXIBLE",
-        ...(formData.taskTiming === "fixed-date" && {
-          preferredDate: formData.preferredDate ? dayjs(formData.preferredDate).format("YYYY-MM-DD") : null,
-          preferredTime: formData.preferredTime || "00:00" 
+        scheduleType: mappedData.taskTiming, 
+        ...(mappedData.taskTiming === "FIXED_DATE_AND_TIME" && {
+          preferredDate: mappedData.preferredDate ? dayjs(mappedData.preferredDate).format("YYYY-MM-DD") : null,
+          preferredTime: mappedData.preferredTime || "00:00" 
         }),
         payOn: "completion",
-        taskType: formData.taskType
+        doneBy: mappedData.taskType 
       };
 
       if (taskPayload.preferredTime && taskPayload.preferredTime.length === 4) {
         taskPayload.preferredTime = `0${taskPayload.preferredTime}`;
       }
 
-      formDataToSend.append('data', JSON.stringify(taskPayload));
-
       console.log("Sending to API:", taskPayload);
+
+      formDataToSend.append('data', JSON.stringify(taskPayload));
 
       const result = await createTask(formDataToSend).unwrap();
       

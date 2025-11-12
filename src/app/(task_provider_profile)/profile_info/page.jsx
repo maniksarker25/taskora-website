@@ -5,9 +5,12 @@ import client from "../../../../public/client.png";
 import Link from "next/link";
 import { CgProfile } from "react-icons/cg";
 import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";
+import { useSelector } from "react-redux";
 
 const ProfileInfo = () => {
   const { data, isLoading, error } = useGetMyProfileQuery();
+   const role = useSelector((state) => state?.auth?.user?.role);
+   console.log(role)
   
   // User data from API
   const userData = data?.data;
@@ -144,7 +147,7 @@ const ProfileInfo = () => {
                         Role
                       </h3>
                       <p className="text-gray-600 text-lg bg-gray-50 p-3 rounded-lg capitalize">
-                        {userData?.role || "Not specified"}
+                        {role || "Not specified"}
                       </p>
                     </div>
                   </div>
@@ -186,7 +189,7 @@ const ProfileInfo = () => {
                         )}
                       </p>
                     </div>
-                    {userData?.dateOfBirth && (
+                    {/* {userData?.dateOfBirth && (
                       <div className="group">
                         <h3 className="font-semibold text-gray-800 text-xl mb-2 group-hover:text-[#115e59] transition-colors">
                           Date of Birth
@@ -195,7 +198,7 @@ const ProfileInfo = () => {
                           {new Date(userData.dateOfBirth).toLocaleDateString()}
                         </p>
                       </div>
-                    )}
+                    )} */}
                   </div>
                 </div>
 

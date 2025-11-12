@@ -6,6 +6,7 @@ import Navbar from "@/components/ui/Navbar";
 import Footer from "@/components/ui/Footer";
 import Filter from "@/components/browseservice/Filter";
 import AllServicePage from "@/components/browseservice/AllServicePage";
+import { Toaster } from "sonner";
 
 const BrowseServiceLayout = ({ children }) => {
   const [filters, setFilters] = useState({});
@@ -26,6 +27,11 @@ const BrowseServiceLayout = ({ children }) => {
             <AllServicePage filters={filters} />
           </div>
           <div className="w-full pl-2">{children}</div>
+          <Toaster 
+          position="top-right"
+          expand={true}
+          richColors
+        />
         </div>
       </div>
       <Footer />

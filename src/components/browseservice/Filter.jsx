@@ -58,6 +58,7 @@ const Filter = ({ onFilterChange }) => {
         value={filters.location}
         onChange={(value) => handleFilterChange("location", value)}
       />
+
       <PriceRange
         minPrice={filters.minPrice}
         maxPrice={filters.maxPrice}
