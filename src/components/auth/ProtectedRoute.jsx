@@ -1,12 +1,14 @@
 "use client";
 
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { logout } from "@/lib/features/auth/authSlice";
 
 const ProtectedRoute = ({ children, requiredRole = null }) => {
   const { isAuthenticated, user, isLoading } = useSelector((state) => state.auth);
   const router = useRouter();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -15,12 +17,24 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
       return;
     }
 
+    // If requiredRole is specified and user role doesn't match, logout and redirect to login
     if (!isLoading && isAuthenticated && requiredRole && user?.role !== requiredRole) {
-      // Redirect to home or appropriate page if role doesn't match
-      router.push("/");
+      // Logout the user
+      dispatch(logout());
+      
+      // Clear refreshToken cookie
+      if (typeof document !== 'undefined') {
+        document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
+        if (process.env.NODE_ENV === 'production') {
+          document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax; Secure';
+        }
+      }
+      
+      // Redirect to login
+      router.push("/login");
       return;
     }
-  }, [isAuthenticated, isLoading, user, requiredRole, router]);
+  }, [isAuthenticated, isLoading, user, requiredRole, router, dispatch]);
 
   // Show loading state while checking authentication
   if (isLoading) {
@@ -36,7 +50,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
     return null;
   }
 
-  // Check role if required
+  // Check role if required - if role doesn't match, don't render (logout already handled in useEffect)
   if (requiredRole && user?.role !== requiredRole) {
     return null;
   }
