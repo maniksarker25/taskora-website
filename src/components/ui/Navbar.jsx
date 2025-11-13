@@ -33,24 +33,24 @@ const Navbar = () => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!mounted) return;
+  // useEffect(() => {
+  //   if (!mounted) return;
 
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+  //   const handleScroll = () => {
+  //     const currentScrollY = window.scrollY;
       
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(true);
-      }
+  //     if (currentScrollY > lastScrollY && currentScrollY > 100) {
+  //       setIsVisible(false);
+  //     } else {
+  //       setIsVisible(true);
+  //     }
       
-      setLastScrollY(currentScrollY);
-    };
+  //     setLastScrollY(currentScrollY);
+  //   };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, mounted]);
+  //   window.addEventListener('scroll', handleScroll, { passive: true });
+  //   return () => window.removeEventListener('scroll', handleScroll);
+  // }, [lastScrollY, mounted]);
 
   const getLinkClass = (path, isButton = false) => {
     const isActive = pathname === path;

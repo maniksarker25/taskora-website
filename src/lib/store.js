@@ -6,6 +6,7 @@ import categoryApi from './features/category/categoryApi';
 import taskApi from './features/task/taskApi';
 import serviceApi from './features/service/serviceApi';
 import bidApi from './features/bidApi/bidApi';
+import questionApi from './features/question/questionApi';
 
 export const makeStore = () =>
   configureStore({
@@ -16,7 +17,8 @@ export const makeStore = () =>
       [categoryApi.reducerPath]: categoryApi.reducer,
       [taskApi.reducerPath]: taskApi.reducer,
       [serviceApi.reducerPath]: serviceApi.reducer,
-      [bidApi.reducerPath]: bidApi.reducer
+      [bidApi.reducerPath]: bidApi.reducer,
+      [questionApi.reducerPath]: questionApi.reducer
  
     },
     middleware:(getDefaultMiddleware) => getDefaultMiddleware()
@@ -26,7 +28,8 @@ export const makeStore = () =>
       categoryApi.middleware,
       taskApi.middleware,
       serviceApi.middleware,
-      bidApi.middleware
+      bidApi.middleware,
+      questionApi.middleware
     ),
     devTools: process.env.NODE_ENV !== 'production',
   });
