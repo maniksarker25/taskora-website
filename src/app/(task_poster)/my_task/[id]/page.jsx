@@ -18,7 +18,7 @@ const TaskDetails = () => {
   const params = useParams();
   const taskId = params.id;
   const [currentStatus, setCurrentStatus] = useState("Bids");
-  const [showResolutionModal, setShowResolutionModal] = useState(false); // Modal state
+  const [showResolutionModal, setShowResolutionModal] = useState(false); 
   
   const status = ["Bids", "Progress", "Completed", "Cancelled"];
   

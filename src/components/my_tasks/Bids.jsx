@@ -29,7 +29,7 @@ const questions = [
 ];
 
 const Bids = ({ taskDetails, bidsData }) => {
-  const info = bidsData?.data
+  const info = bidsData?.data.result
   const [activeTab, setActiveTab] = useState("bids");
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
   const [taskStatus, setTaskStatus] = useState(taskDetails?.status || "OPEN_FOR_BID");

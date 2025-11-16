@@ -1,34 +1,62 @@
 "use client"
-import React, { useState, useRef } from "react";
+
+import React, { useState, useRef, useMemo } from "react";
 import { Plus, Upload, X } from "lucide-react";
+import { useCreateServiceMutation } from "@/lib/features/providerService/providerServiceApi";
+import { useGetAllCategoriesQuery } from "@/lib/features/category/categoryApi";
+import dynamic from 'next/dynamic';
+
+// Dynamic import for Jodit to avoid SSR issues
+const JoditEditor = dynamic(() => import('jodit-react'), {
+  ssr: false,
+  loading: () => <div className="min-h-[300px] border rounded-md p-4 bg-gray-50">Loading editor...</div>
+});
 
 const AddService = () => {
   const [formData, setFormData] = useState({
     serviceTitle: "",
     startingPrice: "",
     serviceCategory: "",
-    serviceDescription: "",
-    serviceImage: null
+    serviceImage: null,
+    serviceDescription: ""
   });
   
+  const { data: categoriesData, error: categoriesError } = useGetAllCategoriesQuery();
+  const [createService, { isLoading, error: createError }] = useCreateServiceMutation();
+  
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
   const [imagePreview, setImagePreview] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
   const fileInputRef = useRef(null);
+  const editorRef = useRef(null);
 
+  // Jodit Editor configuration
+  const editorConfig = useMemo(() => ({
+    readonly: false,
+    placeholder: 'Describe your service in detail...',
+    height: 300,
+    toolbarAdaptive: false,
+    toolbarButtonSize: "medium",
+    buttons: [
+      'bold', 'italic', 'underline', 'strikethrough', '|',
+      'ul', 'ol', '|',
+      'outdent', 'indent', '|',
+      'font', 'fontsize', 'brush', '|',
+      'align', '|',
+      'link', '|',
+      'undo', 'redo', '|',
+      'preview'
+    ],
+    style: {
+      background: '#fff',
+      color: '#000'
+    }
+  }), []);
 
-  const serviceCategories = [
-    "Cleaning & Maintenance",
-    "Home Repair",
-    "Moving & Delivery",
-    "Personal Care",
-    "Pet Care",
-    "Tutoring & Training",
-    "Technology Support",
-    "Event Services",
-    "Business Services",
-    "Other"
-  ];
+  const serviceCategories = categoriesData?.data?.result?.map(category => ({
+    value: category?._id || category?.id, 
+    label: category?.name 
+  })) || [];
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({
@@ -36,7 +64,6 @@ const AddService = () => {
       [field]: value
     }));
     
-    // Clear error when user starts typing
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -48,7 +75,6 @@ const AddService = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // Validate file type
       if (!file.type.startsWith('image/')) {
         setErrors(prev => ({
           ...prev,
@@ -57,7 +83,6 @@ const AddService = () => {
         return;
       }
       
-      // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
         setErrors(prev => ({
           ...prev,
@@ -71,14 +96,12 @@ const AddService = () => {
         serviceImage: file
       }));
 
-      // Create preview
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target.result);
       };
       reader.readAsDataURL(file);
 
-      // Clear any previous error
       setErrors(prev => ({
         ...prev,
         serviceImage: ""
@@ -100,30 +123,35 @@ const AddService = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    // Service Title validation
     if (!formData.serviceTitle.trim()) {
       newErrors.serviceTitle = "Service title is required";
     } else if (formData.serviceTitle.trim().length < 3) {
       newErrors.serviceTitle = "Service title must be at least 3 characters";
     }
 
-    // Starting Price validation
     if (!formData.startingPrice.trim()) {
       newErrors.startingPrice = "Starting price is required";
     } else if (isNaN(formData.startingPrice) || parseFloat(formData.startingPrice) <= 0) {
       newErrors.startingPrice = "Please enter a valid price";
     }
 
-    // Service Category validation
     if (!formData.serviceCategory) {
       newErrors.serviceCategory = "Please select a service category";
     }
 
-    // Service Description validation
-    if (!formData.serviceDescription.trim()) {
+    // Get plain text from HTML description for validation
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = formData.serviceDescription;
+    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+    
+    if (!plainText.trim()) {
       newErrors.serviceDescription = "Service description is required";
-    } else if (formData.serviceDescription.trim().length < 10) {
+    } else if (plainText.trim().length < 10) {
       newErrors.serviceDescription = "Description must be at least 10 characters";
+    }
+
+    if (!formData.serviceImage) {
+      newErrors.serviceImage = "Service image is required";
     }
 
     setErrors(newErrors);
@@ -135,34 +163,74 @@ const AddService = () => {
       return;
     }
 
-    setIsLoading(true);
-    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Create FormData object for file upload
+      const submitFormData = new FormData();
+      submitFormData.append('title', formData.serviceTitle);
       
-      // Handle success
-      alert("Service added successfully!");
+      // Convert price to number - backend should handle the conversion
+      const priceValue = parseFloat(formData.startingPrice);
+      submitFormData.append('price', priceValue.toString());
       
-      // Reset form
-      setFormData({
-        serviceTitle: "",
-        startingPrice: "",
-        serviceCategory: "",
-        serviceDescription: "",
-        serviceImage: null
-      });
-      setImagePreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
+      submitFormData.append('category', formData.serviceCategory);
+      submitFormData.append('description', formData.serviceDescription);
+      
+      if (formData.serviceImage) {
+        submitFormData.append('image', formData.serviceImage);
+      }
+
+      console.log('Submitting form data...');
+
+      // Call the API
+      const result = await createService(submitFormData).unwrap();
+      
+      // Handle success - based on your backend response
+      if (result.success) {
+        setSuccessMessage("Service added successfully!");
+        
+        // Reset form
+        setFormData({
+          serviceTitle: "",
+          startingPrice: "",
+          serviceCategory: "",
+          serviceImage: null,
+          serviceDescription: ""
+        });
+        setImagePreview(null);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+        
+        // Reset editor content
+        if (editorRef.current) {
+          editorRef.current.value = '';
+        }
+
+        // Clear success message after 5 seconds
+        setTimeout(() => {
+          setSuccessMessage("");
+        }, 5000);
       }
       
     } catch (error) {
-      setErrors({
-        submit: "Failed to add service. Please try again."
-      });
-    } finally {
-      setIsLoading(false);
+      console.error('Failed to create service:', error);
+      
+      // Check if it's a validation error from backend
+      if (error?.data?.success === false) {
+        if (error.data.message.includes("number") && error.data.message.includes("price")) {
+          setErrors({
+            startingPrice: "Please enter a valid numeric price"
+          });
+        } else {
+          setErrors({
+            submit: error.data.message || "Failed to add service. Please try again."
+          });
+        }
+      } else {
+        setErrors({
+          submit: "Failed to add service. Please try again."
+        });
+      }
     }
   };
 
@@ -180,6 +248,13 @@ const AddService = () => {
 
       {/* Form */}
       <div className="space-y-6">
+        {/* Success Message */}
+        {successMessage && (
+          <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+            <p className="text-sm text-green-600">{successMessage}</p>
+          </div>
+        )}
+
         {/* Image Upload */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">
@@ -209,10 +284,10 @@ const AddService = () => {
             <div className="relative">
               <div className="w-44 h-44 lg:w-72 lg:h-72">
                 <img
-                src={imagePreview}
-                alt="Service preview"
-                className="w-full h-full object-cover rounded-lg  border-gray-200"
-              />
+                  src={imagePreview}
+                  alt="Service preview"
+                  className="w-full h-full object-cover rounded-lg border-gray-200"
+                />
               </div>
               <button
                 onClick={removeImage}
@@ -292,8 +367,8 @@ const AddService = () => {
             >
               <option value="">Select Service Category</option>
               {serviceCategories.map((category, index) => (
-                <option key={index} value={category}>
-                  {category}
+                <option key={index} value={category.value}>
+                  {category?.label} 
                 </option>
               ))}
             </select>
@@ -303,34 +378,41 @@ const AddService = () => {
           </div>
         </div>
 
-        {/* Service Description */}
+        {/* Service Description with Jodit Editor */}
         <div className="space-y-2">
           <label className="block text-sm font-medium text-gray-700">
             Service Description
           </label>
-          <textarea
-            rows={4}
-            value={formData.serviceDescription}
-            onChange={(e) => handleInputChange('serviceDescription', e.target.value)}
-            placeholder="Describe what's included in the service, materials used, etc."
-            className={`w-full px-4 py-3 border rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-green-800 focus:border-transparent ${
-              errors.serviceDescription ? 'border-red-500' : 'border-gray-300'
-            }`}
-          />
+          
+          <div className={`border rounded-md focus-within:ring-2 focus-within:ring-green-800 focus-within:border-transparent ${
+            errors.serviceDescription ? 'border-red-500' : 'border-gray-300'
+          }`}>
+            <JoditEditor
+              ref={editorRef}
+              value={formData.serviceDescription}
+              config={editorConfig}
+              onBlur={(newContent) => handleInputChange('serviceDescription', newContent)}
+              onChange={(newContent) => {
+                handleInputChange('serviceDescription', newContent);
+              }}
+            />
+          </div>
+          
           {errors.serviceDescription && (
             <p className="text-sm text-red-600">{errors.serviceDescription}</p>
           )}
-          <p className="text-xs text-gray-500">
-            {formData.serviceDescription.length}/500 characters
-          </p>
+          
+          {/* Character Count */}
+          <div className="flex justify-between items-center">
+            <p className="text-xs text-gray-500">
+              {formData.serviceDescription.replace(/<[^>]*>/g, '').length}/500 characters
+            </p>
+            <p className="text-xs text-gray-500">
+              Use toolbar for rich text formatting
+            </p>
+          </div>
         </div>
 
-        {/* Submit Error */}
-        {errors.submit && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{errors.submit}</p>
-          </div>
-        )}
 
         {/* Submit Button */}
         <button
@@ -345,10 +427,10 @@ const AddService = () => {
           {isLoading ? (
             <div className="flex items-center justify-center gap-2">
               <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              Saving Service...
+              Creating Service...
             </div>
           ) : (
-            'Save Service'
+            'Create Service'
           )}
         </button>
       </div>

@@ -2,6 +2,7 @@ import { MapPin, Star } from "lucide-react";
 import Image from "next/image";
 
 const ServiceCard = ({ service }) => {
+  console.log("srviceeecard",service)
   return (
     <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden cursor-pointer">
       {/* Image */}

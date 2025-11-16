@@ -12,7 +12,7 @@ const bidApi = createApi({
       if (accessToken) {
         // Backend expects token without "Bearer " prefix
         headers.set("Authorization", `${accessToken}`);
-      }else {
+      } else {
         console.log(" No access token found");
       }
       return headers;
@@ -30,15 +30,7 @@ const bidApi = createApi({
       invalidatesTags: ["Bid"],
     }),
 
-    // getTaskBids: builder.query({
-    //   query: (taskId) => ({
-    //     url: `/bid/bids-by-task-id/${taskId}`,
-    //     method: "GET",
-    //   }),
-    //   providesTags: ["Bid"],
-    // }),
-
-     getBidsByTaskId: builder.query({
+    getBidsByTaskId: builder.query({
       query: (taskId) => ({
         url: `/bid/bids-by-task-id/${taskId}`,
         method: "GET",
@@ -51,17 +43,33 @@ const bidApi = createApi({
         url: `/task/accept-TaskBy-Customer`,
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: payload, 
+        body: payload,
       }),
       invalidatesTags: ["Bid"],
+    }),
+
+    getMyBids: builder.query({
+      query: (taskId) => {
+        // const params = new URLSearchParams();
+        // params.append("limit", limit);
+        // params.append("page", page);
+        // if (status) params.append("status", status);
+
+        return {
+          url: `/bid/my-bids?${taskId}`,
+          method: "GET",
+        };
+      },
+      providesTags: ["Bid"],
     }),
   }),
 });
 
-export const { 
-  useCreateBidMutation, 
-  useGetBidsByTaskIdQuery, 
-  useAcceptBidMutation 
+export const {
+  useCreateBidMutation,
+  useGetBidsByTaskIdQuery,
+  useAcceptBidMutation,
+  useGetMyBidsQuery,
 } = bidApi;
 
 export default bidApi;

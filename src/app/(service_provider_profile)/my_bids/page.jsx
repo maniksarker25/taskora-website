@@ -8,28 +8,24 @@ import Link from "next/link";
 
 const bidStatusCategories = [
   {
-    name: "Active Bids",
+    name: "Ongoing Task",
     status: "ACTIVE",
   },
   {
-    name: "Pending Bids", 
+    name: "Bids Made", 
     status: "PENDING",
   },
   {
-    name: "Accepted Bids",
+    name: "Bids Received",
     status: "ACCEPTED",
+  },
+   {
+    name: "Completed Tasks",
+    status: "WON",
   },
   {
     name: "Rejected Bids",
     status: "REJECTED",
-  },
-  {
-    name: "Won Bids",
-    status: "WON",
-  },
-  {
-    name: "Lost Bids", 
-    status: "LOST",
   }
 ];
 
@@ -42,10 +38,9 @@ const MyBids = () => {
   //   limit: 20
   // });
 
-  const isLoading = false; // Remove when API is added
-  const error = null; // Remove when API is added
-  const bids = []; // Remove when API is added - use bidsData?.data instead
-
+  const isLoading = false; 
+  const error = null;
+  const bids = []; 
   const activeStatus = bidStatusCategories.find((cat) => cat.name === activeTab)?.status || "";
 
   const handleTabChange = (tabName) => {

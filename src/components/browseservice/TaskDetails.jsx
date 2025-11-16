@@ -56,9 +56,6 @@ const TaskDetails = ({ task }) => {
   } = useGetQuestionsByTaskIdQuery(task?._id, {
     skip: !task?._id,
   });
-
-   console.log("kfjlksdjfksjlfkjslkdfjlk",questionsData)
-
   const taskData = {
     title: task?.title || "Task Title",
     poster: {
@@ -83,12 +80,9 @@ const TaskDetails = ({ task }) => {
       : "Recently",
   };
 
-  const bids = bidsData?.data || [];
+  const bids = bidsData?.data.result || [];
 
-  // Handle different possible response structures
   const questions = questionsData?.data || questionsData || [];
-  
-
 
   const contentTabs = ["Bids", "Questions"];
 
@@ -463,12 +457,12 @@ const TaskDetails = ({ task }) => {
           {/* Bids List */}
           {!isLoadingBids && !bidsError && (
             <>
-              {bids.length === 0 ? (
+              {bids?.length === 0 ? (
                 <div className="text-center py-8">
                   <p className="text-gray-600">No bids yet. Be the first to bid on this task!</p>
                 </div>
               ) : (
-                bids.map((bid) => (
+                bids?.map((bid) => (
                   <div
                     key={bid._id}
                     className="flex gap-4 p-4 bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors"
