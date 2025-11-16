@@ -2,33 +2,33 @@
 import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import FilterSection from "@/components/serviceprovider/FilterSection";
-import RadioFilter from "@/components/serviceprovider/RadioFilter"; 
+import RadioFilter from "@/components/serviceprovider/RadioFilter";
 import { useGetAllServicesQuery } from "@/lib/features/service/serviceApi";
-import { useGetAllCategoriesQuery } from "@/lib/features/category/categoryApi";
+import { useGetAllCategoriesQuery, useGetDuplicateAllServicesQuery } from "@/lib/features/category/categoryApi";
 import ServiceCard from "@/components/serviceprovider/ServiceCard";
 import Link from "next/link";
 
 const ServiceListing = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("all"); 
+  const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedSortBy, setSelectedSortBy] = useState("");
   const [categoryFilterOpen, setCategoryFilterOpen] = useState(true);
   const [sortByOpen, setSortByOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [debouncedSearch, setDebouncedSearch] = useState("");
 
-  const limit = 8; 
+  const limit = 8;
+  const { data: servicesData, isLoading: servicesLoading, error } = useGetDuplicateAllServicesQuery({
+    page: currentPage,
+    searchTerm: debouncedSearch,
+    category: selectedCategory !== "all" ? selectedCategory : "",
+    sortBy: selectedSortBy,
+  });
+  
+  console.log("service data", servicesData)
 
   const { data: categoriesData, isLoading: categoriesLoading } = useGetAllCategoriesQuery();
   
-  const { data: servicesData, isLoading: servicesLoading, error } = useGetAllServicesQuery({
-    page: currentPage,
-    // limit: limit,
-    searchTerm: debouncedSearch,
-    category: selectedCategory !== "all" ? selectedCategory : "", 
-    sortBy: selectedSortBy,
-  });
-
   useEffect(() => {
     console.log(" DEBUG - API Call Parameters:", {
       page: currentPage,
@@ -36,27 +36,25 @@ const ServiceListing = () => {
       category: selectedCategory !== "all" ? selectedCategory : "",
       sortBy: selectedSortBy
     });
-    
-    console.log(" DEBUG - Services Data:", servicesData);
   }, [currentPage, debouncedSearch, selectedCategory, selectedSortBy, servicesData]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-      setCurrentPage(1); 
+      setCurrentPage(1);
     }, 500);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  const serviceCategories = categoriesData?.data?.result 
+  const serviceCategories = categoriesData?.data?.result
     ? [
-        { id: "all", label: "All Categories" }, 
-        ...categoriesData.data.result.map(cat => ({
-          id: cat._id,
-          label: cat.name
-        }))
-      ]
+      { id: "all", label: "All Categories" },
+      ...categoriesData.data.result.map(cat => ({
+        id: cat._id,
+        label: cat.name
+      }))
+    ]
     : [{ id: "all", label: "All Categories" }];
 
   const sortOptions = [
@@ -69,12 +67,12 @@ const ServiceListing = () => {
 
   const handleCategoryChange = (categoryId) => {
     setSelectedCategory(categoryId);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   const handleSortChange = (sortId) => {
     setSelectedSortBy(sortId);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   const handleNextPage = () => {
@@ -143,7 +141,7 @@ const ServiceListing = () => {
                   isOpen={categoryFilterOpen}
                   onToggle={() => setCategoryFilterOpen(!categoryFilterOpen)}
                 >
-                  <RadioFilter 
+                  <RadioFilter
                     options={serviceCategories}
                     selectedOption={selectedCategory}
                     onChange={handleCategoryChange}
@@ -158,7 +156,7 @@ const ServiceListing = () => {
                   isOpen={sortByOpen}
                   onToggle={() => setSortByOpen(!sortByOpen)}
                 >
-                  <RadioFilter 
+                  <RadioFilter
                     options={sortOptions}
                     selectedOption={selectedSortBy}
                     onChange={handleSortChange}
@@ -231,11 +229,10 @@ const ServiceListing = () => {
                           <button
                             key={pageNumber}
                             onClick={() => handlePageClick(pageNumber)}
-                            className={`px-3 py-2 border text-sm font-medium rounded-md ${
-                              currentPage === pageNumber
-                                ? "bg-green-600 text-white border-green-600"
-                                : "border-gray-300 text-gray-500 hover:bg-gray-50"
-                            }`}
+                            className={`px-3 py-2 border text-sm font-medium rounded-md ${currentPage === pageNumber
+                              ? "bg-green-600 text-white border-green-600"
+                              : "border-gray-300 text-gray-500 hover:bg-gray-50"
+                              }`}
                           >
                             {pageNumber}
                           </button>
@@ -268,8 +265,8 @@ const ServiceListing = () => {
                   No services found
                 </h3>
                 <p className="text-gray-500">
-                  {debouncedSearch || selectedCategory !== "all" 
-                    ? "Try adjusting your search or filter criteria" 
+                  {debouncedSearch || selectedCategory !== "all"
+                    ? "Try adjusting your search or filter criteria"
                     : "No services available at the moment"}
                 </p>
               </div>
