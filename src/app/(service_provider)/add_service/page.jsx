@@ -30,7 +30,6 @@ const AddService = () => {
   const fileInputRef = useRef(null);
   const editorRef = useRef(null);
 
-  // Jodit Editor configuration
   const editorConfig = useMemo(() => ({
     readonly: false,
     placeholder: 'Describe your service in detail...',
@@ -139,7 +138,6 @@ const AddService = () => {
       newErrors.serviceCategory = "Please select a service category";
     }
 
-    // Get plain text from HTML description for validation
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = formData.serviceDescription;
     const plainText = tempDiv.textContent || tempDiv.innerText || '';
@@ -164,31 +162,26 @@ const AddService = () => {
     }
 
     try {
-      // Create FormData object for file upload
       const submitFormData = new FormData();
-      submitFormData.append('title', formData.serviceTitle);
-      
-      // Convert price to number - backend should handle the conversion
-      const priceValue = parseFloat(formData.startingPrice);
-      submitFormData.append('price', priceValue.toString());
-      
-      submitFormData.append('category', formData.serviceCategory);
-      submitFormData.append('description', formData.serviceDescription);
-      
-      if (formData.serviceImage) {
-        submitFormData.append('image', formData.serviceImage);
-      }
+  submitFormData.append('title', formData.serviceTitle);
 
-      console.log('Submitting form data...');
+  const priceValue = parseFloat(formData.startingPrice);
+  submitFormData.append('price', priceValue.toString());
 
-      // Call the API
+  submitFormData.append('category', formData.serviceCategory);
+  submitFormData.append('description', formData.serviceDescription);
+
+  if (formData.serviceImage) {
+    submitFormData.append('image', formData.serviceImage);
+  }
+      console.log('Submitting form data...', submitFormData);
+
       const result = await createService(submitFormData).unwrap();
+      console.log("API Response:", result);
       
-      // Handle success - based on your backend response
-      if (result.success) {
+      if (result?.success) {
         setSuccessMessage("Service added successfully!");
         
-        // Reset form
         setFormData({
           serviceTitle: "",
           startingPrice: "",
@@ -201,12 +194,10 @@ const AddService = () => {
           fileInputRef.current.value = "";
         }
         
-        // Reset editor content
         if (editorRef.current) {
           editorRef.current.value = '';
         }
 
-        // Clear success message after 5 seconds
         setTimeout(() => {
           setSuccessMessage("");
         }, 5000);
@@ -215,7 +206,6 @@ const AddService = () => {
     } catch (error) {
       console.error('Failed to create service:', error);
       
-      // Check if it's a validation error from backend
       if (error?.data?.success === false) {
         if (error.data.message.includes("number") && error.data.message.includes("price")) {
           setErrors({
@@ -348,9 +338,7 @@ const AddService = () => {
                 errors.startingPrice ? 'border-red-500' : 'border-gray-300'
               }`}
             />
-            {errors.startingPrice && (
-              <p className="text-sm text-red-600">{errors.startingPrice}</p>
-            )}
+          
           </div>
 
           {/* Service Category */}

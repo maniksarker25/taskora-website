@@ -230,7 +230,7 @@ const ServiceListing = () => {
                             key={pageNumber}
                             onClick={() => handlePageClick(pageNumber)}
                             className={`px-3 py-2 border text-sm font-medium rounded-md ${currentPage === pageNumber
-                              ? "bg-green-600 text-white border-green-600"
+                              ? "bg-[#115e59] text-white border-[#115e59]"
                               : "border-gray-300 text-gray-500 hover:bg-gray-50"
                               }`}
                           >
