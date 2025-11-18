@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useMemo } from "react";
 import { Plus, Upload, X } from "lucide-react";
+import { useCreateServiceMutation } from "@/lib/features/providerService/providerServiceApi";
 import { useGetAllCategoriesQuery } from "@/lib/features/category/categoryApi";
 import dynamic from 'next/dynamic';
 
@@ -21,11 +22,11 @@ const AddService = () => {
   });
   
   const { data: categoriesData, error: categoriesError } = useGetAllCategoriesQuery();
+  const [createService, { isLoading, error: createError }] = useCreateServiceMutation();
   
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -155,26 +156,38 @@ const AddService = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async () => {
-    if (!validateForm()) {
-      return;
+const handleSubmit = async () => {
+  if (!validateForm()) {
+    return;
+  }
+   const stripHtml = (html) => {
+      const tmp = document.createElement("div");
+      tmp.innerHTML = html;
+      return tmp.textContent || tmp.innerText || "";
+    };
+
+  try {
+    const serviceData = {
+      title: formData.serviceTitle,
+      price: Number(formData.startingPrice),
+      category: formData.serviceCategory,
+      description: stripHtml(formData.serviceDescription),
+      deletedImages: [], 
+    };
+
+    const formDataToSend = new FormData();
+    formDataToSend.append('data', JSON.stringify(serviceData));
+
+    if (formData.serviceImage) {
+      formDataToSend.append('service_image', formData.serviceImage);
     }
 
-    setIsLoading(true);
-    
-    try {
-     
-      console.log('Form data to submit:', {
-        title: formData.serviceTitle,
-        price: formData.startingPrice,
-        category: formData.serviceCategory,
-        description: formData.serviceDescription,
-        image: formData.serviceImage
-      });
+    console.log('Submitting form data...', serviceData);
 
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+    const result = await createService(formDataToSend).unwrap();
+    console.log("API Response:", result);
+    
+    if (result?.success) {
       setSuccessMessage("Service added successfully!");
       
       // Reset form
@@ -185,6 +198,7 @@ const AddService = () => {
         serviceImage: null,
         serviceDescription: ""
       });
+      
       setImagePreview(null);
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -197,16 +211,23 @@ const AddService = () => {
       setTimeout(() => {
         setSuccessMessage("");
       }, 5000);
-      
-    } catch (error) {
-      console.error('Failed to create service:', error);
-      setErrors({
-        submit: "Failed to add service. Please try again."
-      });
-    } finally {
-      setIsLoading(false);
     }
-  };
+  } catch (error) {
+    console.error('Failed to create service:', error);
+    
+    if (error?.data?.success === false) {
+      setErrors(prev => ({
+        ...prev,
+        submit: error.data?.message || "Failed to add service. Please try again."
+      }));
+    } else {
+      setErrors(prev => ({
+        ...prev,
+        submit: "Failed to add service. Please try again."
+      }));
+    }
+  }
+};
 
   return (
     <div className="project_container px-6 bg-white p-6 md:p-8">
@@ -322,9 +343,7 @@ const AddService = () => {
                 errors.startingPrice ? 'border-red-500' : 'border-gray-300'
               }`}
             />
-            {errors.startingPrice && (
-              <p className="text-sm text-red-600">{errors.startingPrice}</p>
-            )}
+          
           </div>
 
           {/* Service Category */}
@@ -387,12 +406,6 @@ const AddService = () => {
           </div>
         </div>
 
-        {/* Submit Error */}
-        {errors.submit && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{errors.submit}</p>
-          </div>
-        )}
 
         {/* Submit Button */}
         <button

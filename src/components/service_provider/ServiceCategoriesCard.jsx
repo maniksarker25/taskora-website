@@ -1,18 +1,23 @@
+"use client"
+
 import Image from "next/image";
 import Link from "next/link";
 import { useSelector } from "react-redux";
+import main_logo from "../../../public/main_logo_svg.svg";
 
 const ServiceCategoriesCard = ({ serviceData }) => {
     const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+    console.log("ser",serviceData)
   
   console.log(user)
   return (
-    <div className=" bg-white rounded-xl shadow-md overflow-hidden 
-    flex w-full border flex-col md:flex-row">
+    <div className="max-w-3xl mx-auto p-4 bg-white rounded-xl shadow-md overflow-hidden 
+    flex w-full border flex-col md:flex-row justify-between">
       {/* Left Side - Image */}
-      <div className="relative lg:h-72">
+      <div className="relative w-52 h-full lg:h-52">
         <Image
-          src={serviceData?.images[0]}
+          src={serviceData?.images?.[0] || main_logo}
           alt="Cleaning Service"
           width={400}
           height={300}
@@ -22,7 +27,7 @@ const ServiceCategoriesCard = ({ serviceData }) => {
       </div>
 
       {/* Right Side - Details */}
-      <div className="px-5 py-5 flex flex-col md:w-2/3">
+      <div className="px-5 py-5 flex flex-col md:w-3/5">
         <h2 className="text-2xl font-semibold text-gray-800">
           {serviceData?.title}
         </h2>
@@ -38,9 +43,9 @@ const ServiceCategoriesCard = ({ serviceData }) => {
             <span className="font-semibold">Contact Number :</span> (603)
             555-0123
           </p> */}
-          <p>
+          {/* <p>
             <span className="font-semibold">Service Location :</span> {serviceData?.city}
-          </p>
+          </p> */}
         </div>
 
         {/* Button */}

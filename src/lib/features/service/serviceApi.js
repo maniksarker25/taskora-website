@@ -39,20 +39,20 @@ const serviceApi = createApi({
       providesTags: ["Service"],
     }),
 
-    getServiceById: builder.query({
-      query: (id) => ({
-        url: `/service/get-single-service/${id}`,
-        method: "GET",
-      }),
-      providesTags: ["Service"],
-    }),
+    // getServiceById: builder.query({
+    //   query: (id) => ({
+    //     url: `/service/get-single-service/${id}`,
+    //     method: "GET",
+    //   }),
+    //   providesTags: ["Service"],
+    // }),
   
   }),
 });
 
 export const { 
   useGetAllServicesQuery,
-  useGetServiceByIdQuery,
+  // useGetServiceByIdQuery,
 } = serviceApi;
 
 export default serviceApi;

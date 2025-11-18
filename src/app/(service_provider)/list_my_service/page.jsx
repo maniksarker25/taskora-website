@@ -1,57 +1,61 @@
 "use client"
-import React from "react";
-import serviceImage from "../../../../public/service_image.png";
+import React, { useEffect, useState } from "react";
 import ServiceCategoriesCard from "@/components/service_provider/ServiceCategoriesCard";
 import AddService from "../add_service/page";
 import { useGetMyServiceQuery } from "@/lib/features/providerService/providerServiceApi";
 
 const ListMyService = () => {
-  const postAService = false;
-
-     const { 
+  const { 
     data: service, 
     isLoading, 
     error, 
-    isError 
+    isError,
+    refetch 
   } = useGetMyServiceQuery();
-    
-    const serviceData = service?.data
-    console.log("servicedatafound", serviceData)
+
+  const serviceData = service?.data;
+  console.log("Service data found:", serviceData);
+
   
+  const [showAddForm, setShowAddForm] = useState(!serviceData);
 
-  // const serviceData = [
-  //   {
-  //     id: 1,
-  //     email: "mavin@gmail.com",
-  //     starting_price: "₦24.00",
-  //     number: 1234567,
-  //     service_location: "2715 Ash Dr. San Jose, South Dakota 83475",
-  //     image: serviceImage,
-  //   },
-  // ];
+ 
+  useEffect(() => {
+    setShowAddForm(!serviceData);
+  }, [serviceData]);
 
+  
+  const handleServiceAdded = () => {
+    refetch();
+    setShowAddForm(false);
+  };
+
+
+  const handleAddNewService = () => {
+    setShowAddForm(true);
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (isError) {
+    return <div>Error loading service data</div>;
+  }
 
   return (
-    <div>
-      {postAService ? (
-        <><AddService/></>
+    <div className="py-12 px-12">
+      {!showAddForm && serviceData ? (
+        
+        <div>
+         
+          <ServiceCategoriesCard serviceData={serviceData} />
+        </div>
       ) : (
-        <>
-          {" "}
-          <div className="project_container px-6 py-12">
-
-            <ServiceCategoriesCard serviceData={serviceData}/>
-            {/* <div className="rounded-4xl">
-              <div className=" flex flex-col gap-8">
-                <p className="text-3xl font-semibold">My Service</p>
-
-                {serviceData && serviceData?.map((data, index) => (
-                  <ServiceCategoriesCard data={data} key={index} />
-                ))}
-              </div>
-            </div> */}
-          </div>
-        </>
+    
+        <div className="project_container px-6 py-12">
+          <AddService onSuccess={handleServiceAdded} />
+        </div>
       )}
     </div>
   );
