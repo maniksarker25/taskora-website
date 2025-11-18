@@ -18,13 +18,12 @@ const providerServiceApi = createApi({
       return headers;
     },
   }),
-  tagTypes: ["Servicee"],
+  tagTypes: ["ProviderService"],
   endpoints: (builder) => ({
   createService: builder.mutation({
   query: (formData) => {
-    console.log("Form Data From API Layer:", formData); // ✅ এখানে লগ করবে
-
-    return {
+    console.log("Form Data From API Layer:", formData); 
+     return {
       url: "/service/create-service",
       method: "POST",
       body: formData
@@ -33,11 +32,20 @@ const providerServiceApi = createApi({
   invalidatesTags: ["Servicee"],
 }),
 
+  getMyService: builder.query({
+      query:()=>({
+        url: "/service/my-service",
+        method: "GET"
+      }),
+      providesTags: ["ProviderService"],
+    })
+
   }),
 });
 
 export const { 
-  useCreateServiceMutation
+  useCreateServiceMutation,
+  useGetMyServiceQuery
 } = providerServiceApi;
 
 export default providerServiceApi;

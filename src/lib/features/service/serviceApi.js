@@ -46,9 +46,13 @@ const serviceApi = createApi({
       }),
       providesTags: ["Service"],
     }),
+  
   }),
 });
 
-export const { useGetAllServicesQuery, useGetServiceByIdQuery } = serviceApi;
+export const { 
+  useGetAllServicesQuery,
+  useGetServiceByIdQuery,
+} = serviceApi;
 
 export default serviceApi;
