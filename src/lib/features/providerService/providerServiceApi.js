@@ -20,14 +20,18 @@ const providerServiceApi = createApi({
   }),
   tagTypes: ["Servicee"],
   endpoints: (builder) => ({
-    createService: builder.mutation({
-      query: (formData) => ({
-        url: "/service/create-service",
-        method: "POST",
-        body: formData,
-      }),
-      invalidatesTags: ["Servicee"],
-    }),
+  createService: builder.mutation({
+  query: (formData) => {
+    console.log("Form Data From API Layer:", formData); // ✅ এখানে লগ করবে
+
+    return {
+      url: "/service/create-service",
+      method: "POST",
+      body: formData
+    };
+  },
+  invalidatesTags: ["Servicee"],
+}),
 
   }),
 });
