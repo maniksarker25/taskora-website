@@ -18,16 +18,11 @@ const geistMono = Geist_Mono({
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <ProviderProtectedRoute>
-          <Navbar />
-          <div className="">{children}</div>
-          <Footer />
-        </ProviderProtectedRoute>
-      </body>
-    </html>
+    // Remove html and body tags from route group layout
+    <ProviderProtectedRoute>
+      <Navbar />
+      <div className="">{children}</div>
+      <Footer />
+    </ProviderProtectedRoute>
   );
 }

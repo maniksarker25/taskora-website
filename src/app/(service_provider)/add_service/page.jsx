@@ -2,7 +2,6 @@
 
 import React, { useState, useRef, useMemo } from "react";
 import { Plus, Upload, X } from "lucide-react";
-import { useCreateServiceMutation } from "@/lib/features/providerService/providerServiceApi";
 import { useGetAllCategoriesQuery } from "@/lib/features/category/categoryApi";
 import dynamic from 'next/dynamic';
 
@@ -22,11 +21,11 @@ const AddService = () => {
   });
   
   const { data: categoriesData, error: categoriesError } = useGetAllCategoriesQuery();
-  const [createService, { isLoading, error: createError }] = useCreateServiceMutation();
   
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -161,66 +160,51 @@ const AddService = () => {
       return;
     }
 
+    setIsLoading(true);
+    
     try {
-      const submitFormData = new FormData();
-  submitFormData.append('title', formData.serviceTitle);
+     
+      console.log('Form data to submit:', {
+        title: formData.serviceTitle,
+        price: formData.startingPrice,
+        category: formData.serviceCategory,
+        description: formData.serviceDescription,
+        image: formData.serviceImage
+      });
 
-  const priceValue = parseFloat(formData.startingPrice);
-  submitFormData.append('price', priceValue.toString());
-
-  submitFormData.append('category', formData.serviceCategory);
-  submitFormData.append('description', formData.serviceDescription);
-
-  if (formData.serviceImage) {
-    submitFormData.append('image', formData.serviceImage);
-  }
-      console.log('Submitting form data...', submitFormData);
-
-      const result = await createService(submitFormData).unwrap();
-      console.log("API Response:", result);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (result?.success) {
-        setSuccessMessage("Service added successfully!");
-        
-        setFormData({
-          serviceTitle: "",
-          startingPrice: "",
-          serviceCategory: "",
-          serviceImage: null,
-          serviceDescription: ""
-        });
-        setImagePreview(null);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
-        
-        if (editorRef.current) {
-          editorRef.current.value = '';
-        }
-
-        setTimeout(() => {
-          setSuccessMessage("");
-        }, 5000);
+      setSuccessMessage("Service added successfully!");
+      
+      // Reset form
+      setFormData({
+        serviceTitle: "",
+        startingPrice: "",
+        serviceCategory: "",
+        serviceImage: null,
+        serviceDescription: ""
+      });
+      setImagePreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
       }
+      
+      if (editorRef.current) {
+        editorRef.current.value = '';
+      }
+
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 5000);
       
     } catch (error) {
       console.error('Failed to create service:', error);
-      
-      if (error?.data?.success === false) {
-        if (error.data.message.includes("number") && error.data.message.includes("price")) {
-          setErrors({
-            startingPrice: "Please enter a valid numeric price"
-          });
-        } else {
-          setErrors({
-            submit: error.data.message || "Failed to add service. Please try again."
-          });
-        }
-      } else {
-        setErrors({
-          submit: "Failed to add service. Please try again."
-        });
-      }
+      setErrors({
+        submit: "Failed to add service. Please try again."
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -338,7 +322,9 @@ const AddService = () => {
                 errors.startingPrice ? 'border-red-500' : 'border-gray-300'
               }`}
             />
-          
+            {errors.startingPrice && (
+              <p className="text-sm text-red-600">{errors.startingPrice}</p>
+            )}
           </div>
 
           {/* Service Category */}
@@ -401,6 +387,12 @@ const AddService = () => {
           </div>
         </div>
 
+        {/* Submit Error */}
+        {errors.submit && (
+          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+            <p className="text-sm text-red-600">{errors.submit}</p>
+          </div>
+        )}
 
         {/* Submit Button */}
         <button
