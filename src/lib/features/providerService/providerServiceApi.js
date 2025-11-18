@@ -2,7 +2,6 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getTokens } from "@/utils/auth";
 import baseUrl from "../../../../utils/baseUrl";
 
-
 const providerServiceApi = createApi({
   reducerPath: "serviceApi",
   baseQuery: fetchBaseQuery({
@@ -20,32 +19,40 @@ const providerServiceApi = createApi({
   }),
   tagTypes: ["ProviderService"],
   endpoints: (builder) => ({
-  createService: builder.mutation({
-  query: (formData) => {
-    console.log("Form Data From API Layer:", formData); 
-     return {
-      url: "/service/create-service",
-      method: "POST",
-      body: formData
-    };
-  },
-  invalidatesTags: ["Servicee"],
-}),
+    createService: builder.mutation({
+      query: (formData) => {
+        console.log("Form Data From API Layer:", formData);
+        return {
+          url: "/service/create-service",
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["ProviderService"], 
+    }),
 
-  getMyService: builder.query({
-      query:()=>({
+    getMyService: builder.query({
+      query: () => ({
         url: "/service/my-service",
-        method: "GET"
+        method: "GET",
       }),
       providesTags: ["ProviderService"],
-    })
+    }),
 
+    getServiceById: builder.query({
+      query: (serviceId) => ({
+        url: `/service/get-single-service/${serviceId}`,
+        method: "GET"
+      }),
+      providesTags: ["ProviderService"], 
+    }),
   }),
 });
 
 export const { 
-  useCreateServiceMutation,
-  useGetMyServiceQuery
+  useCreateServiceMutation, 
+  useGetMyServiceQuery, 
+  useGetServiceByIdQuery 
 } = providerServiceApi;
 
 export default providerServiceApi;

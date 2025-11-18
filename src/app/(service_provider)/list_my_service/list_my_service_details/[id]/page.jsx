@@ -7,9 +7,27 @@ import Image from "next/image";
 import ServiceTabs from "@/components/serviceprovider/ServiceTabs";
 import { PiNotePencilFill } from "react-icons/pi";
 import { MdBlock } from "react-icons/md";
+import { useParams } from "next/navigation";
+import { useGetServiceByIdQuery } from "@/lib/features/providerService/providerServiceApi";
 
 const ListMyServiceDetails = () => {
   const [activeTab, setActiveTab] = useState("Description");
+  const params = useParams();
+  
+   const serviceId = params.id;
+   console.log("params",serviceId)
+
+
+    const { 
+    data: serviceData, 
+    isLoading, 
+    error, 
+    isError 
+  } = useGetServiceByIdQuery(serviceId);
+
+  const info = serviceData?.data
+
+  // console.log("serviceData",info)
 
   return (
     <div className="project_container mx-auto lg:p-6 overflow-clip">
@@ -19,11 +37,11 @@ const ListMyServiceDetails = () => {
         <div className="flex flex-col flex-co gap-3 mb-6">
           <div>
             <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-              Cleaning
+              {info?.title}
             </span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-6">
-            Office Cleaning Service
+            {info?.title}
           </h1>
         </div>
 
@@ -32,37 +50,63 @@ const ListMyServiceDetails = () => {
           {/* Main large image */}
           <div className="flex-1">
             <Image
-              src={service_main_image}
-              height={800}
+              src={info?.images[0]}
+              width={100}
+              height={100}
               alt="Professional cleaner vacuuming office"
-              className="w-full object-cover rounded-lg"
+              className="w-36 md:w-96 object-cover rounded-lg"
             />
           </div>
           <div className="flex-1">
             {/* Smaller images */}
 
             <div className="grid grid-cols-2 gap-4">
-              <Image
-                src={service_second}
-                alt="Window cleaning"
-                className="w-full h-36 md:h-60  object-cover rounded-lg"
-              />
-              <Image
-                src={service_second}
-                alt="Office cleaning"
-                className="w-full h-36 md:h-60 object-cover rounded-lg"
-              />
-              <Image
-                src={service_second}
-                alt="Window cleaning"
-                className="w-full h-36 md:h-60 object-cover rounded-lg"
-              />
-
-              <Image
-                src={service_second}
-                alt="Office cleaning"
-                className="w-full h-36 md:h-60 object-cover rounded-lg"
-              />
+               {
+  info?.images?.[1] && (
+    <Image
+      src={info.images[1]}
+      width={100}
+      height={100}
+      alt="Office cleaning"
+      className="w-full h-36 md:h-60 object-cover rounded-lg"
+    />
+  )
+}
+                {
+  info?.images?.[2] && (
+    <Image
+      src={info.images[2]}
+      width={100}
+      height={100}
+      alt="Office cleaning"
+      className="w-full h-36 md:h-60 object-cover rounded-lg"
+    />
+  )
+}
+                {
+  info?.images?.[3] && (
+    <Image
+      src={info.images[3]}
+      width={100}
+      height={100}
+      alt="Office cleaning"
+      className="w-full h-36 md:h-60 object-cover rounded-lg"
+    />
+  )
+}
+             
+             {
+  info?.images?.[4] && (
+    <Image
+      src={info.images[4]}
+      width={100}
+      height={100}
+      alt="Office cleaning"
+      className="w-full h-36 md:h-60 object-cover rounded-lg"
+    />
+  )
+}
+              
             </div>
 
             <div className="flex gap-4"></div>
@@ -76,9 +120,9 @@ const ListMyServiceDetails = () => {
         <div className="col-span-2">
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
             <div className="text-gray-600 text-sm mb-2">Starts From</div>
-        <div className="text-3xl font-bold text-gray-900 mb-6">₦24.00</div>
+        <div className="text-3xl font-bold text-gray-900 mb-6">₦ {info?.price}</div>
 
-            <ServiceTabs />
+            <ServiceTabs info={info}/>
           </div>
 
           <div className="flex px-2 pb-24">
