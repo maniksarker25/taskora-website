@@ -12,28 +12,22 @@ const ProviderProtectedRoute = ({ children }) => {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      // Redirect to login if not authenticated
       router.push("/login");
       return;
     }
 
-    // If authenticated but not a provider, logout and redirect to login
     if (!isLoading && isAuthenticated && user?.role !== 'provider') {
-      // Logout the user
       dispatch(logout());
       
-      // Clear refreshToken cookie
       if (typeof document !== 'undefined') {
         document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
       }
       
-      // Redirect to login
       router.push("/login");
       return;
     }
   }, [isAuthenticated, isLoading, user, router, dispatch]);
 
-  // Show loading state while checking authentication
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -42,7 +36,6 @@ const ProviderProtectedRoute = ({ children }) => {
     );
   }
 
-  // Don't render children if not authenticated or not a provider
   if (!isAuthenticated || user?.role !== 'provider') {
     return null;
   }
