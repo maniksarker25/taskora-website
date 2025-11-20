@@ -10,10 +10,10 @@ const LogoutPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    // Dispatch logout action to clear Redux state
+
     dispatch(logout());
     
-    // Clear refreshToken cookie
+
     if (typeof document !== 'undefined') {
       document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
       if (process.env.NODE_ENV === 'production') {
@@ -21,7 +21,7 @@ const LogoutPage = () => {
       }
     }
     
-    // Redirect to login page
+
     router.push("/login");
   }, [dispatch, router]);
 

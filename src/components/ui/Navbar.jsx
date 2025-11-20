@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useSelector } from "react-redux";
-import { usePathname } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { MdMenu, MdClose } from "react-icons/md";
 import taskalleyLogo from "../../../public/Group (5).svg";
@@ -12,23 +12,30 @@ import { FaMessage } from "react-icons/fa6";
 import { RiUserSettingsFill } from "react-icons/ri";
 import { PiSignOutBold } from "react-icons/pi";
 import { FaHandshake } from "react-icons/fa";
+import { logout } from "@/lib/features/auth/authSlice";
 
 const Navbar = () => {
   const pathname = usePathname();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
   const [mounted, setMounted] = useState(false);
 
   const [profileOpen, setProfileOpen] = useState(false);
   const [desktopProfileOpen, setDesktopProfileOpen] = useState(false);
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+   const handleLogout = () => {
+    dispatch(logout());
+    setDesktopProfileOpen(false);
+   router.push("/login");
+  };
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Close desktop dropdown when clicking outside
   useEffect(() => {
     if (!desktopProfileOpen) return;
 
@@ -233,13 +240,12 @@ const Navbar = () => {
             <RiUserSettingsFill className="text-[#115e59]" /> My Profile
           </Link>
 
-          <Link
+          <button
             className="flex items-center gap-2 text-lg hover:bg-red-50 hover:text-red-600 px-3 py-2 rounded-md transition-colors"
-            href="/login"
-            onClick={() => setDesktopProfileOpen(false)}
+             onClick={handleLogout}
           >
             <PiSignOutBold className="text-red-500" /> Sign Out
-          </Link>
+          </button>
         </ul>
       )}
     </div>
@@ -308,13 +314,13 @@ const Navbar = () => {
             <RiUserSettingsFill className="text-[#115e59]" /> My Profile
           </Link>
 
-          <Link
+          <button
             className="flex items-center gap-2 text-lg hover:bg-red-50 hover:text-red-600 px-3 py-2 rounded-md transition-colors"
-            href="/login"
-            onClick={() => setDesktopProfileOpen(false)}
+           
+           onClick={handleLogout}
           >
             <PiSignOutBold className="text-red-500" /> Sign Out
-          </Link>
+          </button>
         </ul>
       )}
     </div>
@@ -366,12 +372,12 @@ const Navbar = () => {
             <RiUserSettingsFill className="text-[#115e59]" /> My Profile
           </Link>
 
-          <Link
+          <button
             className="flex items-center gap-2 text-lg hover:bg-red-50 hover:text-red-600 px-3 py-2 rounded-md transition-colors"
-            href="/logout"
+            onClick={handleLogout}
           >
             <PiSignOutBold className="text-red-500" /> Sign Out
-          </Link>
+          </button>
         </div>
       </div>
     </div>
