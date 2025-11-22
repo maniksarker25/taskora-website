@@ -97,12 +97,12 @@ const BidCard = ({ task }) => {
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <span>Total Offers: {task.totalOffer || 0}</span>
         </div>
-        {/* <Link
-          href={`/task/${task._id}`}
+        <Link
+          href={`/my_bids/${task._id}`}
           className="px-4 py-2 bg-[#115e59] text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium"
         >
           View Details
-        </Link> */}
+        </Link>
       </div>
     </div>
   );
