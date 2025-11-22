@@ -60,7 +60,7 @@ const BidsDetails = () => {
   } = useGetBidsByTaskIdQuery(taskId);
 
   return (
-    <div className="project_container mx-auto px-3 py-6 md:p-6">
+    <div className="mx-auto px-3 py-6 md:p-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
         <Link
