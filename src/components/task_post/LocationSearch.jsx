@@ -22,6 +22,8 @@ const LocationSearch = ({
     libraries,
   });
 
+  console.log("Is Loaded---->",isLoaded)
+
   // Update input value when value prop changes
   useEffect(() => {
     setInputValue(value);
