@@ -4,6 +4,8 @@ import { FiSend } from "react-icons/fi";
 import { FaImage } from "react-icons/fa6";
 
 const ChatInterface = () => {
+
+  
   const [messages, setMessages] = useState([
     { id: 1, type: "received", text: "Hello Jacob" },
     { id: 2, type: "received", text: "How are you doing" },
@@ -18,7 +20,7 @@ const ChatInterface = () => {
 
   // Auto scroll bottom
   // useEffect(() => {
-  //   messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   // }, [messages]);
 
   const sendMessage = () => {
