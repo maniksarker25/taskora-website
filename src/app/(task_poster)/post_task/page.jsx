@@ -20,14 +20,26 @@ import dayjs from "dayjs";
 import { useGetAllCategoriesQuery } from "@/lib/features/category/categoryApi";
 import { useCreateTaskMutation } from "@/lib/features/task/taskApi";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation"; 
 
 const TaskCreationApp = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formErrors, setFormErrors] = useState({});
+  const [providerId, setProviderId] = useState(null);
   const { data, isLoading, error } = useGetAllCategoriesQuery();
+  const router = useRouter();
   
   const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
   
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const providerIdFromUrl = urlParams.get('providerId');
+      setProviderId(providerIdFromUrl);
+    }
+  }, []);
+
   const categories = data?.data?.result?.map(category => ({
     value: category?._id || category?.id, 
     label: category?.name 
@@ -128,7 +140,6 @@ const TaskCreationApp = () => {
     }
   };
 
-  // Handle location selection with coordinates and city
   const handleLocationSelect = (locationData) => {
     if (locationData) {
       setFormData(prev => ({
@@ -167,57 +178,71 @@ const TaskCreationApp = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
 
-  const handleSubmit = async () => {
-    if (!validateStep(3)) {
-      toast.error("Please fill all required fields");
-      return;
+ const handleSubmit = async () => {
+  if (!validateStep(3)) {
+    toast.error("Please fill all required fields");
+    return;
+  }
+
+  try {
+    const formDataToSend = new FormData();
+
+    // Append files
+    formData.taskAttachments.forEach((file) => {
+      formDataToSend.append('task_attachments', file);
+    });
+
+    const mappedData = mapToBackendValues(formData);
+
+    const coordinates = mappedData.locationCoordinates || [90.4125, 23.8103];
+
+    const taskPayload = {
+      title: mappedData.taskTitle,
+      category: mappedData.taskCategory,
+      description: mappedData.taskDescription,
+      budget: parseInt(mappedData.budget),
+      address: mappedData.location || "",
+      city: mappedData.city || "",
+      location: {
+        type: "Point",
+        coordinates: coordinates
+      },
+      scheduleType: mappedData.taskTiming, 
+      ...(mappedData.taskTiming === "FIXED_DATE_AND_TIME" && {
+        preferredDate: mappedData.preferredDate ? dayjs(mappedData.preferredDate).format("YYYY-MM-DD") : null,
+        preferredTime: mappedData.preferredTime || "00:00" 
+      }),
+      payOn: "completion",
+      doneBy: mappedData.taskType 
+    };
+
+    if (providerId && providerId !== "null" && providerId !== "undefined") {
+      taskPayload.provider = providerId;
+      console.log("Creating task for specific provider:", providerId);
+    } else {
+      console.log("Creating general task (no specific provider)");
     }
 
-    try {
-      const formDataToSend = new FormData();
+    if (taskPayload.preferredTime && taskPayload.preferredTime.length === 4) {
+      taskPayload.preferredTime = `0${taskPayload.preferredTime}`;
+    }
 
-      // Append files
-      formData.taskAttachments.forEach((file) => {
-        formDataToSend.append('task_attachments', file);
-      });
+    console.log("Final Task Payload for Backend:", taskPayload);
+    
+    formDataToSend.append('data', JSON.stringify(taskPayload));
 
-      const mappedData = mapToBackendValues(formData);
-
-      const coordinates = mappedData.locationCoordinates || [90.4125, 23.8103];
-
-      const taskPayload = {
-        title: mappedData.taskTitle,
-        category: mappedData.taskCategory,
-        description: mappedData.taskDescription,
-        budget: parseInt(mappedData.budget),
-        address: mappedData.location || "",
-        city: mappedData.city || "",
-        location: {
-          type: "Point",
-          coordinates: coordinates
-        },
-        scheduleType: mappedData.taskTiming, 
-        ...(mappedData.taskTiming === "FIXED_DATE_AND_TIME" && {
-          preferredDate: mappedData.preferredDate ? dayjs(mappedData.preferredDate).format("YYYY-MM-DD") : null,
-          preferredTime: mappedData.preferredTime || "00:00" 
-        }),
-        payOn: "completion",
-        doneBy: mappedData.taskType 
-      };
-
-      if (taskPayload.preferredTime && taskPayload.preferredTime.length === 4) {
-        taskPayload.preferredTime = `0${taskPayload.preferredTime}`;
+    const result = await createTask(formDataToSend).unwrap();
+    console.log("API Response:", result);
+    
+    if (result.success) {
+      if (result.data?.provider) {
+        console.log(" Task created WITH provider:", result.data.provider);
+        toast.success(`Task created successfully for the provider!`);
+      } else {
+        console.log(" Task created WITHOUT specific provider");
+        toast.success("Task created successfully!");
       }
 
-      console.log("Task Payload:", taskPayload);
-      formDataToSend.append('data', JSON.stringify(taskPayload));
-
-      const result = await createTask(formDataToSend).unwrap();
-      console.log("result--->", result);
-      
-      toast.success("Task created successfully!");
-
-      // Reset form
       setFormData({
         taskTitle: "",
         taskCategory: "",
@@ -238,11 +263,16 @@ const TaskCreationApp = () => {
       localStorage.removeItem("currentStep");
       setCurrentStep(0);
 
-    } catch (error) {
-      console.error("Failed to create task:", error);
-      toast.error(error?.data?.message || "Failed to create task. Please try again.");
+      setTimeout(() => {
+        router.push("/browseservice");
+      }, 1500);
     }
-  };
+
+  } catch (error) {
+    console.error(" Failed to create task:", error);
+    toast.error(error?.data?.message || "Failed to create task. Please try again.");
+  }
+};
 
   useEffect(() => {
     const savedStep = localStorage.getItem("currentStep");
@@ -273,6 +303,22 @@ const TaskCreationApp = () => {
         return (
           <div className="space-y-6">
             <StepHeader icon={FileText} title="Task Overview" />
+            
+            {/* Provider Info Banner */}
+            {providerId && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  <p className="text-sm text-blue-700 font-medium">
+                    You're creating this task for a specific provider
+                  </p>
+                </div>
+                <p className="text-xs text-blue-600 mt-1">
+                  Provider ID: <code>{providerId}</code>
+                </p>
+              </div>
+            )}
+            
             <div>
               <FormInput
                 label="Task Title"
@@ -367,7 +413,9 @@ const TaskCreationApp = () => {
                   placeholder="Search for your location..."
                   required
                 />
-              
+                {formErrors.location && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.location}</p>
+                )}
               </div>
             )}
             <RadioGroup
@@ -423,13 +471,6 @@ const TaskCreationApp = () => {
                 </div>
               </div>
             )}
-            {formData.taskTiming === "flexible" && (
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <p className="text-sm text-blue-700">
-                  Great! Workers will contact you to schedule a convenient time.
-                </p>
-              </div>
-            )}
           </div>
         );
 
@@ -437,9 +478,19 @@ const TaskCreationApp = () => {
         return (
           <div className="space-y-6">
             <div className="flex gap-4 items-center">
-               <p className="text-2xl font-bold text-[#115e59]">₦</p>
-            <p className="text-2xl font-semibold">Budget</p>
+              <p className="text-2xl font-bold text-[#115e59]">₦</p>
+              <p className="text-2xl font-semibold">Budget</p>
             </div>
+            
+            {/* Provider-specific message */}
+            {providerId && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm text-green-700">
+                  💡 Since you're submitting to a specific provider, they'll see your offer first!
+                </p>
+              </div>
+            )}
+            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 How much are you offering? *
@@ -486,18 +537,36 @@ const TaskCreationApp = () => {
   };
 
   return (
-    <MultiStepForm steps={steps} currentStep={currentStep} showTimelineBorder>
-      {renderStepContent()}
-      <FormNavigation
-        onPrevious={handlePrevious}
-        onNext={handleNext}
-        currentStep={currentStep}
-        totalSteps={steps.length}
-        finalLabel={isCreating ? "Creating..." : "Post Task"}
-        handleSubmit={handleSubmit}
-        disabled={isCreating}
-      />
-    </MultiStepForm>
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="container mx-auto px-4 max-w-4xl">
+        {/* Page Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            {providerId ? "Submit Your Offer" : "Create New Task"}
+          </h1>
+          <p className="text-gray-600">
+            {providerId 
+              ? "Submit a personalized offer to this specific provider" 
+              : "Post your task and get offers from multiple providers"
+            }
+          </p>
+        </div>
+
+        {/* Main Form */}
+        <MultiStepForm steps={steps} currentStep={currentStep} showTimelineBorder>
+          {renderStepContent()}
+          <FormNavigation
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+            currentStep={currentStep}
+            totalSteps={steps.length}
+            finalLabel={isCreating ? "Creating..." : providerId ? "Submit Offer" : "Post Task"}
+            handleSubmit={handleSubmit}
+            disabled={isCreating}
+          />
+        </MultiStepForm>
+      </div>
+    </div>
   );
 };
 

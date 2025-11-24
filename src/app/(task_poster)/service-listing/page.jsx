@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import FilterSection from "@/components/serviceprovider/FilterSection";
 import RadioFilter from "@/components/serviceprovider/RadioFilter";
-import { useGetAllServicesQuery } from "@/lib/features/service/serviceApi";
 import { useGetAllCategoriesQuery, useGetDuplicateAllServicesQuery } from "@/lib/features/category/categoryApi";
 import ServiceCard from "@/components/serviceprovider/ServiceCard";
 import Link from "next/link";
