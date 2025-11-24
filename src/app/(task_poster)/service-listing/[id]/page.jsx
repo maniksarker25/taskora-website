@@ -10,9 +10,16 @@ import InfoProvider from "@/components/serviceprovider/InfoProvider";
 import ServiceTabs from "@/components/serviceprovider/ServiceTabs";
 import BookingCard from "@/components/serviceprovider/BookingCard";
 import clsx from "clsx";
+import { useParams } from "next/navigation";
+import { useGetServiceByIdQuery } from "@/lib/features/service/serviceApi";
 
 const ServiceDetails = ({service}) => {
   const [activeTab, setActiveTab] = useState("Description");
+  const params = useParams();
+  const {data: singleService} = useGetServiceByIdQuery(params?.id)
+
+  const signgleServiceData = singleService?.data;
+  console.log("gets",signgleServiceData)
   
   return (
     <div className="project_container mx-auto lg:p-6 overflow-clip">
@@ -85,7 +92,7 @@ const ServiceDetails = ({service}) => {
         </div>
 
         {/* Right Sidebar */}
-        <BookingCard />
+        <BookingCard signgleServiceData={signgleServiceData}/>
       </div>
     </div>
   );
