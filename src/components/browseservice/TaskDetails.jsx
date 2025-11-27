@@ -39,6 +39,7 @@ const TaskDetails = ({ task }) => {
 
   const [createBid, { isLoading: isSubmittingBid }] = useCreateBidMutation();
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
+  console.log("new URL",acceptBid)
   const [createQuestion, { isLoading: isSubmittingQuestion }] = useCreateQuestionMutation();
 
   const {
@@ -132,15 +133,32 @@ const TaskDetails = ({ task }) => {
       const result = await acceptBid({ bidID: bidId }).unwrap();
 
       if (result.success) {
-       
-        toast.success("Bid accepted successfully!", {
+        console.log("Bid accept response:", result);
+        const paymentLink = result?.data?.paymentLink;
+        const reference = result?.data?.reference;
+
+        toast.success(
+          paymentLink
+            ? "Bid accepted! Redirecting to payment..."
+            : "Bid accepted successfully!",
+          {
           style: {
             backgroundColor: "#d1fae5",
             color: "#065f46",
             borderLeft: "6px solid #10b981",
           },
-          duration: 3000,
-        });
+            duration: 3500,
+          }
+        );
+
+        if (paymentLink && typeof window !== "undefined") {
+          window.open(paymentLink, "_blank");
+        }
+
+        if (reference) {
+          console.log("Payment reference:", reference);
+        }
+
         // Update local task status to reflect UI change
         setTaskStatus(result?.data?.status || "IN_PROGRESS");
         refetchBids();

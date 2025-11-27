@@ -3,13 +3,13 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { MdDateRange } from "react-icons/md";
 import { BsChatLeftText } from "react-icons/bs";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { FaStar } from "react-icons/fa6";
 import srvcporvider from "../../../public/women.svg";
 import Image from 'next/image';
 import { toast } from "sonner";
 import { useAcceptBidMutation } from '@/lib/features/bidApi/bidApi';
-
-
+import { useAuth } from '@/components/auth/useAuth';
 
 const questions = [
   {
@@ -32,7 +32,10 @@ const Bids = ({ taskDetails, bidsData }) => {
   const info = bidsData?.data.result
   const [activeTab, setActiveTab] = useState("bids");
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
+  
   const [taskStatus, setTaskStatus] = useState(taskDetails?.status || "OPEN_FOR_BID");
+  const { user } = useAuth();
+  const router = useRouter();
 
   const handleAcceptBid = async (bidId) => {
     if (taskStatus !== "OPEN_FOR_BID") {
@@ -42,18 +45,35 @@ const Bids = ({ taskDetails, bidsData }) => {
     if (!confirm("Are you sure you want to accept this bid?")) return;
     try {
       const result = await acceptBid({ bidID: bidId }).unwrap();
+      console.log("new url",result)
       if (result?.success) {
-        toast.success("Bid accepted successfully!", {
+        console.log("Bid accept response:", result);
+        const paymentLink = result?.data?.paymentLink;
+        const reference = result?.data?.reference;
+
+        toast.success(
+          paymentLink
+            ? "Bid accepted! Redirecting to payment..."
+            : "Bid accepted successfully!",
+          {
           style: {
             backgroundColor: "#d1fae5",
             color: "#065f46",
             borderLeft: "6px solid #10b981",
           },
-          duration: 3000,
-        });
-        // Update local status to hide accept buttons
+            duration: 3500,
+          }
+        );
+
+        if (paymentLink && typeof window !== "undefined") {
+          window.open(paymentLink, "_blank");
+        }
+
+        if (reference) {
+          console.log("Payment reference:", reference);
+        }
+
         setTaskStatus(result?.data?.status || "IN_PROGRESS");
-        // Optional: refresh page or trigger parent refetch if provided in future
       }
     } catch (error) {
       console.error("Failed to accept bid:", error);
@@ -67,6 +87,27 @@ const Bids = ({ taskDetails, bidsData }) => {
       });
     }
   };
+
+  const handleChatClick = (bid) => {
+    let receiverId = null;
+    
+    if (user?.role === "customer") {
+      // Customer wants to chat with the provider who placed the bid
+      receiverId = bid?.provider?._id || bid?.provider || bid?.providerId;
+    } else if (user?.role === "provider") {
+      // Provider wants to chat with the task owner (customer)
+      receiverId = taskDetails?.customer?._id || taskDetails?.customer || taskDetails?.customerId;
+    }
+
+    if (!receiverId) {
+      toast.error("Unable to find user to chat with");
+      return;
+    }
+
+    // Navigate to chat page with receiverId
+    router.push(`/chat?receiverId=${receiverId}`);
+  };
+
   return (
     <div>
       <div className="flex flex-col lg:flex-row lg:justify-between gap-8 border rounded-2xl p-6 bg-white shadow mt-8 items-center">
@@ -208,13 +249,13 @@ const Bids = ({ taskDetails, bidsData }) => {
                       {isAcceptingBid ? "Accepting..." : "Accept the Bid"}
                     </button>
                   )}
-                  <Link
-                    href="/chat"
+                  <button
+                    onClick={() => handleChatClick(bid)}
                     className="px-6 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer flex gap-2 items-center justify-center"
                   >
                     <BsChatLeftText />
                     Chat Now
-                  </Link>
+                  </button>
                 </div>
               </div>
               {/* right side */}
