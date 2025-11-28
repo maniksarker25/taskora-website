@@ -85,7 +85,7 @@ const taskApi = createApi({
       },
       providesTags: ["Task"],
     }),
-        completeTask: builder.mutation({
+    completeTask: builder.mutation({
       query: (taskId) => ({
         url: "/task/complete-task",
         method: "PATCH",
@@ -96,7 +96,7 @@ const taskApi = createApi({
     }),
   }),
 
- 
+
 });
 
 export const {
