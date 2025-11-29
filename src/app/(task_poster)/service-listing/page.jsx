@@ -150,7 +150,7 @@ const ServiceListing = () => {
                 </FilterSection>
               </div>
               {/* Sort By Filter */}
-              <div>
+              {/* <div>
                 <FilterSection
                   title="Sort By"
                   isOpen={sortByOpen}
@@ -163,7 +163,7 @@ const ServiceListing = () => {
                     name="sort-by"
                   />
                 </FilterSection>
-              </div>
+              </div> */}
             </div>
           </div>
 
