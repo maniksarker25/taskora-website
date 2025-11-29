@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { FiSend } from "react-icons/fi";
 import { FaImage } from "react-icons/fa6";
+import { useSocket } from "@/components/context/socketProvider";
 
 const ChatInterface = () => {
 
@@ -14,6 +15,8 @@ const ChatInterface = () => {
     { id: 5, type: "sent", text: "How are you doing" },
     { id: 6, type: "sent", text: "Is you free now ?" },
   ]);
+
+
 
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
@@ -28,6 +31,9 @@ const ChatInterface = () => {
     setMessages([...messages, { id: Date.now(), type: "sent", text: input }]);
     setInput("");
   };
+
+  const { socket, socketLoading, socketError } = useSocket();
+  console.log(socket)
 
   return (
     <div className="flex flex-col h-[750px] max-w-4xl mx-auto bg-white rounded-lg ">
