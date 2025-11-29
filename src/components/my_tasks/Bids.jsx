@@ -28,7 +28,8 @@ const questions = [
   },
 ];
 
-const Bids = ({ taskDetails, bidsData }) => {
+const Bids = ({ taskDetails, bidsData, questionsData }) => {
+  console.log("questionsData",questionsData?.data)
   const info = bidsData?.data.result
   const [activeTab, setActiveTab] = useState("bids");
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
@@ -106,6 +107,20 @@ const Bids = ({ taskDetails, bidsData }) => {
 
     // Navigate to chat page with receiverId
     router.push(`/chat?receiverId=${receiverId}`);
+  };
+
+  const formatTimeAgo = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+
+    if (diffInHours < 1) return "Just now";
+    if (diffInHours === 1) return "1 hour ago";
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays === 1) return "1 day ago";
+    return `${diffInDays} days ago`;
   };
 
   return (
@@ -271,36 +286,67 @@ const Bids = ({ taskDetails, bidsData }) => {
           ))}
 
         {activeTab === "questions" &&
-          questions.map((q) => (
+          questionsData?.data?.map((q) => (
             <div
-              key={q.id}
-              className="flex flex-col md:flex-row gap-4 p-4 border rounded-lg"
-            >
-              <div className="w-16 h-16 rounded-full overflow-clip">
-                {" "}
-                <Image
-                  src={srvcporvider}
-                  alt={q.name}
-                  className="w-full h-full object-cover"
-                />
+            key={q._id}
+            className="flex gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+          >
+            <Image
+              src={q?.provider?.profile_image || q?.user?.profileImage }
+              alt={q?.user?.name || "User"}
+              width={64}
+              height={64}
+              className="w-16 h-16 rounded-full object-cover"
+            />
+            <div className="flex-1">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-medium text-gray-900">
+                  {q?.provider?.name || "Anonymous"}
+                </h3>
+                <span className="text-xs text-gray-400">
+                  {formatTimeAgo(q.createdAt)}
+                </span>
               </div>
-              <div className="flex-1 flex flex-col justify-between">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-semibold">{q.name}</h4>
-                  <p className="text-sm text-gray-500">{q.date}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm mt-2">{q.message}</p>
-                  <button
-                    href="/construction"
-                    className="px-6 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer flex gap-2 items-center justify-center mt-12"
-                  >
-                    <BsChatLeftText />
-                    Chat Now
-                  </button>
-                </div>
+
+              {/* Question */}
+              <div className="mb-3">
+                <p className="text-sm font-medium text-gray-800 mb-1">Q:</p>
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {q.details}
+                </p>
+                
+                {/* Question Image */}
+                {q.question_image && (
+                  <div className="mt-2">
+                    <img
+                      src={q.question_image}
+                      alt="Question attachment"
+                      className="max-w-xs rounded-lg border border-gray-200"
+                    />
+                  </div>
+                )}
               </div>
+
+              {/* Answer */}
+              {q.answer && (
+                <div className="bg-green-50 p-3 rounded-lg border border-green-100">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs font-medium text-green-700">
+                      Task Poster Response:
+                    </span>
+                    {q.answeredAt && (
+                      <span className="text-xs text-gray-500">
+                        {formatTimeAgo(q.answeredAt)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {q.answer}
+                  </p>
+                </div>
+              )}
             </div>
+          </div>
           ))}
       </div>
     </div>

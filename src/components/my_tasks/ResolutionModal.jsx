@@ -157,7 +157,7 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
           </div>
 
           {/* Task Info */}
-          <div className="bg-blue-50 rounded-lg p-3 md:p-4 mb-4 md:mb-6">
+          {/* <div className="bg-blue-50 rounded-lg p-3 md:p-4 mb-4 md:mb-6">
             <h3 className="font-semibold text-blue-900 mb-2 text-sm md:text-base">Task Information</h3>
             <div className="space-y-1 md:space-y-2">
               <p className="text-blue-700 text-xs md:text-sm">
@@ -180,7 +180,7 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
             <p className="text-blue-600 text-xs mt-2">
               Use this center to manage task disputes, cancellations, and date changes.
             </p>
-          </div>
+          </div> */}
 
           {/* Options */}
           <div className="space-y-3 md:space-y-4">
@@ -457,7 +457,7 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
               {/* Warning Message */}
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                 <p className="text-xs text-yellow-600">
-                  ⚠️ Cancelling this task may affect your account rating and refund eligibility. 
+                   Cancelling this task may affect your account rating and refund eligibility. 
                   Please ensure this is necessary before submitting.
                 </p>
               </div>

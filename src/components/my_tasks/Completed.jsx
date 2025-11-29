@@ -342,7 +342,7 @@ const Completed = ({ bidsData, taskDetails }) => {
       </div>
 
       {/* Task Information Summary */}
-      <div className="bg-blue-50 p-6 rounded-lg">
+      {/* <div className="bg-blue-50 p-6 rounded-lg">
         <h3 className="text-lg font-semibold text-blue-900 mb-4">Task Summary</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
           <div>
@@ -362,7 +362,7 @@ const Completed = ({ bidsData, taskDetails }) => {
             <span className="ml-2 text-blue-700">{taskDetails?.totalOffer || 0}</span>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

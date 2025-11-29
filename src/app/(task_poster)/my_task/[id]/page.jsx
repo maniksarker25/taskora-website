@@ -13,13 +13,15 @@ import { useParams } from "next/navigation";
 import { useGetTaskByIdQuery } from "@/lib/features/task/taskApi";
 import { useGetBidsByTaskIdQuery } from "@/lib/features/bidApi/bidApi";
 import ResolutionModal from "@/components/my_tasks/ResolutionModal";
+import { useGetQuestionsByTaskIdQuery } from "@/lib/features/question/questionApi";
 
 const TaskDetails = () => {
   const params = useParams();
   const taskId = params.id;
   const [currentStatus, setCurrentStatus] = useState("Bids");
   const [showResolutionModal, setShowResolutionModal] = useState(false); 
-  
+
+
   const status = ["Bids", "Progress", "Completed", "Cancelled"];
   
   const {
@@ -28,7 +30,16 @@ const TaskDetails = () => {
     error
   } = useGetTaskByIdQuery(taskId);
   const taskDetails = taskData?.data;
-  console.log(taskDetails)
+
+  const {
+    data: questionsData,
+    isLoading: isLoadingQuestions,
+    error: questionsError,
+    refetch: refetchQuestions
+  } = useGetQuestionsByTaskIdQuery(taskId, {
+    skip: !taskId,
+  });
+  
 
   const tabForStatus = useMemo(() => {
     const backendStatus = taskDetails?.status;
@@ -118,7 +129,7 @@ const TaskDetails = () => {
         </div>
 
         <div className="mt-4">
-          {currentStatus === "Bids" && <Bids taskDetails={taskDetails} bidsData={bidsData}/>}
+          {currentStatus === "Bids" && <Bids taskDetails={taskDetails} bidsData={bidsData} questionsData={questionsData}/>}
           {currentStatus === "Progress" && <Progress taskId={taskId} taskDetails={taskDetails} bidsData={bidsData}/>}
           {currentStatus === "Completed" && <Completed taskDetails={taskDetails} bidsData={bidsData} />}
           {currentStatus === "Cancelled" && <Cancelled taskDetails={taskDetails} />}
