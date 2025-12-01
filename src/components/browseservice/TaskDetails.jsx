@@ -39,7 +39,7 @@ const TaskDetails = ({ task }) => {
 
   const [createBid, { isLoading: isSubmittingBid }] = useCreateBidMutation();
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
-  console.log("new URL",acceptBid)
+ 
   const [createQuestion, { isLoading: isSubmittingQuestion }] = useCreateQuestionMutation();
 
   const {
@@ -63,9 +63,9 @@ const TaskDetails = ({ task }) => {
       name: task?.customer?.name || "Customer",
       profile_image: task?.customer?.profile_image || client,
     },
-    location: task?.city || task?.address || "Location not specified",
-    dueDate: task?.preferredDate
-      ? new Date(task.preferredDate).toLocaleDateString("en-US", {
+    location: task?.address|| task?.address || "Location not specified",
+    dueDate: task?.preferredDeliveryDateTime
+      ? new Date(task.preferredDeliveryDateTime).toLocaleDateString("en-US", {
         day: "numeric",
         month: "short",
         year: "numeric",

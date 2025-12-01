@@ -13,6 +13,8 @@ import { useParams } from "next/navigation";
 import { useGetTaskByIdQuery } from "@/lib/features/task/taskApi";
 import { useGetBidsByTaskIdQuery } from "@/lib/features/bidApi/bidApi";
 import ResolutionModal from "@/components/my_tasks/ResolutionModal";
+import ProviderBids from "@/components/my_bids/ProviderBids";
+import ProviderProgress from "@/components/my_bids/ProviderProgress";
 
 const BidsDetails = () => {
   const params = useParams();
@@ -118,8 +120,8 @@ const BidsDetails = () => {
         </div>
 
         <div className="mt-4">
-          {currentStatus === "Bids" && <Bids taskDetails={taskDetails} bidsData={bidsData}/>}
-          {currentStatus === "Progress" && <Progress taskId={taskId} taskDetails={taskDetails} bidsData={bidsData}/>}
+          {currentStatus === "Bids" && <ProviderBids taskDetails={taskDetails} bidsData={bidsData} taskId={taskId}/>}
+          {currentStatus === "Progress" && <ProviderProgress taskId={taskId} taskDetails={taskDetails} bidsData={bidsData}/>}
           {currentStatus === "Completed" && <Completed taskDetails={taskDetails} bidsData={bidsData} />}
           {currentStatus === "Cancelled" && <Cancelled taskDetails={taskDetails} />}
         </div>

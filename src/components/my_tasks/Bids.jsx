@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { toast } from "sonner";
 import { useAcceptBidMutation } from '@/lib/features/bidApi/bidApi';
 import { useAuth } from '@/components/auth/useAuth';
+import { Calendar } from 'lucide-react';
 
 const questions = [
   {
@@ -159,26 +160,17 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                 To Be Done On
               </p>
               <p className="text-sm text-gray-600">
-                {taskDetails?.preferredDate
-                  ? new Date(taskDetails.preferredDate).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })
-                  : "No date selected"}
+                {taskDetails?.preferredDeliveryDateTime && (
+                    <div className="flex items-center gap-2 text-gray-700">
+                     
+                      <span className="text-sm">{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
+                    </div>
+                  )}
               </p>
             </div>
           </div>
 
-          {/* Details */}
-          <div>
-            <h3 className="text-lg font-semibold mb-2 text-black">
-              Details
-            </h3>
-            <p className="text-gray-600 text-sm leading-6">
-              {taskDetails?.description}
-            </p>
-          </div>
+      
         </div>
 
         {/* Right side */}

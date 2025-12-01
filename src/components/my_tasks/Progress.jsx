@@ -29,6 +29,8 @@ const Progress = ({
       return "";
     }
   };
+// console.log("bidsdata",bidsData?.data)
+
 
   const offeredDate = taskDetails?.createdAt ? formatDate(taskDetails.createdAt) : "";
   const inProgressDate = (taskDetails?.status === "IN_PROGRESS" || taskDetails?.status === "ASSIGNED")
@@ -109,13 +111,10 @@ const Progress = ({
         bidsData={bidsData}
       />
 
-      <TaskDetailsSection description={description} />
-
       <PricingSection budget={budget} />
 
       <ProgressBarComponent steps={steps} progressWidth={progressWidth} />
 
-      {/* Cancellation Status - Now it will automatically show only when there's a PENDING request */}
       <div>
         <CancellationStatusComponent
           taskId={taskId}

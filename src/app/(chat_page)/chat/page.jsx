@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState, useCallback, Suspense } from "react
 import { FiSend } from "react-icons/fi";
 import { FaImage, FaFilePdf } from "react-icons/fa6";
 import { Check, CheckCheck } from "lucide-react";
-import { useSocket } from "@/components/context/socketProvider";
+// import { useSocket } from "@/components/context/socketProvider";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
 import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";
@@ -11,6 +11,7 @@ import { useGetChatListQuery, useGetMessagesQuery } from "@/lib/features/chatApi
 import baseUrl from "../../../../utils/baseUrl";
 import { useSelector } from "react-redux";
 import Image from "next/image";
+import { useSocketContext } from "@/app/context/SocketProvider";
 
 const ChatContent = () => {
   const [messages, setMessages] = useState([]);
@@ -30,7 +31,7 @@ const ChatContent = () => {
   const { data: profileData } = useGetMyProfileQuery();
   const myUserId = profileData?.data?._id;
   const accessToken = useSelector((state) => state.auth.accessToken);
-  const { socket, isConnected } = useSocket();
+  const { socket, isConnected } = useSocketContext();
   const { data: chatListData, refetch: refetchChatList } = useGetChatListQuery();
   
   // Load messages from REST API

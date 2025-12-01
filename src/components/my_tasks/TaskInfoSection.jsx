@@ -5,10 +5,14 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth/useAuth";
 
-const TaskInfoSection = ({ assignedTo, location, dateLabel, taskDetails, bidsData }) => {
+const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
+
+
   const router = useRouter();
   const { user } = useAuth();
-console.log("taskdetailsddd",taskDetails)
+   console.log("taskdetailsddd",taskDetails)
+
+   
   const handleChatClick = () => {
 
     if (!taskDetails) {
@@ -79,7 +83,14 @@ console.log("taskdetailsddd",taskDetails)
           </div>
           <div>
             <p className="text-base md:text-xl font-semibold">To Be Done On</p>
-            <p className="text-[#6B7280] text-sm">{dateLabel || "Schedule not set"}</p>
+             <p className="text-sm text-gray-600">
+                {taskDetails?.preferredDeliveryDateTime && (
+                    <div className="flex items-center gap-2 text-gray-700">
+                     
+                      <span className="text-sm">{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
+                    </div>
+                  )}
+              </p>
           </div>
         </div>
       </div>
