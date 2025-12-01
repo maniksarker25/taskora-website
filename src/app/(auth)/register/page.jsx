@@ -49,8 +49,8 @@ const RegisterContent = () => {
       router.push("/verify_register_user");
     }
   } catch (err) {
-    console.error("Registration failed:", err);
-    toast.error("Registration failed. Please try again.", {
+    console.error("Registration failed:", err.data.message);
+    toast.error(err?.data?.message || "Registration failed. Please try again.", {
       style: {
         backgroundColor: "#fee2e2",
         color: "#991b1b",

@@ -1,37 +1,19 @@
 import React, { useState } from 'react'
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { MdDateRange } from "react-icons/md";
-import { BsChatLeftText } from "react-icons/bs";
-import Link from "next/link";
+
 import { useRouter } from "next/navigation";
-import { FaStar } from "react-icons/fa6";
-import srvcporvider from "../../../public/women.svg";
+
 import Image from 'next/image';
 import { toast } from "sonner";
 import { useAcceptBidMutation } from '@/lib/features/bidApi/bidApi';
 import { useAuth } from '@/components/auth/useAuth';
-import { Calendar } from 'lucide-react';
 
-const questions = [
-  {
-    id: 1,
-    name: "Ronald Richards",
-    date: "24 January, 2023",
-    message:
-      "I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!",
-  },
-  {
-    id: 2,
-    name: "Ronald Richards",
-    date: "24 January, 2023",
-    message:
-      "Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?",
-  },
-];
 
-const Bids = ({ taskDetails, bidsData, questionsData }) => {
+const ProviderBids = ({ taskDetails, bidsData, questionsData,taskId }) => {
  
   const info = bidsData?.data.result
+  console.log("bidsdetails",taskDetails)
 
   const [activeTab, setActiveTab] = useState("bids");
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
@@ -40,85 +22,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   const { user } = useAuth();
   const router = useRouter();
 
-  const handleAcceptBid = async (bidId) => {
-    if (taskStatus !== "OPEN_FOR_BID") {
-      toast.error("Task is no longer open for bids.");
-      return;
-    }
-    if (!confirm("Are you sure you want to accept this bid?")) return;
-    try {
-      const result = await acceptBid({ bidID: bidId }).unwrap();
-      console.log("new url",result)
-      if (result?.success) {
-        console.log("Bid accept response:", result);
-        const paymentLink = result?.data?.paymentLink;
-        const reference = result?.data?.reference;
 
-        toast.success(
-          paymentLink
-            ? "Bid accepted! Redirecting to payment..."
-            : "Bid accepted successfully!",
-          {
-          style: {
-            backgroundColor: "#d1fae5",
-            color: "#065f46",
-            borderLeft: "6px solid #10b981",
-          },
-            duration: 3500,
-          }
-        );
-
-        if (paymentLink && typeof window !== "undefined") {
-          window.open(paymentLink, "_blank");
-        }
-
-        if (reference) {
-          console.log("Payment reference:", reference);
-        }
-
-        setTaskStatus(result?.data?.status || "IN_PROGRESS");
-      }
-    } catch (error) {
-      console.error("Failed to accept bid:", error);
-      toast.error(error?.data?.message || "Failed to accept bid. Please try again.", {
-        style: {
-          backgroundColor: "#fee2e2",
-          color: "#991b1b",
-          borderLeft: "6px solid #ef4444",
-        },
-        duration: 3000,
-      });
-    }
-  };
-
-  const handleChatClick = (bid) => {
-    console.log("clickk",bid)
-   
-    if ((taskStatus || taskDetails?.status) !== "IN_PROGRESS") {
-      toast.info("Chat is available only while the task is In Progress.");
-      return;
-    }
-
-    // Determine receiverId - pick the other participant (not the current user)
-    const providerId = bid?.provider?._id || bid?.provider || bid?.providerId;
-    const customerId = taskDetails?.customer?._id || taskDetails?.customer || taskDetails?.customerId;
-    let resolvedReceiverId = null;
-    // If both exist, prefer the other user
-    if (providerId && customerId) {
-      resolvedReceiverId = (providerId === user?._id || providerId === user?.id) ? customerId : providerId;
-    } else {
-      resolvedReceiverId = providerId || customerId;
-    }
-    const receiverId = resolvedReceiverId;
-
-    if (!receiverId) {
-      toast.error("Unable to find user to chat with");
-      return;
-    }
-
-    // Navigate to chat page with receiverId
-    router.push(`/chat?receiverId=${receiverId}`);
-  };
 
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
@@ -136,9 +40,21 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
   return (
     <div>
-      <div className="flex flex-col lg:flex-row lg:justify-between gap-8 border rounded-2xl p-6 bg-white shadow mt-8 items-center">
+      <div className="flex flex-col lg:flex-row lg:justify-between gap-8 border rounded-2xl p-6 bg-white shadow mt-8 ">
         {/* Left side */}
         <div className="flex-1 space-y-6">
+
+            {/* user */}
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-full bg-[#E6F4F1] text-[#115E59] flex items-center justify-center">
+              <User size={20} />
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-black">Posted By</p>
+              <p className="text-sm text-gray-600">{taskDetails?.customer?.name}</p>
+            </div>
+          </div>
+
           {/* Location */}
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-full bg-[#E6F4F1] text-[#115E59] flex items-center justify-center">
@@ -170,29 +86,16 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
             </div>
           </div>
 
-      
+       <div>
+             <p className='text-xl font-bold pb-4'>Details</p>
+             <p>{taskDetails?.description}</p>
+        </div>
         </div>
 
+       
+
         {/* Right side */}
-        <div className="w-full md:w-auto">
-          <div className="bg-[#E6F4F1] rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
-            <div className="mb-4">
-              <p className="text-gray-500">Task budget</p>
-              <p className="text-2xl font-bold text-black">₦ {taskDetails?.budget}</p>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full">
-              <button className="px-6 py-2 border-2 border-[#115e59] rounded-md hover:bg-[#115e59] hover:text-white transition transform duration-300 cursor-pointer">
-                Edit Task
-              </button>
-              <button
-                href="/construction"
-                className="px-6 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer"
-              >
-                Remove Task
-              </button>
-            </div>
-          </div>
-        </div>
+       
       </div>
 
       {/* Tabs */}
@@ -219,13 +122,13 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
       {/* Bids / Questions */}
       <div className="mt-4 space-y-4">
-        {activeTab === "bids" &&
+        {/* {activeTab === "bids" &&
           info?.map((bid) => (
             <div
               key={bid._id || bid.id}
               className="flex flex-col lg:flex-row gap-4 p-4 border rounded-lg"
             >
-              {/* left side */}
+        
               <div className="flex flex-col justify-between gap-10 bg-[#E6F4F1] rounded-xl px-4 py-4 ">
                 <div className="flex flex-wrap lg:justify-between items-center gap-4 md:gap-8">
                   <div className="w-14 h-14 md:w-24 md:h-24  rounded-full overflow-clip">
@@ -251,7 +154,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                     </p>
                   </div>
                 </div>
-                {/* accept and chat button */}
+             
                 <div className="flex flex-col sm:flex-row gap-3  ">
                   {taskStatus === "OPEN_FOR_BID" && (
                     <button
@@ -275,7 +178,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                   </button>
                 </div>
               </div>
-              {/* right side */}
+            
 
               <div className="flex-1">
                 <p className="text-gray-600 text-sm mt-2">{bid.details}</p>
@@ -285,7 +188,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                 <div className="flex flex-col md:flex-row  justify-between md:items-center mt-16 gap-5"></div>
               </div>
             </div>
-          ))}
+          ))} */}
 
         {activeTab === "questions" &&
           questionsData?.data?.map((q) => (
@@ -355,4 +258,4 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   )
 }
 
-export default Bids
+export default ProviderBids

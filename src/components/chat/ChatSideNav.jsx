@@ -6,14 +6,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FaHome } from "react-icons/fa";
 import Link from "next/link";
 import { useGetChatListQuery } from "@/lib/features/chatApi/chatApi";
-import { useSocket } from "@/components/context/socketProvider";
 import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";
+import { useSocketContext } from '@/app/context/SocketProvider';
 
 const ChatSideNavContent = ({ onMobileItemClick }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
-  const { socket, isConnected } = useSocket();
+   const { socket, isConnected } = useSocketContext();
+  console.log(socket)
   const { data: profileData } = useGetMyProfileQuery();
   const myUserId = profileData?.data?._id;
   

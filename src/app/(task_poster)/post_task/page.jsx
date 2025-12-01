@@ -31,7 +31,6 @@ const TaskCreationApp = () => {
   
   const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
   
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
@@ -79,10 +78,18 @@ const TaskCreationApp = () => {
       "flexible": "FLEXIBLE"
     };
 
+    // Combine date and time into preferredDeliveryDateTime
+    let preferredDeliveryDateTime = null;
+    if (frontendData.preferredDate && frontendData.preferredTime) {
+      const dateTimeString = `${frontendData.preferredDate}T${frontendData.preferredTime}:00.000Z`;
+      preferredDeliveryDateTime = dateTimeString;
+    }
+
     return {
       ...frontendData,
       taskType: taskTypeMap[frontendData.taskType] || "IN_PERSON",
-      taskTiming: scheduleTypeMap[frontendData.taskTiming] || "FLEXIBLE"
+      taskTiming: scheduleTypeMap[frontendData.taskTiming] || "FLEXIBLE",
+      preferredDeliveryDateTime: preferredDeliveryDateTime
     };
   };
 
@@ -178,101 +185,101 @@ const TaskCreationApp = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
 
- const handleSubmit = async () => {
-  if (!validateStep(3)) {
-    toast.error("Please fill all required fields");
-    return;
-  }
-
-  try {
-    const formDataToSend = new FormData();
-
-    // Append files
-    formData.taskAttachments.forEach((file) => {
-      formDataToSend.append('task_attachments', file);
-    });
-
-    const mappedData = mapToBackendValues(formData);
-
-    const coordinates = mappedData.locationCoordinates || [90.4125, 23.8103];
-
-    const taskPayload = {
-      title: mappedData.taskTitle,
-      category: mappedData.taskCategory,
-      description: mappedData.taskDescription,
-      budget: parseInt(mappedData.budget),
-      address: mappedData.location || "",
-      city: mappedData.city || "",
-      location: {
-        type: "Point",
-        coordinates: coordinates
-      },
-      scheduleType: mappedData.taskTiming, 
-      ...(mappedData.taskTiming === "FIXED_DATE_AND_TIME" && {
-        preferredDate: mappedData.preferredDate ? dayjs(mappedData.preferredDate).format("YYYY-MM-DD") : null,
-        preferredTime: mappedData.preferredTime || "00:00" 
-      }),
-      payOn: "completion",
-      doneBy: mappedData.taskType 
-    };
-
-    if (providerId && providerId !== "null" && providerId !== "undefined") {
-      taskPayload.provider = providerId;
-      console.log("Creating task for specific provider:", providerId);
-    } else {
-      console.log("Creating general task (no specific provider)");
+  const handleSubmit = async () => {
+    if (!validateStep(3)) {
+      toast.error("Please fill all required fields");
+      return;
     }
 
-    if (taskPayload.preferredTime && taskPayload.preferredTime.length === 4) {
-      taskPayload.preferredTime = `0${taskPayload.preferredTime}`;
-    }
+    try {
+      const formDataToSend = new FormData();
 
-    console.log("Final Task Payload for Backend:", taskPayload);
-    
-    formDataToSend.append('data', JSON.stringify(taskPayload));
+      // Append files
+      formData.taskAttachments.forEach((file) => {
+        formDataToSend.append('task_attachments', file);
+      });
 
-    const result = await createTask(formDataToSend).unwrap();
-    console.log("API Response:", result);
-    
-    if (result.success) {
-      if (result.data?.provider) {
-        console.log(" Task created WITH provider:", result.data.provider);
-        toast.success(`Task created successfully for the provider!`);
-      } else {
-        console.log(" Task created WITHOUT specific provider");
-        toast.success("Task created successfully!");
+      const mappedData = mapToBackendValues(formData);
+
+      const coordinates = mappedData.locationCoordinates || [90.4125, 23.8103];
+
+      // Create the task payload according to backend expectations
+      const taskPayload = {
+        title: mappedData.taskTitle,
+        category: mappedData.taskCategory,
+        description: mappedData.taskDescription,
+        budget: parseInt(mappedData.budget),
+        address: mappedData.location || "",
+        city: mappedData.city || "",
+        location: {
+          type: "Point",
+          coordinates: coordinates
+        },
+        scheduleType: mappedData.taskTiming,
+        payOn: "completion",
+        doneBy: mappedData.taskType
+      };
+
+      // Add preferredDeliveryDateTime for fixed date tasks
+      if (mappedData.taskTiming === "FIXED_DATE_AND_TIME" && mappedData.preferredDeliveryDateTime) {
+        taskPayload.preferredDeliveryDateTime = mappedData.preferredDeliveryDateTime;
       }
 
-      setFormData({
-        taskTitle: "",
-        taskCategory: "",
-        taskDescription: "",
-        taskType: "in-person",
-        location: "",
-        locationCoordinates: null,
-        city: "",
-        taskTiming: "fixed-date",
-        preferredDate: "",
-        preferredTime: "",
-        budget: "",
-        agreedToTerms: false,
-        taskAttachments: [],
-      });
+      // Add provider if available
+      if (providerId && providerId !== "null" && providerId !== "undefined") {
+        taskPayload.provider = providerId;
+        console.log("Creating task for specific provider:", providerId);
+      } else {
+        console.log("Creating general task (no specific provider)");
+      }
+
+      console.log("Final Task Payload for Backend:", taskPayload);
       
-      localStorage.removeItem("formData");
-      localStorage.removeItem("currentStep");
-      setCurrentStep(0);
+      formDataToSend.append('data', JSON.stringify(taskPayload));
 
-      setTimeout(() => {
-        router.push("/browseservice");
-      }, 1500);
+      const result = await createTask(formDataToSend).unwrap();
+      console.log("API Response:", result);
+      
+      if (result.success) {
+        if (result.data?.provider) {
+          console.log("Task created WITH provider:", result.data.provider);
+          toast.success(`Task created successfully for the provider!`);
+        } else {
+          console.log("Task created WITHOUT specific provider");
+          toast.success("Task created successfully!");
+        }
+
+        // Reset form
+        setFormData({
+          taskTitle: "",
+          taskCategory: "",
+          taskDescription: "",
+          taskType: "in-person",
+          location: "",
+          locationCoordinates: null,
+          city: "",
+          taskTiming: "fixed-date",
+          preferredDate: "",
+          preferredTime: "",
+          budget: "",
+          agreedToTerms: false,
+          taskAttachments: [],
+        });
+        
+        localStorage.removeItem("formData");
+        localStorage.removeItem("currentStep");
+        setCurrentStep(0);
+
+        setTimeout(() => {
+          router.push("/browseservice");
+        }, 1500);
+      }
+
+    } catch (error) {
+      console.error("Failed to create task:", error);
+      toast.error(error?.data?.message || "Failed to create task. Please try again.");
     }
-
-  } catch (error) {
-    console.error(" Failed to create task:", error);
-    toast.error(error?.data?.message || "Failed to create task. Please try again.");
-  }
-};
+  };
 
   useEffect(() => {
     const savedStep = localStorage.getItem("currentStep");

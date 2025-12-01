@@ -5,14 +5,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth/useAuth";
 
-const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
-
-
+const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsData }) => {
   const router = useRouter();
   const { user } = useAuth();
-   console.log("taskdetailsddd",taskDetails)
+console.log("taskdetailsddd Provider end",taskDetails)
 
-   
+
   const handleChatClick = () => {
 
     if (!taskDetails) {
@@ -22,6 +20,7 @@ const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
 
 
     const status = taskDetails?.status || null;
+    
     if (status && status !== "IN_PROGRESS") {
       toast.info("Chat is available only while the task is In Progress.");
       return;
@@ -64,7 +63,7 @@ const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
             <User className="w-4 md:w-6 h-4 md:h-6 text-[#115E59]" />
           </div>
           <div>
-            <p className="text-base md:text-xl font-semibold"> Assigned To</p>
+            <p className="text-base md:text-xl font-semibold"> Assigned By</p>
             <p className="text-[#6B7280] text-sm">{assignedTo || "Not assigned"}</p>
           </div>
         </div>
@@ -110,4 +109,4 @@ const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
   );
 };
 
-export default TaskInfoSection;
+export default ProviderTaskInfo

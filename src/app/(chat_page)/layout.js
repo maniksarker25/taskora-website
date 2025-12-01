@@ -6,13 +6,11 @@ import ChatSideNav from "@/components/chat/ChatSideNav";
 import Navbar from "@/components/ui/Navbar";
 import Footer from "@/components/ui/Footer";
 import { Menu, X } from "lucide-react";
-import { SocketProvider } from "@/components/context/socketProvider";
 
 const ChatLayout = ({ children }) => {
   const [open, setOpen] = useState(false);
 
   return (
-    <SocketProvider>
       <div className="min-h-screen bg-gray-50">
         <div className="mb-8">
           <Navbar />
@@ -58,7 +56,6 @@ const ChatLayout = ({ children }) => {
           <Footer />
         </div>
       </div>
-    </SocketProvider>
   );
 };
 

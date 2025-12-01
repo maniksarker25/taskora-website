@@ -1,14 +1,16 @@
 import React from "react";
-import TaskInfoSection from "./TaskInfoSection";
-import TaskDetailsSection from "./TaskDetailsSection";
-import PricingSection from "./PricingSection";
-import ProgressBarComponent from "./ProgressBarComponent";
-import CancellationStatusComponent from "./CancellationStatusComponent";
-import DateExtensionRequestSection from "./DateExtensionRequestSection";
+
 import { useCompleteTaskMutation } from "@/lib/features/task/taskApi";
 import { toast } from "sonner";
+import CancellationStatusComponent from "../my_tasks/CancellationStatusComponent";
+import DateExtensionRequestSection from "../my_tasks/DateExtensionRequestSection";
+import PricingSection from "../my_tasks/PricingSection";
+import ProgressBarComponent from "../my_tasks/ProgressBarComponent";
+import TaskDetailsSection from "../my_tasks/TaskDetailsSection";
+import TaskInfoSection from "../my_tasks/TaskInfoSection";
+import ProviderTaskInfo from "./ProviderTaskInfo";
 
-const Progress = ({
+const ProviderProgress = ({
   extensionStatus = "",
   bidsData,
   taskDetails,
@@ -29,7 +31,7 @@ const Progress = ({
       return "";
     }
   };
-// console.log("bidsdata",bidsData?.data)
+console.log("bidsdata",bidsData?.data)
 
 
   const offeredDate = taskDetails?.createdAt ? formatDate(taskDetails.createdAt) : "";
@@ -50,12 +52,12 @@ const Progress = ({
   const progressWidth = isCompleted ? "100%" : (isInProgress ? "66.67%" : "33.33%");
 
   const assignedTo = (() => {
-    if (taskDetails?.provider && typeof taskDetails.provider === "object" && taskDetails.provider.name) {
-      return taskDetails.provider.name;
+    if (taskDetails?.customer && typeof taskDetails.customer === "object" && taskDetails.customer.name) {
+      return taskDetails.customer.name;
     }
-    const providerId = typeof taskDetails?.provider === "string" ? taskDetails.provider : null;
-    if (providerId && Array.isArray(bidsData?.data)) {
-      const matchedBid = bidsData.data.find(
+    const customerId = typeof taskDetails?.customer === "string" ? taskDetails.customer : null;
+    if (customerId && Array.isArray(bidsData?.data)) {
+      const matchedBid = bidsData?.data?.find(
         (b) => b?.provider?._id === providerId
       );
       if (matchedBid?.provider?.name) {
@@ -103,13 +105,15 @@ const Progress = ({
 
   return (
     <div className="flex flex-col gap-12">
-      <TaskInfoSection
+      <ProviderTaskInfo
         assignedTo={assignedTo}
         location={location}
         dateLabel={dateLabel}
         taskDetails={taskDetails}
         bidsData={bidsData}
       />
+
+      <TaskDetailsSection description={description} />
 
       <PricingSection budget={budget} />
 
@@ -151,4 +155,4 @@ const Progress = ({
   );
 };
 
-export default Progress;
+export default ProviderProgress
