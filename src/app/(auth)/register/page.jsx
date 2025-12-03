@@ -213,7 +213,7 @@ const RegisterContent = () => {
                         <div className="relative flex items-center">
                           <PhoneInput
                             international
-                            defaultCountry="BD" 
+                            defaultCountry="NG" 
                             value={phoneValue}
                             onChange={handlePhoneChange}
                             className="w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 pr-10 rounded-md outline-blue-600 focus:border-blue-500 outline-none"

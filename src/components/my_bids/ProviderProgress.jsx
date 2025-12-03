@@ -8,6 +8,7 @@ import ProgressBarComponent from "../my_tasks/ProgressBarComponent";
 import TaskDetailsSection from "../my_tasks/TaskDetailsSection";
 import ProviderTaskInfo from "./ProviderTaskInfo";
 import { useGetExtensionRequestsByTaskIdQuery } from "@/lib/features/extensionApi/extensionApi";
+import { useGetCancellationRequestByTaskQuery } from "@/lib/features/cancelApi/cancellationApi";
 
 const ProviderProgress = ({
   bidsData,
@@ -16,9 +17,16 @@ const ProviderProgress = ({
 }) => {
   const [completeTask, { isLoading: isCompleting }] = useCompleteTaskMutation();
     const {data: extensionRequest}   =  useGetExtensionRequestsByTaskIdQuery(taskId)
+      const { 
+        data: cancellationData, 
+        isLoading, 
+        error 
+      } = useGetCancellationRequestByTaskQuery(taskId);
+     
+       
     const extentionData = extensionRequest?.data?.[0] || []
-    console.log("extentionAta",extentionData)
-
+    const cancelData = cancellationData?.data || {}
+    
     const extensionStatuss = extentionData?.status
     const extensionStatus =extensionStatuss
     
@@ -131,6 +139,7 @@ const ProviderProgress = ({
 
       <div>
         <CancellationStatusComponent
+        cancelData={cancelData}
           taskId={taskId}
           taskDetails={taskDetails}
           isServiceProvider={false}

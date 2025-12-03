@@ -201,7 +201,7 @@ const Login = () => {
                       <p className="text-[#6B7280] text-base !mt-6">
                         Don't have an account?{" "}
                         <Link
-                          href="register"
+                          href="role"
                           className="text-[#115E59] hover:underline ml-1 whitespace-nowrap font-semibold"
                         >
                           Register here
