@@ -70,7 +70,8 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
 
     try {
       const result = await createExtensionRequest(extensionRequest).unwrap();
-      console.log("extension request", result);
+      console.log("extension request===>", result);
+     
       
       if (result.success) {
         toast.success("Date extension request created successfully!", {
@@ -81,7 +82,7 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
           }
         });
         
-        // Reset form and close modal
+      
         setDateExtensionData({
           newDate: "",
           newTime: "",
@@ -333,7 +334,7 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
                     setOpenModal(null);
                     setDateExtensionData({
                       newDate: "",
-                      newTime: "08:00",
+                      newTime: "",
                       reason: "",
                     });
                   }}

@@ -8,15 +8,21 @@ import PricingSection from "../my_tasks/PricingSection";
 import ProgressBarComponent from "../my_tasks/ProgressBarComponent";
 import TaskDetailsSection from "../my_tasks/TaskDetailsSection";
 import ProviderTaskInfo from "./ProviderTaskInfo";
+import { useGetExtensionRequestsByTaskIdQuery } from "@/lib/features/extensionApi/extensionApi";
 
 const ProviderProgress = ({
-  extensionStatus = "",
   bidsData,
   taskDetails,
   taskId
 }) => {
   const [completeTask, { isLoading: isCompleting }] = useCompleteTaskMutation();
+    const {data: extensionRequest}   =  useGetExtensionRequestsByTaskIdQuery(taskId)
+    const extentionData = extensionRequest?.data?.[2] || []
+    console.log("extentionAta",extentionData)
 
+    const extensionStatuss = extentionData?.status
+    const extensionStatus =extensionStatuss
+    
   const formatDate = (date) => {
     if (!date) return "";
     try {
@@ -30,7 +36,7 @@ const ProviderProgress = ({
       return "";
     }
   };
-console.log("bidsdata",bidsData?.data)
+
 
 
   const offeredDate = taskDetails?.createdAt ? formatDate(taskDetails.createdAt) : "";
@@ -124,7 +130,7 @@ console.log("bidsdata",bidsData?.data)
           taskDetails={taskDetails}
           isServiceProvider={false}
         />
-        <DateExtensionRequestSection extensionStatus={extensionStatus} />
+        <DateExtensionRequestSection extensionStatus={extensionStatus} extentionData={extentionData}/>
       </div>
 
       {!isCompleted && (

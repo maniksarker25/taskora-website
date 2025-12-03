@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Calendar,
   ArrowLeftRight,
@@ -8,43 +8,98 @@ import {
 } from "lucide-react";
 import client from "../../../public/client.png";
 import Image from "next/image";
+import { useSelector } from "react-redux";
 
-const DateExtensionRequestSection = ({ extensionStatus }) => {
-  console.log("extentionstatus",extensionStatus)
+import RejectModal from "../extention/RejectModal";
+import { useAcceptExtensionRequestMutation, useRejectExtensionRequestMutation } from "@/lib/features/extensionApi/extensionApi";
+import { toast } from "sonner";
+
+const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
+  const user = useSelector((state) => state.auth.user);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  
+  // RTK Query mutations
+  const [acceptExtensionRequest, { isLoading: isAccepting }] = useAcceptExtensionRequestMutation();
+  const [rejectExtensionRequest, { isLoading: isRejecting }] = useRejectExtensionRequestMutation();
+
+  const isLoading = isAccepting || isRejecting;
+
+  console.log("login user", user);
+  console.log("extentionstatus", extensionStatus);
+  console.log("extentionData=======>", extentionData);
+
+  const currentUserRole = user?.role?.toLowerCase(); 
+  console.log("Current User Role:", currentUserRole);
+  console.log("Request To Model:", extentionData?.requestToModel);
+  console.log("Request From Model:", extentionData?.requestedFromModel);
+
   const getExtensionContent = () => {
     if (!extensionStatus) return null;
 
-    switch (extensionStatus) {
-      case "in-progress":
+    switch (extensionStatus.toUpperCase()) {
+      case "PENDING":
+        let showButtons = false;
+
+        if (
+          extentionData?.requestedFromModel === "Customer" &&
+          extentionData?.requestToModel === "Provider" &&
+          currentUserRole === "provider"
+        ) {
+          showButtons = true;
+          console.log("Case 1: Customer to Provider - Provider sees buttons");
+        }
+        else if (
+          extentionData?.requestedFromModel === "Provider" &&
+          extentionData?.requestToModel === "Customer" &&
+          currentUserRole === "customer"
+        ) {
+          showButtons = true;
+          console.log("Case 2: Provider to Customer - Customer sees buttons");
+        }
+        
+        console.log("Should show buttons:", showButtons);
+
         return {
           statusText: "In Progress",
           statusColor: "text-green-600",
           statusIcon: <Check className="w-4 h-4 text-white" />,
           statusBgColor: "bg-green-700",
-          button: {
-            text: "Cancel The Request",
-            color: "bg-[#115e59] hover:bg-teal-700",
-          },
+          buttons: showButtons ? [
+            {
+              text: "Reject Request",
+              color: "bg-red-600 hover:bg-red-700",
+              action: "reject",
+            },
+            {
+              text: "Accept Request",
+              color: "bg-[#115e59] hover:bg-teal-700",
+              action: "accept",
+            },
+          ] : null,
           showMarkComplete: true,
         };
-      case "accepted":
+      case "ACCEPTED":
         return {
-          statusText: "Approved By Service Provider",
+          statusText: extentionData?.requestToModel === "Provider" 
+            ? "Approved By Service Provider" 
+            : "Approved By Customer",
           statusColor: "text-[#115e59]",
           statusIcon: <Check className="w-4 h-4 text-white" />,
           statusBgColor: "bg-[#115e59]",
-          button: null,
+          buttons: null,
           showMarkComplete: true,
         };
-      case "rejected":
+      case "REJECTED":
         return {
-          statusText: "Rejected By Service Provider",
+          statusText: extentionData?.requestToModel === "Provider" 
+            ? "Rejected By Service Provider" 
+            : "Rejected By Customer",
           statusColor: "text-red-600",
           statusIcon: <X className="w-4 h-4 text-white" />,
           statusBgColor: "bg-red-600",
-          button: null,
+          buttons: null,
           showMarkComplete: false,
-          rejectionReason:
+          rejectionReason: extentionData?.rejectDetails || 
             "The proposed extension cannot be granted due to project deadlines and client commitments.",
         };
       default:
@@ -55,119 +110,265 @@ const DateExtensionRequestSection = ({ extensionStatus }) => {
   const content = getExtensionContent();
   if (!content) return null;
 
+  // Handle button clicks
+  const handleButtonClick = (action) => {
+    if (action === "reject") {
+      setShowRejectModal(true);
+    } else if (action === "accept") {
+      handleAcceptRequest();
+    }
+  };
+
+  // Handle accept request using RTK Query
+  const handleAcceptRequest = async () => {
+    try {
+      await acceptExtensionRequest(extentionData._id).unwrap();
+      console.log("Request accepted successfully");
+      // You can add a toast notification here
+      // toast.success("Request accepted successfully");
+      
+      // Optionally refresh the page or update state
+      // window.location.reload();
+      
+    } catch (error) {
+      console.error("Error accepting request:", error);
+      // toast.error(error?.data?.message || "Failed to accept request");
+    }
+  };
+
+  // Handle reject submission from modal using RTK Query
+  const handleRejectSubmit = async ({ reason, file }) => {
+    try {
+      const rejectData = {
+        requestId: extentionData._id,
+        rejectDetails: reason,
+      };
+      
+      if (file) {
+        rejectData.reject_evidence = file;
+      }
+
+    const rejectExt =   await rejectExtensionRequest(rejectData).unwrap();
+
+    if(rejectExt.success){
+        toast.success("Extension request rejected successfully", {
+                style: {
+                  backgroundColor: "#d1fae5",
+                  color: "#065f46",
+                  borderLeft: "6px solid #10b981",
+                },
+              });
+    }
+       setShowRejectModal(false);
+
+      
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+       toast.error("Failed to reject extension request. Please try again.", {
+              style: {
+                backgroundColor: "#fee2e2",
+                color: "#991b1b",
+                borderLeft: "6px solid #dc2626",
+              },
+            });
+    }
+  };
+
+  const isRequestSender = (
+    (currentUserRole === "customer" && extentionData?.requestedFromModel === "Customer") ||
+    (currentUserRole === "provider" && extentionData?.requestedFromModel === "Provider")
+  );
+  
+  const isRequestReceiver = (
+    (currentUserRole === "customer" && extentionData?.requestToModel === "Customer") ||
+    (currentUserRole === "provider" && extentionData?.requestToModel === "Provider")
+  );
+
+  const getHeadingText = () => {
+    if (isRequestSender) {
+      return "You Requested Change of Task Completion Date";
+    } else if (isRequestReceiver) {
+      return "Date Extension Request";
+    } else {
+      return "Date Extension Request";
+    }
+  };
+
   return (
-    <div className="bg-[#E6F4F1] border border-green-200 rounded-lg p-6 mb-6">
-      <div className="flex items-start gap-3">
-        <div className="bg-white rounded-full p-2 hidden lg:block">
-          <GitPullRequest className="w-5 h-5 text-green-900" />
-        </div>
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
-            You Request Change of Task Completion Date
-          </h3>
+    <>
+      <div className="bg-[#E6F4F1] border border-green-200 rounded-lg p-6 mb-6">
+        <div className="flex items-start gap-3">
+          <div className="bg-white rounded-full p-2 hidden lg:block">
+            <GitPullRequest className="w-5 h-5 text-green-900" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-gray-900 mb-6">
+              {getHeadingText()}
+            </h3>
 
-          {/* Requested By Section */}
-          <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between mb-6">
-            <div className="flex flex-col md:flex-row md:items-center gap-3">
-              <div className="w-16 h-16">
-                <Image src={client} alt="client" />
+            {/* Requested By Section */}
+            <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between mb-6">
+              <div className="flex flex-col md:flex-row items-center gap-3">
+                <div>
+                  <Image
+                    src={extentionData?.requestFrom?.profile_image || client}
+                    width={40}
+                    height={40}
+                    alt="client"
+                    className="rounded-full"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <p className="font-medium text-gray-900">Request From</p>
+                  <p className="text-gray-600 text-sm">
+                    {extentionData?.requestFrom?.name}
+                    {isRequestSender && " (You)"}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {extentionData?.requestedFromModel}
+                  </p>
+                </div>
               </div>
               <div>
-                <p className="font-medium text-gray-900">Requested By</p>
-                <p className="text-gray-600 text-sm">Me</p>
-              </div>
-            </div>
-            <p className="text-gray-500 text-sm">15 May 2020 8:00 am</p>
-          </div>
-
-          {/* Current and New Date Section */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6  border px-4 py-2 rounded-2xl">
-            {/* Current Date */}
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">
-                Current Completion Date
-              </h4>
-              <div className=" rounded-lg p-3 flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-700 text-sm">
-                  15 May 2020 8:00 am
-                </span>
+                <div className="flex flex-col gap-1">
+                  <p className="font-medium text-gray-900">Extension Date:</p>
+                  <p className="text-gray-500 text-sm">
+                    {extentionData?.createdAt
+                      ? new Date(extentionData.createdAt).toLocaleString()
+                      : ""}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Arrow */}
-            <div className="flex items-center justify-center">
-              <ArrowLeftRight className="w-6 h-6 text-gray-400" />
-            </div>
-
-            {/* New Proposed Date */}
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">
-                New Proposed Date
-              </h4>
-              <div className=" rounded-lg p-3 flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-gray-400" />
-                <span className="text-gray-700 text-sm">
-                  15 May 2020 8:00 am
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Reason for Request */}
-          <div className="mb-6">
-            <h4 className="font-medium text-gray-900 mb-2">
-              Reason For Request
-            </h4>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              I request the immediate cancellation of the project due to
-              repeated breaches: poor communication, multiple missed meetings,
-              delays without real progress, and deliverables not meeting agreed
-              standards. I request a full refund and preservation of all
-              evidence in accordance with Fiverr's Terms of Service, Article
-              5.3.
-            </p>
-          </div>
-
-          {/* Extension Status */}
-          <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between mb-6">
-            <div className="flex flex-col md:flex-row md:items-center gap-2">
-              <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center ${content.statusBgColor}`}
-              >
-                {content.statusIcon}
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">Extension Status</p>
-                <p className={`text-sm ${content.statusColor}`}>
-                  {content.statusText}
+            {/* Requested To Section */}
+            <div className="mb-4">
+              <div className="flex flex-col gap-1">
+                <p className="font-medium text-gray-900">Request To</p>
+                <p className="text-gray-600 text-sm">
+                  {extentionData?.requestTo?.name} 
+                  {isRequestReceiver && " (You)"}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {extentionData?.requestToModel}
                 </p>
               </div>
             </div>
-            <p className="text-gray-500 text-sm">15 May 2020 8:00 am</p>
-          </div>
 
-          {/* Rejection Reason */}
-          {extensionStatus === "rejected" && content.rejectionReason && (
+            {/* Current and New Date Section */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6 border px-4 py-3 rounded-2xl">
+              {/* Current Date */}
+              <div className="flex-1">
+                <h4 className="font-medium text-gray-900 mb-2">
+                  Current Completion Date
+                </h4>
+                <div className="rounded-lg p-3 flex items-center gap-3">
+                  <Calendar className="w-5 h-5 text-gray-400" />
+                  <p className="text-gray-500 text-sm">
+                    {extentionData?.currentDate
+                      ? new Date(extentionData.currentDate).toLocaleString()
+                      : ""}
+                  </p>
+                </div>
+              </div>
+
+              {/* Arrow */}
+              <div className="flex items-center justify-center">
+                <ArrowLeftRight className="w-6 h-6 text-gray-400" />
+              </div>
+
+              {/* New Proposed Date */}
+              <div className="flex-1">
+                <h4 className="font-medium text-gray-900 mb-2">
+                  New Proposed Date
+                </h4>
+                <div className="rounded-lg p-3 flex items-center gap-3">
+                  <Calendar className="w-5 h-5 text-gray-400" />
+                  <p className="text-gray-500 text-sm">
+                    {extentionData?.requestedDateTime
+                      ? new Date(extentionData.requestedDateTime).toLocaleString()
+                      : ""}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Reason for Request */}
             <div className="mb-6">
               <h4 className="font-medium text-gray-900 mb-2">
-                Reason For Rejection :
+                Reason For Request
               </h4>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                {content.rejectionReason}
+              <p className="text-gray-600 text-sm leading-relaxed rounded-lg">
+                {extentionData?.reason}
               </p>
             </div>
-          )}
 
-          {/* Action Button */}
-          {content.button && (
-            <button className="px-6 py-2.5 bg-[#115E59] hover:bg-teal-700 text-white rounded-md transition-colors font-medium cursor-pointer">
-              {content.button.text}
-            </button>
-          )}
+            {/* Extension Status */}
+            <div className="flex flex-col md:flex-row md:items-center gap-4 justify-between mb-6">
+              <div className="flex flex-col md:flex-row md:items-center gap-2">
+                <div
+                  className={`w-6 h-6 rounded-full flex items-center justify-center ${content.statusBgColor}`}
+                >
+                  {content.statusIcon}
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Extension Status</p>
+                  <p className={`text-sm ${content.statusColor}`}>
+                    {content.statusText}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Rejection Reason */}
+            {extensionStatus.toUpperCase() === "REJECTED" && content.rejectionReason && (
+              <div className="mb-6">
+                <h4 className="font-medium text-gray-900 mb-2">
+                  Reason For Rejection :
+                </h4>
+                <p className="text-gray-600 text-sm leading-relaxed rounded-lg">
+                  {content.rejectionReason}
+                </p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            {content.buttons && !isLoading && (
+              <div className="flex flex-wrap gap-3">
+                {content.buttons.map((button, index) => (
+                  <button
+                    key={index}
+                    className={`px-6 py-2.5 ${button.color} text-white rounded-md transition-colors font-medium cursor-pointer`}
+                    onClick={() => handleButtonClick(button.action)}
+                    disabled={isLoading}
+                  >
+                    {button.text}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Loading State */}
+            {isLoading && (
+              <div className="flex items-center gap-2 text-gray-600">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-[#115e59]"></div>
+                Processing...
+              </div>
+            )}
+
+           
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Reject Modal */}
+      <RejectModal
+        isOpen={showRejectModal}
+        onClose={() => setShowRejectModal(false)}
+        onSubmit={handleRejectSubmit}
+        isLoading={isLoading}
+      />
+    </>
   );
 };
 

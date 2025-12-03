@@ -7,14 +7,21 @@ import CancellationStatusComponent from "./CancellationStatusComponent";
 import DateExtensionRequestSection from "./DateExtensionRequestSection";
 import { useCompleteTaskMutation } from "@/lib/features/task/taskApi";
 import { toast } from "sonner";
+import { useGetExtensionRequestsByTaskIdQuery } from "@/lib/features/extensionApi/extensionApi";
 
 const Progress = ({
-  extensionStatus = "",
   bidsData,
   taskDetails,
   taskId
 }) => {
   const [completeTask, { isLoading: isCompleting }] = useCompleteTaskMutation();
+  const {data: extensionRequest}   =  useGetExtensionRequestsByTaskIdQuery(taskId)
+      const extentionData = extensionRequest?.data?.[2] || []
+  
+      const extensionStatuss = extentionData?.status
+      const extensionStatus =extensionStatuss
+
+      console.log("customer page=====>",extentionData)
 
   const formatDate = (date) => {
     if (!date) return "";
@@ -121,7 +128,7 @@ const Progress = ({
           taskDetails={taskDetails}
           isServiceProvider={false}
         />
-        <DateExtensionRequestSection extensionStatus={extensionStatus} />
+        <DateExtensionRequestSection extensionStatus={extensionStatus} extentionData={extentionData} />
       </div>
 
       {!isCompleted && (

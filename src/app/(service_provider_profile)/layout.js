@@ -6,6 +6,7 @@ import ServiceProvideSideNav from "@/components/service_provider/ServiceProvideS
 import Footer from "@/components/ui/Footer";
 import Navbar from "@/components/ui/Navbar";
 import ProviderProtectedRoute from "@/components/auth/ProviderProtectedRoute";
+import { Toaster } from "sonner";
 
 const ServiceProviderProfileLayout = ({ children }) => {
   const [open, setOpen] = useState(false);
@@ -41,6 +42,7 @@ const ServiceProviderProfileLayout = ({ children }) => {
       <html lang="en">
         <body className="">
           <Navbar/>
+          <Toaster position="top-right" richColors />
           <div className="mb-12 md:max-w-10/12 mx-auto flex justify-center items-center">
           <div className="flex shadow-lg rounded-xl overflow-hidden min-h-[900px] w-full p-4">
             

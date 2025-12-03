@@ -12,7 +12,7 @@ const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsDa
    const [message, setMessage] = useState("");
   const router = useRouter();
   const { user } = useAuth();
-console.log("taskdetailsddd Provider end",taskDetails)
+
 
 
   const handleChatClick = () => {

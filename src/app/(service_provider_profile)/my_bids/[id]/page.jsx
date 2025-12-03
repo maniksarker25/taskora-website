@@ -30,7 +30,7 @@ const BidsDetails = () => {
     error
   } = useGetTaskByIdQuery(taskId);
   const taskDetails = taskData?.data;
-  console.log(taskDetails)
+  
 
   const tabForStatus = useMemo(() => {
     const backendStatus = taskDetails?.status;
@@ -125,6 +125,8 @@ const BidsDetails = () => {
           {currentStatus === "Completed" && <Completed taskDetails={taskDetails} bidsData={bidsData} />}
           {currentStatus === "Cancelled" && <Cancelled taskDetails={taskDetails} />}
         </div>
+
+        
       </div>
 
       {/* Resolution Modal */}

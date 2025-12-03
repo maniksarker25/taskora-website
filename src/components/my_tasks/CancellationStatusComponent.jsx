@@ -79,7 +79,7 @@ const CancellationStatusComponent = ({ taskId, taskDetails, isServiceProvider = 
         };
       case "REJECTED":
         return {
-          statusText: "Rejected By Service Provider",
+          statusText: "Rejected ",
           statusColor: "text-red-600",
           button: {
             text: "Request Ruling on Dispute",
