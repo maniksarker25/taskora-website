@@ -16,7 +16,7 @@ const Progress = ({
 }) => {
   const [completeTask, { isLoading: isCompleting }] = useCompleteTaskMutation();
   const {data: extensionRequest}   =  useGetExtensionRequestsByTaskIdQuery(taskId)
-      const extentionData = extensionRequest?.data?.[2] || []
+      const extentionData = extensionRequest?.data?.[0] || []
   
       const extensionStatuss = extentionData?.status
       const extensionStatus =extensionStatuss

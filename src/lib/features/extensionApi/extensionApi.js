@@ -69,7 +69,7 @@ const extensionApi = createApi({
     acceptExtensionRequest: builder.mutation({
       query: (requestId) => ({
         url: `/extension-request/accept-reject/${requestId}`,
-        method: "PUT",
+        method: "PATCH",
         body: {
           status: "ACCEPTED",
         },

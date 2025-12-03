@@ -18,20 +18,13 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
   const user = useSelector((state) => state.auth.user);
   const [showRejectModal, setShowRejectModal] = useState(false);
   
-  // RTK Query mutations
   const [acceptExtensionRequest, { isLoading: isAccepting }] = useAcceptExtensionRequestMutation();
   const [rejectExtensionRequest, { isLoading: isRejecting }] = useRejectExtensionRequestMutation();
 
   const isLoading = isAccepting || isRejecting;
 
-  console.log("login user", user);
-  console.log("extentionstatus", extensionStatus);
-  console.log("extentionData=======>", extentionData);
-
   const currentUserRole = user?.role?.toLowerCase(); 
-  console.log("Current User Role:", currentUserRole);
-  console.log("Request To Model:", extentionData?.requestToModel);
-  console.log("Request From Model:", extentionData?.requestedFromModel);
+
 
   const getExtensionContent = () => {
     if (!extensionStatus) return null;
@@ -46,7 +39,7 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
           currentUserRole === "provider"
         ) {
           showButtons = true;
-          console.log("Case 1: Customer to Provider - Provider sees buttons");
+          
         }
         else if (
           extentionData?.requestedFromModel === "Provider" &&
@@ -54,10 +47,10 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
           currentUserRole === "customer"
         ) {
           showButtons = true;
-          console.log("Case 2: Provider to Customer - Customer sees buttons");
+          
         }
         
-        console.log("Should show buttons:", showButtons);
+       
 
         return {
           statusText: "In Progress",
@@ -122,17 +115,26 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
   // Handle accept request using RTK Query
   const handleAcceptRequest = async () => {
     try {
-      await acceptExtensionRequest(extentionData._id).unwrap();
-      console.log("Request accepted successfully");
-      // You can add a toast notification here
-      // toast.success("Request accepted successfully");
-      
-      // Optionally refresh the page or update state
-      // window.location.reload();
+    const acceptExt =   await acceptExtensionRequest(extentionData._id).unwrap();
+       if(acceptExt.success){
+        toast.success("Extension request accepted successfully", {
+                style: {
+                  backgroundColor: "#d1fae5",
+                  color: "#065f46",
+                  borderLeft: "6px solid #10b981",
+                },
+              });
+    }
       
     } catch (error) {
       console.error("Error accepting request:", error);
-      // toast.error(error?.data?.message || "Failed to accept request");
+      toast.error(error?.data?.message || "Failed to accept extension request. Please try again.", {
+              style: {
+                backgroundColor: "#fee2e2",
+                color: "#991b1b",
+                borderLeft: "6px solid #dc2626",
+              },
+            });
     }
   };
 

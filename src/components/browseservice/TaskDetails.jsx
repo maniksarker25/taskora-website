@@ -126,10 +126,9 @@ const TaskDetails = ({ task }) => {
       toast.error("Task is no longer open for bids.");
       return;
     }
-    if (!confirm("Are you sure you want to accept this bid?")) return;
 
     try {
-      // API expects body: { bidID }
+
       const result = await acceptBid({ bidID: bidId }).unwrap();
 
       if (result.success) {
@@ -159,7 +158,6 @@ const TaskDetails = ({ task }) => {
           console.log("Payment reference:", reference);
         }
 
-        // Update local task status to reflect UI change
         setTaskStatus(result?.data?.status || "IN_PROGRESS");
         refetchBids();
       }
