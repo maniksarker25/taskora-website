@@ -17,7 +17,7 @@ const ProviderProgress = ({
 }) => {
   const [completeTask, { isLoading: isCompleting }] = useCompleteTaskMutation();
     const {data: extensionRequest}   =  useGetExtensionRequestsByTaskIdQuery(taskId)
-    const extentionData = extensionRequest?.data?.[2] || []
+    const extentionData = extensionRequest?.data?.[0] || []
     console.log("extentionAta",extentionData)
 
     const extensionStatuss = extentionData?.status
