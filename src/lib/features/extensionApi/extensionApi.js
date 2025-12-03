@@ -32,18 +32,47 @@ const extensionApi = createApi({
 
     getExtensionRequestsByTaskId: builder.query({
       query: (taskId) => ({
-        url: `/extension-request/task/${taskId}`,
+        url: `/extension-request/byTask/${taskId}`,
         method: "GET",
       }),
       providesTags: ["Extension"],
     }),
 
-    updateExtensionStatus: builder.mutation({
-      query: ({ requestId, status, extensionReason = "", rejectDetails = "" }) => ({
-        url: `/extension-request/update/${requestId}`,
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: { status, extensionReason, rejectDetails },
+    rejectExtensionRequest: builder.mutation({
+      query: ({ requestId, rejectDetails, reject_evidence }) => {
+        const formData = new FormData();
+        formData.append("status", "REJECTED");
+        formData.append("rejectDetails", rejectDetails);
+
+        if (reject_evidence) {
+          formData.append("reject_evidence", reject_evidence);
+        }
+
+        return {
+          url: `/extension-request/accept-reject/${requestId}`,
+          method: "PATCH",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Extension"],
+    }),
+
+    getExtensionRequestsByTaskId: builder.query({
+      query: (taskId) => ({
+        url: `/extension-request/byTask/${taskId}`,
+        method: "GET",
+      }),
+      providesTags: ["Extension"],
+    }),
+
+    // Accept extension request
+    acceptExtensionRequest: builder.mutation({
+      query: (requestId) => ({
+        url: `/extension-request/accept-reject/${requestId}`,
+        method: "PUT",
+        body: {
+          status: "ACCEPTED",
+        },
       }),
       invalidatesTags: ["Extension"],
     }),
@@ -53,7 +82,8 @@ const extensionApi = createApi({
 export const {
   useCreateExtensionRequestMutation,
   useGetExtensionRequestsByTaskIdQuery,
-  useUpdateExtensionStatusMutation,
+  useRejectExtensionRequestMutation,
+  useAcceptExtensionRequestMutation
 } = extensionApi;
 
 export default extensionApi;

@@ -14,7 +14,7 @@ import { User } from 'lucide-react';
 const ProviderBids = ({ taskDetails, bidsData, questionsData,taskId }) => {
  
   const info = bidsData?.data.result
-  console.log("bidsdetails",taskDetails)
+ 
 
   const [activeTab, setActiveTab] = useState("bids");
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
