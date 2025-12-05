@@ -11,10 +11,7 @@ const BookingCard = ({ signgleServiceData }) => {
   const router = useRouter();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const providerUsr = user.role
-  console.log("User:", user);
-
-  console.log("Provider ID:", signgleServiceData?.provider?._id);
-
+  
   const handleSubmitOffer = () => {
     const providerId = signgleServiceData?.provider?._id;
 

@@ -7,9 +7,9 @@ import { useAuth } from "@/components/auth/useAuth";
 import { useSocketContext } from "@/app/context/SocketProvider";
 
 const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsData }) => {
-  const { socket, isConnected ,sendMessageSoket, seenMessage} = useSocketContext();
-   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [message, setMessage] = useState("");
+  const { socket, isConnected, sendMessageSoket, seenMessage } = useSocketContext();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [message, setMessage] = useState("");
   const router = useRouter();
   const { user } = useAuth();
 
@@ -21,34 +21,34 @@ const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsDa
       return;
     }
 
-    setIsModalOpen(true); 
+    setIsModalOpen(true);
   };
 
- const handleSend = () => {
-   const userID =  user?.role !== "customer" ? taskDetails?.customer?._id : taskDetails?.provider?._id ;
-   if(!message.trim()){
+  const handleSend = () => {
+    const userID = user?.role !== "customer" ? taskDetails?.customer?._id : taskDetails?.provider?._id;
+    if (!message.trim()) {
       toast.error("Message cannot be empty");
       return;
-     }
-     if(!userID){
+    }
+    if (!userID) {
       toast.error("Unable to identify the recipient.");
       return;
-     }
+    }
 
-   const data =  {
-    text:message,
-    imageUrl:[""],
-    pdfUrl:[""],
-    receiver:userID
-  }
-  console.log("aksdhnaksd kamnsdkasndm a",data)
+    const data = {
+      text: message,
+      imageUrl: [""],
+      pdfUrl: [""],
+      receiver: userID
+    }
 
- sendMessageSoket(data);
-  setMessage(""); 
-  setIsModalOpen(false)
- if(window !== undefined) {
-  window.location.href = "/chat";
- }
+
+    sendMessageSoket(data);
+    setMessage("");
+    setIsModalOpen(false)
+    if (window !== undefined) {
+      window.location.href = "/chat";
+    }
   };
   // const handleChatClick = () => {
 
@@ -59,7 +59,7 @@ const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsDa
 
 
   //   const status = taskDetails?.status || null;
-    
+
   //   if (status && status !== "IN_PROGRESS") {
   //     toast.info("Chat is available only while the task is In Progress.");
   //     return;
@@ -121,14 +121,14 @@ const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsDa
           </div>
           <div>
             <p className="text-base md:text-xl font-semibold">To Be Done On</p>
-             <p className="text-sm text-gray-600">
-                {taskDetails?.preferredDeliveryDateTime && (
-                    <div className="flex items-center gap-2 text-gray-700">
-                     
-                      <span className="text-sm">{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
-                    </div>
-                  )}
-              </p>
+            <p className="text-sm text-gray-600">
+              {taskDetails?.preferredDeliveryDateTime && (
+                <div className="flex items-center gap-2 text-gray-700">
+
+                  <span className="text-sm">{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
+                </div>
+              )}
+            </p>
           </div>
         </div>
       </div>
@@ -145,7 +145,7 @@ const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsDa
         </button>
       </div>
 
-      
+
       {/* ✅ CHAT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/30 bg-opacity-40 flex items-center justify-center z-50">

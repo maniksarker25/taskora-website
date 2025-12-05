@@ -15,7 +15,7 @@ import Chatfiles from "@/components/chat/Chatfiles";
 const ChatContent = ({ userId }) => {
   const receiverId = usePathname().split("/")[2];
   const [message, setMessage] = useState("");
-  console.log("message send====>",message)
+
   const [selectedFiles, setSelectedFiles] = useState({
     image: null,
     video: null,
@@ -32,7 +32,7 @@ const ChatContent = ({ userId }) => {
     data: messageData,
     refetch,
     isLoading,
-  } = useGetMessagesQuery({ userId ,limit:9999}, { skip: !userId });
+  } = useGetMessagesQuery({ userId, limit: 9999 }, { skip: !userId });
 
   // File upload API hook
   const [uploadFileMutation] = useUploadConversationFilesMutation();
@@ -76,7 +76,7 @@ const ChatContent = ({ userId }) => {
     if (!user?.id) return;
 
     const unsubscribe = onMessageReceivedForUser(user.id, (data) => {
-      console.log("New message notification received:", data);
+
       saveScrollPosition();
       refetch();
     });
@@ -125,9 +125,9 @@ const ChatContent = ({ userId }) => {
 
   const handleFileSelect = (type) => {
     if (fileInputRef.current) {
-      fileInputRef.current.accept = type === 'image' ? 'image/*' : 
-                                  type === 'video' ? 'video/*' : 
-                                  'application/pdf';
+      fileInputRef.current.accept = type === 'image' ? 'image/*' :
+        type === 'video' ? 'video/*' :
+          'application/pdf';
       fileInputRef.current.onchange = (e) => handleFileChange(e, type);
       fileInputRef.current.click();
     }
@@ -172,125 +172,111 @@ const ChatContent = ({ userId }) => {
     }));
   };
 
- const uploadFiles = async () => {
-  const filesToUpload = Object.values(selectedFiles).filter(file => file !== null);
-  if (filesToUpload.length === 0) return { images: [], videos: [], pdfs: [] };
+  const uploadFiles = async () => {
+    const filesToUpload = Object.values(selectedFiles).filter(file => file !== null);
+    if (filesToUpload.length === 0) return { images: [], videos: [], pdfs: [] };
 
-  setUploading(true);
-  
-  try {
-    const uploadedData = {
-      images: [],
-      videos: [],
-      pdfs: []
-    };
+    setUploading(true);
 
-    for (const file of filesToUpload) {
-      const formData = new FormData();
-      formData.append('conversation_image', file);
-      
-      console.log("Uploading file:", file.name, file.type);
-      
-      const result = await uploadFileMutation(formData).unwrap();
-      
-      console.log("API Response:", result);
-      
-      if (result.success && result.data) {
-        // API থেকে images, videos, pdfs আলাদাভাবে পাওয়া যাচ্ছে
-        if (result.data.images && result.data.images.length > 0) {
-          uploadedData.images.push(...result.data.images);
+    try {
+      const uploadedData = {
+        images: [],
+        videos: [],
+        pdfs: []
+      };
+
+      for (const file of filesToUpload) {
+        const formData = new FormData();
+        formData.append('conversation_image', file);
+
+
+        const result = await uploadFileMutation(formData).unwrap();
+
+
+        if (result.success && result.data) {
+          if (result.data.images && result.data.images.length > 0) {
+            uploadedData.images.push(...result.data.images);
+          }
+          if (result.data.videos && result.data.videos.length > 0) {
+            uploadedData.videos.push(...result.data.videos);
+          }
+          if (result.data.pdfs && result.data.pdfs.length > 0) {
+            uploadedData.pdfs.push(...result.data.pdfs);
+          }
         }
-        if (result.data.videos && result.data.videos.length > 0) {
-          uploadedData.videos.push(...result.data.videos);
-        }
-        if (result.data.pdfs && result.data.pdfs.length > 0) {
-          uploadedData.pdfs.push(...result.data.pdfs);
-        }
+      }
+      return uploadedData;
+    } catch (error) {
+      console.error("File upload error:", error);
+      toast.error("Failed to upload files");
+      return { images: [], videos: [], pdfs: [] };
+    } finally {
+      setUploading(false);
+      setSelectedFiles({ image: null, video: null, pdfs: null });
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!message.trim() && Object.values(selectedFiles).every(file => file === null)) {
+      toast.error("Message cannot be empty");
+      return;
+    }
+    if (!receiverId) {
+      toast.error("Unable to identify the recipient.");
+      return;
+    }
+
+    setIsUserSending(true);
+
+    let uploadedData = { images: [], videos: [], pdfs: [] };
+    if (Object.values(selectedFiles).some(file => file !== null)) {
+      uploadedData = await uploadFiles();
+
+
+      const totalUploaded = uploadedData.images.length + uploadedData.videos.length + uploadedData.pdfs.length;
+      if (totalUploaded === 0 && !message.trim()) {
+        toast.error("No files uploaded successfully");
+        setIsUserSending(false);
+        return;
       }
     }
 
-    console.log("Uploaded data:", uploadedData);
-    toast.success("Files uploaded successfully");
-    return uploadedData;
-  } catch (error) {
-    console.error("File upload error:", error);
-    toast.error("Failed to upload files");
-    return { images: [], videos: [], pdfs: [] };
-  } finally {
-    setUploading(false);
-    setSelectedFiles({ image: null, video: null, pdfs: null });
-  }
-};
+    const data = {
+      text: message,
+      imageUrl: uploadedData.images || [],
+      pdfUrl: uploadedData.pdfs || [],
+      videoUrl: uploadedData.videos || [],
+      receiver: receiverId,
+    };
 
- const sendMessage = async () => {
-  if (!message.trim() && Object.values(selectedFiles).every(file => file === null)) {
-    toast.error("Message cannot be empty");
-    return;
-  }
-  if (!receiverId) {
-    toast.error("Unable to identify the recipient.");
-    return;
-  }
+    try {
+      const res = await sendMessageSoket(data);
 
-  setIsUserSending(true);
+      setMessage("");
+      setSelectedFiles({ image: null, video: null, pdfs: null });
 
-  let uploadedData = { images: [], videos: [], pdfs: [] };
-  if (Object.values(selectedFiles).some(file => file !== null)) {
-    uploadedData = await uploadFiles();
-    console.log("Uploaded data for sending:", uploadedData);
-    
-    // Check if any file was actually uploaded
-    const totalUploaded = uploadedData.images.length + uploadedData.videos.length + uploadedData.pdfs.length;
-    if (totalUploaded === 0 && !message.trim()) {
-      toast.error("No files uploaded successfully");
-      setIsUserSending(false);
-      return;
-    }
-  }
-
-  const data = {
-    text: message,
-    imageUrl: uploadedData.images || [],
-    pdfUrl: uploadedData.pdfs || [],
-    videoUrl: uploadedData.videos || [],
-    receiver: receiverId,
-  };
-
-  console.log("Final message data to send:", data);
-
-  try {
-   const res = await sendMessageSoket(data);
-   console.log("resss",res)
-    
-    setMessage("");
-    setSelectedFiles({ image: null, video: null, pdfs: null });
-    
-    // Refetch multiple times to ensure message is captured (accounts for API delay)
-    // Save scroll position before refetching
-    setTimeout(() => {
-      saveScrollPosition();
-      refetch();
-    }, 200);
-    setTimeout(() => {
-      saveScrollPosition();
-      refetch();
-    }, 500);
-    setTimeout(() => {
-      saveScrollPosition();
-      refetch();
-      setIsUserSending(false);
-      // Focus back to message input after refetch completes
       setTimeout(() => {
-        const messageInput = document.querySelector('input[placeholder="Type a message..."]');
-        if (messageInput) messageInput.focus();
-      }, 50);
-    }, 800);
-  } catch (error) {
-    toast.error("Failed to send message");
-    console.error("Send message error:", error);
-    setIsUserSending(false);
-  }
-};
+        saveScrollPosition();
+        refetch();
+      }, 200);
+      setTimeout(() => {
+        saveScrollPosition();
+        refetch();
+      }, 500);
+      setTimeout(() => {
+        saveScrollPosition();
+        refetch();
+        setIsUserSending(false);
+        setTimeout(() => {
+          const messageInput = document.querySelector('input[placeholder="Type a message..."]');
+          if (messageInput) messageInput.focus();
+        }, 50);
+      }, 800);
+    } catch (error) {
+      toast.error("Failed to send message");
+      setIsUserSending(false);
+    }
+  };
 
   const formatMessageTime = (timestamp) => {
     try {
@@ -436,8 +422,8 @@ const ChatContent = ({ userId }) => {
           removeSelectedFile={removeSelectedFile}
           selectedFiles={selectedFiles}
           setSelectedFiles={setSelectedFiles}
-        />  
-     
+        />
+
       </div>
     );
   };
@@ -452,11 +438,11 @@ const ChatContent = ({ userId }) => {
   }
 
   const groupedMessages = groupMessagesByDate();
-  
+
   // Get receiver user info from messages
-  const receiverUserInfo = messageDataResult.find(msg => !msg.isMyMessage)?.userDetails || 
-                          messageDataResult.find(msg => msg.isMyMessage)?.userData || 
-                          { name: "User", profile_image: "" };
+  const receiverUserInfo = messageDataResult.find(msg => !msg.isMyMessage)?.userDetails ||
+    messageDataResult.find(msg => msg.isMyMessage)?.userData ||
+    { name: "User", profile_image: "" };
 
   return (
     <div className="flex flex-col h-[750px] max-w-4xl mx-auto bg-white rounded-lg shadow-lg">
@@ -552,13 +538,13 @@ const ChatContent = ({ userId }) => {
               <FaFilePdf size={20} />
             </button>
           </div>
-          
+
           <input
             type="file"
             ref={fileInputRef}
             className="hidden"
           />
-          
+
           <input
             type="text"
             placeholder="Type a message..."
@@ -568,15 +554,14 @@ const ChatContent = ({ userId }) => {
             className="flex-1 px-4 py-3 rounded-full bg-gray-100 focus:outline-none focus:ring-2 focus:ring-green-500 focus:bg-white transition-all"
             disabled={uploading}
           />
-          
+
           <button
             onClick={sendMessage}
             disabled={(!message.trim() && Object.values(selectedFiles).every(file => file === null)) || uploading}
-            className={`p-3 rounded-full transition-all ${
-              (message.trim() || Object.values(selectedFiles).some(file => file !== null)) && !uploading
+            className={`p-3 rounded-full transition-all ${(message.trim() || Object.values(selectedFiles).some(file => file !== null)) && !uploading
                 ? "bg-green-500 text-white hover:bg-green-600"
                 : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
+              }`}
             title="Send message"
           >
             {uploading ? (

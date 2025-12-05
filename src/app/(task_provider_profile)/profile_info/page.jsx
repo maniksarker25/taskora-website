@@ -9,12 +9,10 @@ import { useSelector } from "react-redux";
 
 const ProfileInfo = () => {
   const { data, isLoading, error } = useGetMyProfileQuery();
-   const role = useSelector((state) => state?.auth?.user?.role);
-  
+  const role = useSelector((state) => state?.auth?.user?.role);
+
   // User data from API
   const userData = data?.data;
-  
-  console.log("User Profile Data:", userData?.profile_image);
 
   // Loading state
   if (isLoading) {
@@ -93,7 +91,7 @@ const ProfileInfo = () => {
               className="rounded-full mx-auto border-4 border-white shadow-lg mb-4"
             />
             <h3 className="text-white text-xl font-semibold mb-1">
-              {userData?.firstName && userData?.lastName 
+              {userData?.firstName && userData?.lastName
                 ? `${userData.firstName} ${userData.lastName}`
                 : userData?.name || "User Name"
               }
@@ -127,7 +125,7 @@ const ProfileInfo = () => {
                         Name
                       </h3>
                       <p className="text-gray-600 text-lg bg-gray-50 p-3 rounded-lg">
-                        {userData?.firstName && userData?.lastName 
+                        {userData?.firstName && userData?.lastName
                           ? `${userData.firstName} ${userData.lastName}`
                           : userData?.name || "Not provided"
                         }
@@ -249,7 +247,7 @@ const ProfileInfo = () => {
                     Name
                   </h3>
                   <p className="text-gray-600 text-base ml-5">
-                    {userData?.firstName && userData?.lastName 
+                    {userData?.firstName && userData?.lastName
                       ? `${userData.firstName} ${userData.lastName}`
                       : userData?.name || "Not provided"
                     }

@@ -2,13 +2,19 @@
 
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { logout } from "@/lib/features/auth/authSlice";
 
 const CustomerProtectedRoute = ({ children }) => {
   const { isAuthenticated, user, isLoading } = useSelector((state) => state.auth);
   const router = useRouter();
   const dispatch = useDispatch();
+
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -21,20 +27,20 @@ const CustomerProtectedRoute = ({ children }) => {
     if (!isLoading && isAuthenticated && user?.role !== 'customer') {
       // Logout the user
       dispatch(logout());
-      
+
       // Clear refreshToken cookie
       if (typeof document !== 'undefined') {
         document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
       }
-      
+
       // Redirect to login
       router.push("/login");
       return;
     }
   }, [isAuthenticated, isLoading, user, router, dispatch]);
 
-  // Show loading state while checking authentication
-  if (isLoading) {
+  // Show loading state while checking authentication or mounting
+  if (!mounted || isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#115E59]"></div>

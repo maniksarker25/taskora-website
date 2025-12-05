@@ -22,17 +22,17 @@ const AddService = ({ serviceData = null, isUpdateMode = false, onSuccess = null
     serviceImage: null,
     serviceDescription: ""
   });
-  
+
   const [existingImages, setExistingImages] = useState([]);
   const [deletedImages, setDeletedImages] = useState([]);
   const [newImages, setNewImages] = useState([]);
-  
+
   const { data: categoriesData, error: categoriesError } = useGetAllCategoriesQuery();
   const [createService, { isLoading: isCreating }] = useCreateServiceMutation();
   const [updateService, { isLoading: isUpdating }] = useUpdateServiceMutation();
-  
+
   const isLoading = isCreating || isUpdating;
-  
+
   const [errors, setErrors] = useState({});
   const [imagePreview, setImagePreview] = useState(null);
   const [successMessage, setSuccessMessage] = useState("");
@@ -49,7 +49,7 @@ const AddService = ({ serviceData = null, isUpdateMode = false, onSuccess = null
         serviceImage: null,
         serviceDescription: serviceData.description || ""
       });
-      
+
       if (serviceData.images && serviceData.images.length > 0) {
         setExistingImages(serviceData.images.filter(img => img && img.trim() !== ''));
       }
@@ -79,8 +79,8 @@ const AddService = ({ serviceData = null, isUpdateMode = false, onSuccess = null
   }), []);
 
   const serviceCategories = categoriesData?.data?.result?.map(category => ({
-    value: category?._id || category?.id, 
-    label: category?.name 
+    value: category?._id || category?.id,
+    label: category?.name
   })) || [];
 
   const handleInputChange = (field, value) => {
@@ -88,7 +88,7 @@ const AddService = ({ serviceData = null, isUpdateMode = false, onSuccess = null
       ...prev,
       [field]: value
     }));
-    
+
     if (errors[field]) {
       setErrors(prev => ({
         ...prev,
@@ -156,7 +156,7 @@ const AddService = ({ serviceData = null, isUpdateMode = false, onSuccess = null
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = formData.serviceDescription;
     const plainText = tempDiv.textContent || tempDiv.innerText || '';
-    
+
     if (!plainText.trim()) {
       newErrors.serviceDescription = "Service description is required";
     } else if (plainText.trim().length < 10) {
@@ -171,94 +171,89 @@ const AddService = ({ serviceData = null, isUpdateMode = false, onSuccess = null
     return Object.keys(newErrors).length === 0;
   };
 
-const handleSubmit = async () => {
-  if (!validateForm()) {
-    return;
-  }
-
-  try {
-    const servicePayload = {
-      title: formData.serviceTitle,
-      price: Number(formData.startingPrice),
-      category: formData.serviceCategory,
-      description: formData.serviceDescription, // Keep HTML for rich text
-      deletedImages: deletedImages,
-    };
-
-    // Add location data if available in update mode
-    if (isUpdateMode && serviceData?.location) {
-      servicePayload.location = serviceData.location;
-    }
-    if (isUpdateMode && serviceData?.address) {
-      servicePayload.address = serviceData.address;
-    }
-    if (isUpdateMode && serviceData?.city) {
-      servicePayload.city = serviceData.city;
+  const handleSubmit = async () => {
+    if (!validateForm()) {
+      return;
     }
 
-    const formDataToSend = new FormData();
-    formDataToSend.append('data', JSON.stringify(servicePayload));
+    try {
+      const servicePayload = {
+        title: formData.serviceTitle,
+        price: Number(formData.startingPrice),
+        category: formData.serviceCategory,
+        description: formData.serviceDescription, // Keep HTML for rich text
+        deletedImages: deletedImages,
+      };
 
-    // Append new images with key 'service_image'
-    newImages.forEach((file) => {
-      formDataToSend.append('service_image', file);
-    });
+      // Add location data if available in update mode
+      if (isUpdateMode && serviceData?.location) {
+        servicePayload.location = serviceData.location;
+      }
+      if (isUpdateMode && serviceData?.address) {
+        servicePayload.address = serviceData.address;
+      }
+      if (isUpdateMode && serviceData?.city) {
+        servicePayload.city = serviceData.city;
+      }
 
-    console.log('Submitting form data...', servicePayload);
+      const formDataToSend = new FormData();
+      formDataToSend.append('data', JSON.stringify(servicePayload));
 
-    let result;
-    if (isUpdateMode) {
-      result = await updateService(formDataToSend).unwrap();
-    } else {
-      result = await createService(formDataToSend).unwrap();
-    }
-    
-    console.log("API Response:", result);
-    
-    if (result?.success) {
-      const message = isUpdateMode ? "Service updated successfully!" : "Service added successfully!";
-      toast.success(message);
-      
-      if (onSuccess) {
-        onSuccess();
+      newImages.forEach((file) => {
+        formDataToSend.append('service_image', file);
+      });
+
+
+      let result;
+      if (isUpdateMode) {
+        result = await updateService(formDataToSend).unwrap();
       } else {
-        // Reset form only if not in update mode
-        if (!isUpdateMode) {
-          setFormData({
-            serviceTitle: "",
-            startingPrice: "",
-            serviceCategory: "",
-            serviceImage: null,
-            serviceDescription: ""
-          });
-          
-          setImagePreview(null);
-          setNewImages([]);
-          setExistingImages([]);
-          setDeletedImages([]);
-          
-          if (fileInputRef.current) {
-            fileInputRef.current.value = "";
-          }
-          
-          if (editorRef.current) {
-            editorRef.current.value = '';
+        result = await createService(formDataToSend).unwrap();
+      }
+      if (result?.success) {
+        const message = isUpdateMode ? "Service updated successfully!" : "Service added successfully!";
+        toast.success(message);
+
+        if (onSuccess) {
+          onSuccess();
+        } else {
+          // Reset form only if not in update mode
+          if (!isUpdateMode) {
+            setFormData({
+              serviceTitle: "",
+              startingPrice: "",
+              serviceCategory: "",
+              serviceImage: null,
+              serviceDescription: ""
+            });
+
+            setImagePreview(null);
+            setNewImages([]);
+            setExistingImages([]);
+            setDeletedImages([]);
+
+            if (fileInputRef.current) {
+              fileInputRef.current.value = "";
+            }
+
+            if (editorRef.current) {
+              editorRef.current.value = '';
+            }
           }
         }
       }
+    } catch (error) {
+      console.error(`Failed to ${isUpdateMode ? 'update' : 'create'} service:`, error);
+
+      const errorMessage = error?.data?.message || error?.message || `Failed to ${isUpdateMode ? 'update' : 'add'} service. Please try again.`;
+      toast.error(errorMessage);
+
+      setErrors(prev => ({
+        ...prev,
+        submit: errorMessage
+      }));
     }
-  } catch (error) {
-    console.error(`Failed to ${isUpdateMode ? 'update' : 'create'} service:`, error);
-    
-    const errorMessage = error?.data?.message || error?.message || `Failed to ${isUpdateMode ? 'update' : 'add'} service. Please try again.`;
-    toast.error(errorMessage);
-    
-    setErrors(prev => ({
-      ...prev,
-      submit: errorMessage
-    }));
-  }
-};
+  };
 
   return (
     <div className="project_container px-6 bg-white p-6 md:p-8">
@@ -296,7 +291,7 @@ const handleSubmit = async () => {
           <label className="block text-sm font-medium text-gray-700">
             Service Images {isUpdateMode && "(You can add more or remove existing)"}
           </label>
-          
+
           {/* Existing Images (Update Mode) */}
           {isUpdateMode && existingImages.length > 0 && (
             <div className="space-y-3">
@@ -350,7 +345,7 @@ const handleSubmit = async () => {
               </div>
             </div>
           )}
-          
+
           {/* Upload Area */}
           {(existingImages.length === 0 && newImages.length === 0) || (
             <div
@@ -372,7 +367,7 @@ const handleSubmit = async () => {
               </div>
             </div>
           )}
-          
+
           <input
             ref={fileInputRef}
             type="file"
@@ -381,7 +376,7 @@ const handleSubmit = async () => {
             onChange={handleImageUpload}
             className="hidden"
           />
-          
+
           {errors.serviceImage && (
             <p className="text-sm text-red-600">{errors.serviceImage}</p>
           )}
@@ -397,9 +392,8 @@ const handleSubmit = async () => {
             value={formData.serviceTitle}
             onChange={(e) => handleInputChange('serviceTitle', e.target.value)}
             placeholder="e.g. Office Cleaning"
-            className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-800 focus:border-transparent ${
-              errors.serviceTitle ? 'border-red-500' : 'border-gray-300'
-            }`}
+            className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-800 focus:border-transparent ${errors.serviceTitle ? 'border-red-500' : 'border-gray-300'
+              }`}
           />
           {errors.serviceTitle && (
             <p className="text-sm text-red-600">{errors.serviceTitle}</p>
@@ -420,11 +414,10 @@ const handleSubmit = async () => {
               value={formData.startingPrice}
               onChange={(e) => handleInputChange('startingPrice', e.target.value)}
               placeholder="e.g. 24.00"
-              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-800 focus:border-transparent ${
-                errors.startingPrice ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-800 focus:border-transparent ${errors.startingPrice ? 'border-red-500' : 'border-gray-300'
+                }`}
             />
-          
+
           </div>
 
           {/* Service Category */}
@@ -435,14 +428,13 @@ const handleSubmit = async () => {
             <select
               value={formData.serviceCategory}
               onChange={(e) => handleInputChange('serviceCategory', e.target.value)}
-              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-800 focus:border-transparent bg-white ${
-                errors.serviceCategory ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full px-4 py-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-800 focus:border-transparent bg-white ${errors.serviceCategory ? 'border-red-500' : 'border-gray-300'
+                }`}
             >
               <option value="">Select Service Category</option>
               {serviceCategories.map((category, index) => (
                 <option key={index} value={category.value}>
-                  {category?.label} 
+                  {category?.label}
                 </option>
               ))}
             </select>
@@ -457,10 +449,9 @@ const handleSubmit = async () => {
           <label className="block text-sm font-medium text-gray-700">
             Service Description
           </label>
-          
-          <div className={`border rounded-md focus-within:ring-2 focus-within:ring-green-800 focus-within:border-transparent ${
-            errors.serviceDescription ? 'border-red-500' : 'border-gray-300'
-          }`}>
+
+          <div className={`border rounded-md focus-within:ring-2 focus-within:ring-green-800 focus-within:border-transparent ${errors.serviceDescription ? 'border-red-500' : 'border-gray-300'
+            }`}>
             <JoditEditor
               ref={editorRef}
               value={formData.serviceDescription}
@@ -471,11 +462,11 @@ const handleSubmit = async () => {
               }}
             />
           </div>
-          
+
           {errors.serviceDescription && (
             <p className="text-sm text-red-600">{errors.serviceDescription}</p>
           )}
-          
+
           {/* Character Count */}
           <div className="flex justify-between items-center">
             <p className="text-xs text-gray-500">
@@ -493,11 +484,10 @@ const handleSubmit = async () => {
           <button
             onClick={handleSubmit}
             disabled={isLoading}
-            className={`flex-1 cursor-pointer px-8 py-3 rounded-md font-medium transition-colors ${
-              isLoading
+            className={`flex-1 cursor-pointer px-8 py-3 rounded-md font-medium transition-colors ${isLoading
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-[#00786f] hover:bg-green-800 active:bg-green-800'
-            } text-white`}
+              } text-white`}
           >
             {isLoading ? (
               <div className="flex items-center justify-center gap-2">
