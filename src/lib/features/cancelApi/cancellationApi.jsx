@@ -76,8 +76,10 @@ const cancellationApi = createApi({
       query: ({ id, reason, evidence }) => {
         const formData = new FormData();
         formData.append('data', JSON.stringify({ reason }));
-        if (evidence) {
-          formData.append('reject_evidence', evidence);
+        if (evidence && evidence.length > 0) {
+          Array.from(evidence).forEach((file) => {
+            formData.append('reject_evidence', file);
+          });
         }
         return {
           url: `/cancel-request/${id}/reject`,
