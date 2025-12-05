@@ -70,7 +70,6 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
 
     try {
       const result = await createExtensionRequest(extensionRequest).unwrap();
-      console.log("extension request===>", result);
      
       
       if (result.success) {
@@ -391,13 +390,7 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
             </p>
 
             <form onSubmit={handleCancellationSubmit} className="space-y-4 md:space-y-5">
-              {/* Task ID Info */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                <p className="text-sm text-blue-700">
-                  <strong>Task ID:</strong> {taskId}
-                </p>
-              </div>
-
+             
               {/* Reason */}
               <div>
                 <label className="block text-gray-700 font-medium mb-1 text-sm md:text-base">
@@ -520,14 +513,6 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
                     </button>
                   </div>
                 )}
-              </div>
-
-              {/* Warning Message */}
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                <p className="text-xs text-yellow-600">
-                   Cancelling this task may affect your account rating and refund eligibility. 
-                  Please ensure this is necessary before submitting.
-                </p>
               </div>
 
               {/* Buttons */}

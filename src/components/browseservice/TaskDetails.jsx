@@ -39,7 +39,7 @@ const TaskDetails = ({ task }) => {
 
   const [createBid, { isLoading: isSubmittingBid }] = useCreateBidMutation();
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
- 
+
   const [createQuestion, { isLoading: isSubmittingQuestion }] = useCreateQuestionMutation();
 
   const {
@@ -63,7 +63,7 @@ const TaskDetails = ({ task }) => {
       name: task?.customer?.name || "Customer",
       profile_image: task?.customer?.profile_image || client,
     },
-    location: task?.address|| task?.address || "Location not specified",
+    location: task?.address || task?.address || "Location not specified",
     dueDate: task?.preferredDeliveryDateTime
       ? new Date(task.preferredDeliveryDateTime).toLocaleDateString("en-US", {
         day: "numeric",
@@ -92,7 +92,7 @@ const TaskDetails = ({ task }) => {
       const result = await createBid(bidData).unwrap();
 
       if (result.success) {
-       
+
         toast.success("Bid send successfull!", {
           style: {
             backgroundColor: "#d1fae5",
@@ -132,7 +132,6 @@ const TaskDetails = ({ task }) => {
       const result = await acceptBid({ bidID: bidId }).unwrap();
 
       if (result.success) {
-        console.log("Bid accept response:", result);
         const paymentLink = result?.data?.paymentLink;
         const reference = result?.data?.reference;
 
@@ -141,11 +140,11 @@ const TaskDetails = ({ task }) => {
             ? "Bid accepted! Redirecting to payment..."
             : "Bid accepted successfully!",
           {
-          style: {
-            backgroundColor: "#d1fae5",
-            color: "#065f46",
-            borderLeft: "6px solid #10b981",
-          },
+            style: {
+              backgroundColor: "#d1fae5",
+              color: "#065f46",
+              borderLeft: "6px solid #10b981",
+            },
             duration: 3500,
           }
         );
@@ -194,7 +193,7 @@ const TaskDetails = ({ task }) => {
       }
 
       setQuestionImage(file);
-      
+
       // Create preview
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -217,16 +216,16 @@ const TaskDetails = ({ task }) => {
 
     try {
       const formData = new FormData();
-      
+
       // Create data object
       const questionData = {
         task: task?._id,
         details: newQuestion.trim()
       };
-      
+
       // Append data as JSON string
       formData.append('data', JSON.stringify(questionData));
-      
+
       // Append image if selected
       if (questionImage) {
         formData.append('question_image', questionImage);
@@ -243,12 +242,12 @@ const TaskDetails = ({ task }) => {
           },
           duration: 3000,
         });
-        
+
         // Reset form
         setNewQuestion("");
         setQuestionImage(null);
         setQuestionImagePreview(null);
-        
+
         // Refetch questions
         refetchQuestions();
       }
@@ -438,8 +437,8 @@ const TaskDetails = ({ task }) => {
             key={tab}
             onClick={() => setContentTab(tab)}
             className={`flex-1 py-4 px-4 text-sm font-medium transition-colors ${contentTab === tab
-                ? "text-white bg-[#115E59] cursor-pointer border-b-2 border-[#115E59]"
-                : "text-gray-600 hover:text-gray-900 cursor-pointer hover:bg-gray-50"
+              ? "text-white bg-[#115E59] cursor-pointer border-b-2 border-[#115E59]"
+              : "text-gray-600 hover:text-gray-900 cursor-pointer hover:bg-gray-50"
               }`}
           >
             {tab}
@@ -498,11 +497,11 @@ const TaskDetails = ({ task }) => {
                         <span className="text-xs text-gray-400">
                           {formatTimeAgo(bid.createdAt)}
                         </span>
-                       
+
                       </div>
-                           <p className=" text-gray-400 text-xl mb-2">
-                          ₦ {bid.price}
-                        </p>
+                      <p className=" text-gray-400 text-xl mb-2">
+                        ₦ {bid.price}
+                      </p>
                       <div className="flex items-center gap-2 mb-2">
                         <div className="flex items-center gap-1">
                           <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -525,11 +524,10 @@ const TaskDetails = ({ task }) => {
                           <button
                             onClick={() => handleAcceptBid(bid._id)}
                             disabled={isAcceptingBid}
-                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                              !isAcceptingBid
+                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isAcceptingBid
                                 ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
                                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                            }`}
+                              }`}
                           >
                             {isAcceptingBid ? "Accepting..." : "Accept Bid"}
                           </button>
@@ -563,7 +561,7 @@ const TaskDetails = ({ task }) => {
                   className="w-full p-3 border border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-[#115E59] focus:border-transparent"
                   rows="3"
                 />
-                
+
                 {/* Image Upload Section */}
                 <div className="mt-3">
                   {questionImagePreview ? (
@@ -598,11 +596,10 @@ const TaskDetails = ({ task }) => {
                   <button
                     onClick={handleQuestionSubmit}
                     disabled={!newQuestion.trim() || isSubmittingQuestion}
-                    className={`px-6 py-2 rounded-lg font-medium transition-colors ${
-                      newQuestion.trim() && !isSubmittingQuestion
+                    className={`px-6 py-2 rounded-lg font-medium transition-colors ${newQuestion.trim() && !isSubmittingQuestion
                         ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    }`}
+                      }`}
                   >
                     {isSubmittingQuestion ? "Submitting..." : "Send Question"}
                   </button>
@@ -669,7 +666,7 @@ const TaskDetails = ({ task }) => {
                           <p className="text-sm text-gray-700 leading-relaxed">
                             {question.details}
                           </p>
-                          
+
                           {/* Question Image */}
                           {question.question_image && (
                             <div className="mt-2">

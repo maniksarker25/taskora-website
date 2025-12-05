@@ -21,7 +21,6 @@ const providerServiceApi = createApi({
   endpoints: (builder) => ({
     createService: builder.mutation({
       query: (formData) => {
-        console.log("Form Data From API Layer:", formData);
         return {
           url: "/service/create-service",
           method: "POST",

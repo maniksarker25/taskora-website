@@ -20,7 +20,7 @@ import dayjs from "dayjs";
 import { useGetAllCategoriesQuery } from "@/lib/features/category/categoryApi";
 import { useCreateTaskMutation } from "@/lib/features/task/taskApi";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 
 const TaskCreationApp = () => {
   const [currentStep, setCurrentStep] = useState(0);
@@ -28,9 +28,9 @@ const TaskCreationApp = () => {
   const [providerId, setProviderId] = useState(null);
   const { data, isLoading, error } = useGetAllCategoriesQuery();
   const router = useRouter();
-  
+
   const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
-  
+
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const urlParams = new URLSearchParams(window.location.search);
@@ -40,8 +40,8 @@ const TaskCreationApp = () => {
   }, []);
 
   const categories = data?.data?.result?.map(category => ({
-    value: category?._id || category?.id, 
-    label: category?.name 
+    value: category?._id || category?.id,
+    label: category?.name
   })) || [];
 
   const [formData, setFormData] = useState({
@@ -52,7 +52,7 @@ const TaskCreationApp = () => {
     location: "",
     locationCoordinates: null,
     city: "",
-    taskTiming: "fixed-date", 
+    taskTiming: "fixed-date",
     preferredDate: "",
     preferredTime: "",
     budget: "",
@@ -163,7 +163,7 @@ const TaskCreationApp = () => {
         city: ""
       }));
     }
-    
+
     if (formErrors.location) {
       setFormErrors(prev => ({ ...prev, location: "" }));
     }
@@ -228,24 +228,20 @@ const TaskCreationApp = () => {
       // Add provider if available
       if (providerId && providerId !== "null" && providerId !== "undefined") {
         taskPayload.provider = providerId;
-        console.log("Creating task for specific provider:", providerId);
+
       } else {
         console.log("Creating general task (no specific provider)");
       }
 
-      console.log("Final Task Payload for Backend:", taskPayload);
-      
+
       formDataToSend.append('data', JSON.stringify(taskPayload));
 
       const result = await createTask(formDataToSend).unwrap();
-      console.log("API Response:", result);
-      
+
       if (result.success) {
         if (result.data?.provider) {
-          console.log("Task created WITH provider:", result.data.provider);
           toast.success(`Task created successfully for the provider!`);
         } else {
-          console.log("Task created WITHOUT specific provider");
           toast.success("Task created successfully!");
         }
 
@@ -265,7 +261,7 @@ const TaskCreationApp = () => {
           agreedToTerms: false,
           taskAttachments: [],
         });
-        
+
         localStorage.removeItem("formData");
         localStorage.removeItem("currentStep");
         setCurrentStep(0);
@@ -276,7 +272,6 @@ const TaskCreationApp = () => {
       }
 
     } catch (error) {
-      console.error("Failed to create task:", error);
       toast.error(error?.data?.message || "Failed to create task. Please try again.");
     }
   };
@@ -310,7 +305,7 @@ const TaskCreationApp = () => {
         return (
           <div className="space-y-6">
             <StepHeader icon={FileText} title="Task Overview" />
-            
+
             {/* Provider Info Banner */}
             {providerId && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -325,7 +320,7 @@ const TaskCreationApp = () => {
                 </p>
               </div>
             )}
-            
+
             <div>
               <FormInput
                 label="Task Title"
@@ -447,7 +442,7 @@ const TaskCreationApp = () => {
                     className="w-full rounded-lg"
                     format="YYYY-MM-DD"
                     value={formData.preferredDate ? dayjs(formData.preferredDate) : null}
-                    onChange={(date, dateString) => 
+                    onChange={(date, dateString) =>
                       handleInputChange("preferredDate", dateString)
                     }
                     suffixIcon={<CalendarOutlined className="text-gray-400" />}
@@ -488,7 +483,7 @@ const TaskCreationApp = () => {
               <p className="text-2xl font-bold text-[#115e59]">₦</p>
               <p className="text-2xl font-semibold">Budget</p>
             </div>
-            
+
             {/* Provider-specific message */}
             {providerId && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -497,7 +492,7 @@ const TaskCreationApp = () => {
                 </p>
               </div>
             )}
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 How much are you offering? *
@@ -552,8 +547,8 @@ const TaskCreationApp = () => {
             {providerId ? "Submit Your Offer" : "Create New Task"}
           </h1>
           <p className="text-gray-600">
-            {providerId 
-              ? "Submit a personalized offer to this specific provider" 
+            {providerId
+              ? "Submit a personalized offer to this specific provider"
               : "Post your task and get offers from multiple providers"
             }
           </p>

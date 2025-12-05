@@ -12,8 +12,8 @@ import { useAuth } from "@/components/auth/useAuth";
 const ChatSideNav = ({ onMobileItemClick }) => {
   const router = useRouter();
   const { user } = useAuth();
-  const {data: chatUsers, refetch}= useGetChatListQuery();
- 
+  const { data: chatUsers, refetch } = useGetChatListQuery();
+
   const { seenMessage, onMessageReceivedForUser } = useSocketContext();
 
   // Auto-refetch chat list every 1 second for real-time updates
@@ -30,7 +30,6 @@ const ChatSideNav = ({ onMobileItemClick }) => {
     if (!user?.id) return;
 
     const unsubscribe = onMessageReceivedForUser(user.id, (data) => {
-      console.log("New message received - updating sidebar:", data);
       refetch();
     });
 
@@ -41,11 +40,11 @@ const ChatSideNav = ({ onMobileItemClick }) => {
 
   const handleUserClick = (user) => {
     const data = {
-    conversationId:user?.lastMessage?.conversationId,
-    msgByUserId:user?.lastMessage?.msgByUserId
+      conversationId: user?.lastMessage?.conversationId,
+      msgByUserId: user?.lastMessage?.msgByUserId
     }
-  seenMessage(data)
-  refetch();
+    seenMessage(data)
+    refetch();
     router.push(`/chat/${user?.userData?._id}`);
     if (onMobileItemClick) {
       onMobileItemClick();
@@ -85,18 +84,18 @@ const ChatSideNav = ({ onMobileItemClick }) => {
             <div
               key={user?._id}
               onClick={() => handleUserClick(user)}
-              className={`flex items-center gap-3 p-4 hover:bg-[#E6F4F1] cursor-pointer rounded-2xl transition-colors ${!user?.lastMessage?.seen  ? "bg-green-50" : "bg-green-100 font-semibold"}`}
+              className={`flex items-center gap-3 p-4 hover:bg-[#E6F4F1] cursor-pointer rounded-2xl transition-colors ${!user?.lastMessage?.seen ? "bg-green-50" : "bg-green-100 font-semibold"}`}
             >
               <div className="w-12 h-12 lg:w-16 lg:h-16 rounded-full flex items-center justify-center overflow-hidden bg-gray-100">
                 {user?.userData?.profile_image && user?.userData?.profile_image.trim() !== "" ? (
-                  <img 
-                    src={user?.userData?.profile_image} 
+                  <img
+                    src={user?.userData?.profile_image}
                     alt={user?.userData?.name}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <img 
-                    src="/taskalley.svg" 
+                  <img
+                    src="/taskalley.svg"
                     alt="TaskAlley Logo"
                     className="w-8 h-8 lg:w-10 lg:h-10"
                   />
@@ -104,7 +103,7 @@ const ChatSideNav = ({ onMobileItemClick }) => {
               </div>
 
               <div className="flex-1 min-w-0">
-                 {user?.unseenMsg > 0 && <div className="badge bg-[#115E59] w-6 h-6 rounded-full text-white p-2 badge-sm float-end">{user?.unseenMsg}</div>}
+                {user?.unseenMsg > 0 && <div className="badge bg-[#115E59] w-6 h-6 rounded-full text-white p-2 badge-sm float-end">{user?.unseenMsg}</div>}
                 <p className="text-sm lg:text-base font-semibold truncate line-clamp-1">{user?.userData?.name}</p>
                 <p className="text-xs lg:text-sm text-gray-500 truncate line-clamp-1">{user?.lastMessage?.text}</p>
               </div>

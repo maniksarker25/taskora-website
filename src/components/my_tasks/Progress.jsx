@@ -8,6 +8,7 @@ import DateExtensionRequestSection from "./DateExtensionRequestSection";
 import { useCompleteTaskMutation } from "@/lib/features/task/taskApi";
 import { toast } from "sonner";
 import { useGetExtensionRequestsByTaskIdQuery } from "@/lib/features/extensionApi/extensionApi";
+import { useGetCancellationRequestByTaskQuery } from "@/lib/features/cancelApi/cancellationApi";
 
 const Progress = ({
   bidsData,
@@ -15,13 +16,12 @@ const Progress = ({
   taskId
 }) => {
   const [completeTask, { isLoading: isCompleting }] = useCompleteTaskMutation();
-  const {data: extensionRequest}   =  useGetExtensionRequestsByTaskIdQuery(taskId)
-      const extentionData = extensionRequest?.data?.[0] || []
-  
-      const extensionStatuss = extentionData?.status
-      const extensionStatus =extensionStatuss
+  const { data: extensionRequest } = useGetExtensionRequestsByTaskIdQuery(taskId)
+  const extentionData = extensionRequest?.data?.[0] || []
 
-      console.log("customer page=====>",extentionData)
+  const extensionStatuss = extentionData?.status
+  const extensionStatus = extensionStatuss
+
 
   const formatDate = (date) => {
     if (!date) return "";
@@ -36,7 +36,6 @@ const Progress = ({
       return "";
     }
   };
-// console.log("bidsdata",bidsData?.data)
 
 
   const offeredDate = taskDetails?.createdAt ? formatDate(taskDetails.createdAt) : "";
@@ -76,10 +75,10 @@ const Progress = ({
 
   const dateLabel = taskDetails?.preferredDate
     ? new Date(taskDetails.preferredDate).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }) + (taskDetails?.preferredTime ? ` ${taskDetails.preferredTime}` : "")
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }) + (taskDetails?.preferredTime ? ` ${taskDetails.preferredTime}` : "")
     : "Schedule not set";
 
   const description = taskDetails?.description || "No description available.";
@@ -97,7 +96,6 @@ const Progress = ({
 
     try {
       const result = await completeTask(taskDetails._id).unwrap();
-
       if (result.success) {
         toast.success("Task marked as complete successfully!");
         window.location.reload();
@@ -105,6 +103,16 @@ const Progress = ({
     } catch (error) {
       console.error("Failed to complete task:", error);
       toast.error(error?.data?.message || "Failed to mark task as complete. Please try again.");
+    }
+  };
+
+  const { data: cancellationData } = useGetCancellationRequestByTaskQuery(taskId);
+  const cancellationRequest = cancellationData?.data;
+
+  const handleScrollToCancellation = () => {
+    const element = document.getElementById("cancellation-status");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
@@ -122,7 +130,7 @@ const Progress = ({
 
       <ProgressBarComponent steps={steps} progressWidth={progressWidth} />
 
-      <div>
+      <div id="cancellation-status">
         <CancellationStatusComponent
           taskId={taskId}
           taskDetails={taskDetails}
@@ -132,15 +140,14 @@ const Progress = ({
       </div>
 
       {!isCompleted && (
-        <div className="flex justify-start">
+        <div className="flex flex-wrap gap-3 justify-start">
           <button
             onClick={handleMarkAsComplete}
             disabled={isCompleting}
-            className={`px-6 py-2.5 rounded-md transition-colors font-medium cursor-pointer ${
-              isCompleting 
-                ? "bg-gray-400 text-white cursor-not-allowed" 
-                : "bg-[#115E59] hover:bg-teal-700 text-white"
-            }`}
+            className={`px-6 py-2.5 rounded-md transition-colors font-medium cursor-pointer ${isCompleting
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-[#115E59] hover:bg-teal-700 text-white"
+              }`}
           >
             {isCompleting ? "Marking Complete..." : "Mark As Complete"}
           </button>
@@ -150,7 +157,7 @@ const Progress = ({
       {isCompleted && (
         <div className="flex justify-start">
           <div className="px-6 py-2.5 bg-green-100 text-green-800 rounded-md font-medium">
-             Task Completed
+            Task Completed
           </div>
         </div>
       )}

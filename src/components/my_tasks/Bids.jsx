@@ -30,12 +30,12 @@ const questions = [
 ];
 
 const Bids = ({ taskDetails, bidsData, questionsData }) => {
- 
+
   const info = bidsData?.data.result
 
   const [activeTab, setActiveTab] = useState("bids");
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
-  
+
   const [taskStatus, setTaskStatus] = useState(taskDetails?.status || "OPEN_FOR_BID");
   const { user } = useAuth();
   const router = useRouter();
@@ -48,9 +48,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
     if (!confirm("Are you sure you want to accept this bid?")) return;
     try {
       const result = await acceptBid({ bidID: bidId }).unwrap();
-      console.log("new url",result)
       if (result?.success) {
-        console.log("Bid accept response:", result);
         const paymentLink = result?.data?.paymentLink;
         const reference = result?.data?.reference;
 
@@ -59,11 +57,11 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
             ? "Bid accepted! Redirecting to payment..."
             : "Bid accepted successfully!",
           {
-          style: {
-            backgroundColor: "#d1fae5",
-            color: "#065f46",
-            borderLeft: "6px solid #10b981",
-          },
+            style: {
+              backgroundColor: "#d1fae5",
+              color: "#065f46",
+              borderLeft: "6px solid #10b981",
+            },
             duration: 3500,
           }
         );
@@ -92,8 +90,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   };
 
   const handleChatClick = (bid) => {
-    console.log("clickk",bid)
-   
+
     if ((taskStatus || taskDetails?.status) !== "IN_PROGRESS") {
       toast.info("Chat is available only while the task is In Progress.");
       return;
@@ -159,18 +156,18 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
               <p className="text-lg font-semibold text-black">
                 To Be Done On
               </p>
-              <p className="text-sm text-gray-600">
+              <div className="text-sm text-gray-600">
                 {taskDetails?.preferredDeliveryDateTime && (
-                    <div className="flex items-center gap-2 text-gray-700">
-                     
-                      <span className="text-sm">{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
-                    </div>
-                  )}
-              </p>
+                  <div className="flex items-center gap-2 text-gray-700">
+
+                    <span className="text-sm">{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-      
+
         </div>
 
         {/* Right side */}
@@ -200,8 +197,8 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
         <button
           onClick={() => setActiveTab("bids")}
           className={`pb-2 ${activeTab === "bids"
-              ? "border-b-2 bg-[#115E59] px-6 rounded-md py-2 text-white cursor-pointer"
-              : "text-black bg-[#E6F4F1] px-6 rounded-md py-2 cursor-pointer"
+            ? "border-b-2 bg-[#115E59] px-6 rounded-md py-2 text-white cursor-pointer"
+            : "text-black bg-[#E6F4F1] px-6 rounded-md py-2 cursor-pointer"
             }`}
         >
           Bids
@@ -209,8 +206,8 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
         <button
           onClick={() => setActiveTab("questions")}
           className={`pb-2 ${activeTab === "questions"
-              ? "border-b-2 bg-[#115E59] px-6 rounded-md py-2 text-white cursor-pointer"
-              : "text-black bg-[#E6F4F1] px-6 rounded-md py-2 cursor-pointer"
+            ? "border-b-2 bg-[#115E59] px-6 rounded-md py-2 text-white cursor-pointer"
+            : "text-black bg-[#E6F4F1] px-6 rounded-md py-2 cursor-pointer"
             }`}
         >
           Questions
@@ -247,7 +244,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                   <div>
                     {" "}
                     <p className="font-semibold text-xl md:text-3xl">
-                     ₦ {bid.price}
+                      ₦ {bid.price}
                     </p>
                   </div>
                 </div>
@@ -257,11 +254,10 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                     <button
                       onClick={() => handleAcceptBid(bid._id)}
                       disabled={isAcceptingBid}
-                      className={`px-6 py-2 border-2 rounded-md transition transform duration-300 ${
-                        !isAcceptingBid
-                          ? "border-[#115e59] text-[#115e59] hover:bg-[#115e59] hover:text-white cursor-pointer"
-                          : "border-gray-300 text-gray-400 cursor-not-allowed"
-                      }`}
+                      className={`px-6 py-2 border-2 rounded-md transition transform duration-300 ${!isAcceptingBid
+                        ? "border-[#115e59] text-[#115e59] hover:bg-[#115e59] hover:text-white cursor-pointer"
+                        : "border-gray-300 text-gray-400 cursor-not-allowed"
+                        }`}
                     >
                       {isAcceptingBid ? "Accepting..." : "Accept the Bid"}
                     </button>
@@ -290,65 +286,65 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
         {activeTab === "questions" &&
           questionsData?.data?.map((q) => (
             <div
-            key={q._id}
-            className="flex gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
-          >
-            <Image
-              src={q?.provider?.profile_image || q?.user?.profileImage }
-              alt={q?.user?.name || "User"}
-              width={64}
-              height={64}
-              className="w-16 h-16 rounded-full object-cover"
-            />
-            <div className="flex-1">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="font-medium text-gray-900">
-                  {q?.provider?.name || "Anonymous"}
-                </h3>
-                <span className="text-xs text-gray-400">
-                  {formatTimeAgo(q.createdAt)}
-                </span>
-              </div>
+              key={q._id}
+              className="flex gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+            >
+              <Image
+                src={q?.provider?.profile_image || q?.user?.profileImage}
+                alt={q?.user?.name || "User"}
+                width={64}
+                height={64}
+                className="w-16 h-16 rounded-full object-cover"
+              />
+              <div className="flex-1">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-medium text-gray-900">
+                    {q?.provider?.name || "Anonymous"}
+                  </h3>
+                  <span className="text-xs text-gray-400">
+                    {formatTimeAgo(q.createdAt)}
+                  </span>
+                </div>
 
-              {/* Question */}
-              <div className="mb-3">
-                <p className="text-sm font-medium text-gray-800 mb-1">Q:</p>
-                <p className="text-sm text-gray-700 leading-relaxed">
-                  {q.details}
-                </p>
-                
-                {/* Question Image */}
-                {q.question_image && (
-                  <div className="mt-2">
-                    <img
-                      src={q.question_image}
-                      alt="Question attachment"
-                      className="max-w-xs rounded-lg border border-gray-200"
-                    />
+                {/* Question */}
+                <div className="mb-3">
+                  <p className="text-sm font-medium text-gray-800 mb-1">Q:</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    {q.details}
+                  </p>
+
+                  {/* Question Image */}
+                  {q.question_image && (
+                    <div className="mt-2">
+                      <img
+                        src={q.question_image}
+                        alt="Question attachment"
+                        className="max-w-xs rounded-lg border border-gray-200"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* Answer */}
+                {q.answer && (
+                  <div className="bg-green-50 p-3 rounded-lg border border-green-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-medium text-green-700">
+                        Task Poster Response:
+                      </span>
+                      {q.answeredAt && (
+                        <span className="text-xs text-gray-500">
+                          {formatTimeAgo(q.answeredAt)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      {q.answer}
+                    </p>
                   </div>
                 )}
               </div>
-
-              {/* Answer */}
-              {q.answer && (
-                <div className="bg-green-50 p-3 rounded-lg border border-green-100">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-medium text-green-700">
-                      Task Poster Response:
-                    </span>
-                    {q.answeredAt && (
-                      <span className="text-xs text-gray-500">
-                        {formatTimeAgo(q.answeredAt)}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-sm text-gray-700 leading-relaxed">
-                    {q.answer}
-                  </p>
-                </div>
-              )}
             </div>
-          </div>
           ))}
       </div>
     </div>

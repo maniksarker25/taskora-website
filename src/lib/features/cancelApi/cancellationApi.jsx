@@ -20,7 +20,7 @@ const cancellationApi = createApi({
     createCancellationRequest: builder.mutation({
       query: (cancellationData) => {
         const formData = new FormData();
-    
+
         formData.append('data', JSON.stringify({
           task: cancellationData.taskId,
           reason: cancellationData.reason,
@@ -39,19 +39,51 @@ const cancellationApi = createApi({
       },
       invalidatesTags: ["Cancellation"],
     }),
-     getCancellationRequestByTask: builder.query({
+    getCancellationRequestByTask: builder.query({
       query: (taskId) => ({
         url: `/cancel-request/byTask/${taskId}`,
         method: "GET",
       }),
       providesTags: ["Cancellation"],
     }),
+    deleteCancellationRequest: builder.mutation({
+      query: (id) => ({
+        url: `/cancel-request/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Cancellation"],
+    }),
+    acceptCancellationRequest: builder.mutation({
+      query: (id) => ({
+        url: `/cancel-request/${id}/accept`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Cancellation"],
+    }),
+    rejectCancellationRequest: builder.mutation({
+      query: ({ id, reason, evidence }) => {
+        const formData = new FormData();
+        formData.append('data', JSON.stringify({ reason }));
+        if (evidence) {
+          formData.append('reject_evidence', evidence);
+        }
+        return {
+          url: `/cancel-request/${id}/reject`,
+          method: "PATCH",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Cancellation"],
+    }),
   }),
 });
 
 export const {
   useCreateCancellationRequestMutation,
-  useGetCancellationRequestByTaskQuery
+  useGetCancellationRequestByTaskQuery,
+  useDeleteCancellationRequestMutation,
+  useAcceptCancellationRequestMutation,
+  useRejectCancellationRequestMutation
 } = cancellationApi;
 
 export default cancellationApi;

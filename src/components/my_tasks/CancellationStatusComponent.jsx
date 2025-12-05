@@ -3,20 +3,30 @@ import React, { useState } from "react";
 import { Check, GitPullRequest, X, Download, Eye } from "lucide-react";
 import Image from "next/image";
 import client from "../../../public/client.png";
-import { useGetCancellationRequestByTaskQuery } from "@/lib/features/cancelApi/cancellationApi";
+import {
+  useGetCancellationRequestByTaskQuery,
+  useDeleteCancellationRequestMutation,
+  useAcceptCancellationRequestMutation,
+  useRejectCancellationRequestMutation
+} from "@/lib/features/cancelApi/cancellationApi";
+import { toast } from "sonner";
 
 
-const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isServiceProvider = false }) => {
-   console.log("cancellation data====>",cancelData)
+const CancellationStatusComponent = ({ cancelData, taskId, taskDetails, isServiceProvider = false }) => {
+  console.log("cancellation data====>", cancelData)
   const [showImagePreview, setShowImagePreview] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
-  
+
   // Fetch cancellation request data from API
-  const { 
-    data: cancellationResponse, 
-    isLoading, 
-    error 
+  const {
+    data: cancellationResponse,
+    isLoading,
+    error
   } = useGetCancellationRequestByTaskQuery(taskId);
+
+  const [deleteCancellationRequest] = useDeleteCancellationRequestMutation();
+  const [acceptCancellationRequest] = useAcceptCancellationRequestMutation();
+  const [rejectCancellationRequest] = useRejectCancellationRequestMutation();
 
   const cancellationRequest = cancellationResponse?.data;
   console.log("Cancellation Request Data:", cancellationRequest);
@@ -62,15 +72,16 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
     switch (status.toUpperCase()) {
       case "PENDING":
         return {
-          statusText: requestToModel === "Provider" 
-            ? "Pending Provider Review" 
+          statusText: requestToModel === "Provider"
+            ? "Pending Provider Review"
             : "Pending Customer Review",
           statusColor: "text-yellow-600",
           bgColor: "bg-[#E6F4F1]",
           icon: <div className="animate-pulse w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">!</span>
-                </div>,
-          showActionButtons: isServiceProvider && requestToModel === "Provider",
+            <span className="text-white text-xs">!</span>
+          </div>,
+          showActionButtons: (isServiceProvider && requestToModel === "Provider") || (!isServiceProvider && requestToModel === "Customer"),
+          showDeleteButton: (isServiceProvider && requestToModel === "Customer") || (!isServiceProvider && requestToModel === "Provider"),
           buttons: [
             {
               text: "View Request Details",
@@ -85,8 +96,8 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
           statusColor: "text-green-600",
           bgColor: "bg-green-100",
           icon: <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center">
-                  <Check className="w-4 h-4 text-white" />
-                </div>,
+            <Check className="w-4 h-4 text-white" />
+          </div>,
           showActionButtons: false,
           buttons: [
             {
@@ -102,8 +113,8 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
           statusColor: "text-red-600",
           bgColor: "bg-red-100",
           icon: <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
-                  <X className="w-4 h-4 text-white" />
-                </div>,
+            <X className="w-4 h-4 text-white" />
+          </div>,
           showActionButtons: false,
           rejectionReason: rejectDetails,
           buttons: [
@@ -120,8 +131,8 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
           statusColor: "text-blue-600",
           bgColor: "bg-blue-100",
           icon: <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-xs">?</span>
-                </div>,
+            <span className="text-white text-xs">?</span>
+          </div>,
           showActionButtons: false,
           buttons: []
         };
@@ -129,7 +140,7 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
   };
 
   const statusDisplay = getStatusDisplay(
-    cancellationRequest.status, 
+    cancellationRequest.status,
     cancellationRequest.requestToModel,
     cancellationRequest.rejectDetails
   );
@@ -151,32 +162,47 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
   };
 
   // Handle button actions
-  const handleButtonClick = (action, buttonType) => {
+  const handleButtonClick = async (action, buttonType) => {
     console.log(`Button clicked: ${action} - ${buttonType}`);
-    
-    switch(action) {
-      case "accept":
-        // Handle accept cancellation request
-        console.log("Accept cancellation request");
-        break;
-      case "reject":
-        // Handle reject cancellation request
-        console.log("Reject cancellation request");
-        break;
-      case "view":
-        // Handle view details
-        console.log("View cancellation details");
-        break;
-      case "refund":
-        // Handle refund request
-        console.log("Request refund");
-        break;
-      case "dispute":
-        // Handle dispute request
-        console.log("Request dispute ruling");
-        break;
-      default:
-        console.log("Unknown action");
+
+    try {
+      switch (action) {
+        case "accept":
+          if (confirm("Are you sure you want to accept this cancellation request?")) {
+            await acceptCancellationRequest(cancellationRequest._id).unwrap();
+            toast.success("Cancellation request accepted successfully");
+          }
+          break;
+        case "reject":
+          if (confirm("Are you sure you want to reject this cancellation request?")) {
+            const reason = prompt("Please provide a reason for rejection:");
+            if (reason) {
+              await rejectCancellationRequest({ id: cancellationRequest._id, reason }).unwrap();
+              toast.success("Cancellation request rejected successfully");
+            }
+          }
+          break;
+        case "view":
+          console.log("View cancellation details");
+          break;
+        case "refund":
+          console.log("Request refund");
+          break;
+        case "dispute":
+          console.log("Request dispute ruling");
+          break;
+        case "delete":
+          if (confirm("Are you sure you want to delete this cancellation request?")) {
+            await deleteCancellationRequest(cancellationRequest._id).unwrap();
+            toast.success("Cancellation request deleted successfully");
+          }
+          break;
+        default:
+          console.log("Unknown action");
+      }
+    } catch (error) {
+      console.error(`Failed to ${action} request:`, error);
+      toast.error(error?.data?.message || `Failed to ${action} request`);
     }
   };
 
@@ -197,9 +223,9 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
               {/* Requested By */}
               <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
                 <div className="w-12 h-12">
-                  <Image 
-                    src={cancellationRequest.requestFrom?.profile_image || client} 
-                    alt="requester" 
+                  <Image
+                    src={cancellationRequest.requestFrom?.profile_image || client}
+                    alt="requester"
                     width={48}
                     height={48}
                     className="rounded-full object-cover"
@@ -210,12 +236,8 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
                   <p className="text-gray-600 text-sm">
                     {cancellationRequest.requestFrom?.name || "N/A"}
                   </p>
-                 
-                  
                 </div>
               </div>
-
-             
             </div>
 
             {/* Cancellation Reason */}
@@ -226,7 +248,7 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
               <p className="text-gray-600 text-sm leading-relaxed rounded-lg ">
                 {cancellationRequest.reason}
               </p>
-              
+
               {/* Additional cancellation details if available */}
               {cancellationRequest.cancellationReason && (
                 <div className="mt-3">
@@ -254,8 +276,8 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
                           <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
                             <span className="text-gray-500">📎</span>
                             <span className="text-sm text-gray-600">Evidence {index + 1}</span>
-                            <button 
-                              onClick={() => handleDownloadFile(evidence, `evidence-${index+1}`)}
+                            <button
+                              onClick={() => handleDownloadFile(evidence, `evidence-${index + 1}`)}
                               className="text-xs text-[#115E59] hover:text-teal-700"
                             >
                               Download
@@ -265,7 +287,7 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
                       </div>
                     </div>
                   )}
-                  
+
                   {/* Reject Evidence */}
                   {cancellationRequest.reject_evidence && (
                     <div>
@@ -273,7 +295,7 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
                       <div className="flex items-center gap-2 p-2 bg-gray-50 rounded">
                         <span className="text-gray-500">📎</span>
                         <span className="text-sm text-gray-600">Rejection Evidence</span>
-                        <button 
+                        <button
                           onClick={() => handleDownloadFile(cancellationRequest.reject_evidence, `reject-evidence`)}
                           className="text-xs text-[#115E59] hover:text-teal-700"
                         >
@@ -299,9 +321,8 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
                   </p>
                 </div>
               </div>
-              
+
               <div className="text-right">
-               
                 {cancellationRequest.reviewedRequestAt && (
                   <p className="text-gray-500 text-xs">
                     Reviewed: {formatDate(cancellationRequest.reviewedRequestAt)}
@@ -326,7 +347,7 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
             <div className="flex flex-wrap gap-3">
               {/* Status based buttons */}
               {statusDisplay.buttons.map((button, index) => (
-                <button 
+                <button
                   key={index}
                   onClick={() => handleButtonClick(button.action, "status")}
                   className={`px-6 py-2.5 text-white rounded-md transition-colors font-medium cursor-pointer ${button.color}`}
@@ -335,22 +356,32 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
                 </button>
               ))}
 
-              {/* Service Provider Actions for PENDING requests */}
+              {/* Accept/Reject Buttons for Recipient */}
               {statusDisplay.showActionButtons && cancellationRequest.status.toUpperCase() === "PENDING" && (
                 <>
-                  <button 
+                  <button
                     onClick={() => handleButtonClick("accept", "provider")}
                     className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-md transition-colors font-medium cursor-pointer"
                   >
                     Accept Request
                   </button>
-                  <button 
+                  <button
                     onClick={() => handleButtonClick("reject", "provider")}
                     className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors font-medium cursor-pointer"
                   >
                     Reject Request
                   </button>
                 </>
+              )}
+
+              {/* Delete Button for Sender */}
+              {statusDisplay.showDeleteButton && cancellationRequest.status.toUpperCase() === "PENDING" && (
+                <button
+                  onClick={() => handleButtonClick("delete", "sender")}
+                  className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors font-medium cursor-pointer"
+                >
+                  Delete Request
+                </button>
               )}
             </div>
 
@@ -384,17 +415,17 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
             >
               <X className="w-6 h-6" />
             </button>
-            
+
             <div className="bg-white rounded-lg overflow-hidden">
-              <Image 
-                src={selectedImage} 
-                alt="Evidence preview" 
+              <Image
+                src={selectedImage}
+                alt="Evidence preview"
                 width={800}
                 height={600}
                 className="max-w-full max-h-[80vh] object-contain"
               />
             </div>
-            
+
             <div className="flex justify-center mt-4">
               <button
                 onClick={() => handleDownloadFile(selectedImage, `evidence-image-${taskId}`)}
@@ -411,4 +442,4 @@ const CancellationStatusComponent = ({cancelData, taskId, taskDetails, isService
   );
 };
 
-export default CancellationStatusComponent;
+export default CancellationStatusComponent; 

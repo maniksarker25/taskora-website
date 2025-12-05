@@ -23,7 +23,6 @@ const UpdateInformation = () => {
 
   const userData = profileData?.data;
 
-  console.log("User Data from API:", userData);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -146,10 +145,8 @@ const UpdateInformation = () => {
       });
 
       const result = await updateProfile(formDataToSend).unwrap();
-      console.log("Full API Response:", result);
 
       if (result && result.success === true) {
-        console.log(" Profile update successful!");
 
         toast.success("Profile updated successfully!", {
           style: {
@@ -157,7 +154,7 @@ const UpdateInformation = () => {
             color: "#065f46",
             borderLeft: "6px solid #10b981",
           },
-          duration: 3000, 
+          duration: 3000,
         });
 
         // Reset file states
@@ -168,7 +165,7 @@ const UpdateInformation = () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
         if (documentInputRef.current) documentInputRef.current.value = "";
       } else {
-        
+
         const errorMessage = result?.message || "Failed to update profile";
         console.error(" Update failed:", errorMessage);
         throw new Error(errorMessage);

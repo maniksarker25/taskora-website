@@ -16,20 +16,20 @@ const ProviderProgress = ({
   taskId
 }) => {
   const [completeTask, { isLoading: isCompleting }] = useCompleteTaskMutation();
-    const {data: extensionRequest}   =  useGetExtensionRequestsByTaskIdQuery(taskId)
-      const { 
-        data: cancellationData, 
-        isLoading, 
-        error 
-      } = useGetCancellationRequestByTaskQuery(taskId);
-     
-       
-    const extentionData = extensionRequest?.data?.[0] || []
-    const cancelData = cancellationData?.data || {}
-    
-    const extensionStatuss = extentionData?.status
-    const extensionStatus =extensionStatuss
-    
+  const { data: extensionRequest } = useGetExtensionRequestsByTaskIdQuery(taskId)
+  const {
+    data: cancellationData,
+    isLoading,
+    error
+  } = useGetCancellationRequestByTaskQuery(taskId);
+
+
+  const extentionData = extensionRequest?.data?.[0] || []
+  const cancelData = cancellationData?.data || {}
+
+  const extensionStatuss = extentionData?.status
+  const extensionStatus = extensionStatuss
+
   const formatDate = (date) => {
     if (!date) return "";
     try {
@@ -83,10 +83,10 @@ const ProviderProgress = ({
 
   const dateLabel = taskDetails?.preferredDate
     ? new Date(taskDetails.preferredDate).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }) + (taskDetails?.preferredTime ? ` ${taskDetails.preferredTime}` : "")
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }) + (taskDetails?.preferredTime ? ` ${taskDetails.preferredTime}` : "")
     : "Schedule not set";
 
   const description = taskDetails?.description || "No description available.";
@@ -117,8 +117,13 @@ const ProviderProgress = ({
 
   const handleCancellationRequest = () => {
     toast.info("Cancellation request functionality will be implemented soon");
-    // Add your cancellation request logic here
-    console.log("Cancellation requested for task:", taskId);
+  };
+
+  const handleScrollToCancellation = () => {
+    const element = document.getElementById("cancellation-status");
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -137,48 +142,34 @@ const ProviderProgress = ({
 
       <ProgressBarComponent steps={steps} progressWidth={progressWidth} />
 
-      <div>
+      <div id="cancellation-status">
         <CancellationStatusComponent
-        cancelData={cancelData}
+          cancelData={cancelData}
           taskId={taskId}
           taskDetails={taskDetails}
-          isServiceProvider={false}
+          isServiceProvider={true}
         />
-        <DateExtensionRequestSection extensionStatus={extensionStatus} extentionData={extentionData}/>
+        <DateExtensionRequestSection extensionStatus={extensionStatus} extentionData={extentionData} />
       </div>
 
+
+
       {!isCompleted && (
-        <div className="flex flex-wrap gap-3 justify-start">
+        <div>
           <button
             onClick={handleMarkAsComplete}
             disabled={isCompleting}
-            className={`px-6 py-2.5 rounded-md transition-colors font-medium cursor-pointer ${
-              isCompleting 
-                ? "bg-gray-400 text-white cursor-not-allowed" 
-                : "bg-[#115E59] hover:bg-teal-700 text-white"
-            }`}
+            className={`px-6 py-2.5 rounded-md transition-colors font-medium cursor-pointer justify-start ${isCompleting
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-[#115E59] hover:bg-teal-700 text-white"
+              }`}
           >
             {isCompleting ? "Marking Complete..." : "Mark As Complete"}
           </button>
-          
-          <button
-            onClick={handleCancellationRequest}
-            className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors font-medium cursor-pointer"
-          >
-            Cancellation Request
-          </button>
-        </div>
-      )}
-
-      {isCompleted && (
-        <div className="flex justify-start">
-          <div className="px-6 py-2.5 bg-green-100 text-green-800 rounded-md font-medium">
-             Task Completed
-          </div>
         </div>
       )}
     </div>
   );
 };
 
-export default ProviderProgress
+export default ProviderProgress;

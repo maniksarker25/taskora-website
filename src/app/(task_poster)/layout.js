@@ -8,20 +8,18 @@ import CustomerProtectedRoute from "@/components/auth/CustomerProtectedRoute";
 
 const TaskPosterLayout = ({ children }) => {
   return (
-    <html >
-      <body>
-        <CustomerProtectedRoute>
-          <Navbar/>
-          <div>{children}</div>
-          <Toaster 
-            position="top-right"
-            expand={true}
-            richColors
-          />
-          <Footer/>
-        </CustomerProtectedRoute>
-      </body>
-    </html>
+    <>
+      <CustomerProtectedRoute>
+        <Navbar />
+        <div>{children}</div>
+        <Toaster
+          position="top-right"
+          expand={true}
+          richColors
+        />
+        <Footer />
+      </CustomerProtectedRoute>
+    </>
   );
 };
 

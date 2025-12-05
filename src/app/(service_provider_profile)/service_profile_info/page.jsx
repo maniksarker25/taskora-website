@@ -10,13 +10,11 @@ import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";
 
 const ServiceProfileInfo = () => {
   const { data, isLoading, error } = useGetMyProfileQuery();
-     const role = useSelector((state) => state?.auth?.user?.role);
-    
-    // User data from API
-    const userData = data?.data;
-    
-    console.log("User Profile Data:", userData?.profile_image);
- // Loading state
+  const role = useSelector((state) => state?.auth?.user?.role);
+
+  // User data from API
+  const userData = data?.data;
+
   if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto lg:px-8 py-4 lg:py-6 mt-12">
@@ -93,7 +91,7 @@ const ServiceProfileInfo = () => {
               className="rounded-full mx-auto border-4 border-white shadow-lg mb-4"
             />
             <h3 className="text-white text-xl font-semibold mb-1">
-              {userData?.firstName && userData?.lastName 
+              {userData?.firstName && userData?.lastName
                 ? `${userData.firstName} ${userData.lastName}`
                 : userData?.name || "User Name"
               }
@@ -127,7 +125,7 @@ const ServiceProfileInfo = () => {
                         Name
                       </h3>
                       <p className="text-gray-600 text-lg bg-gray-50 p-3 rounded-lg">
-                        {userData?.firstName && userData?.lastName 
+                        {userData?.firstName && userData?.lastName
                           ? `${userData.firstName} ${userData.lastName}`
                           : userData?.name || "Not provided"
                         }
@@ -249,7 +247,7 @@ const ServiceProfileInfo = () => {
                     Name
                   </h3>
                   <p className="text-gray-600 text-base ml-5">
-                    {userData?.firstName && userData?.lastName 
+                    {userData?.firstName && userData?.lastName
                       ? `${userData.firstName} ${userData.lastName}`
                       : userData?.name || "Not provided"
                     }

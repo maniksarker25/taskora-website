@@ -37,9 +37,7 @@ export const SocketProvider = ({ children }) => {
       setIsConnected(false);
     });
 
-    // Listen for incoming messages - use 'on' instead of 'once' for continuous listening
     socketInstance.on("receive-message", (data) => {
-      console.log("New message received via socket:", data);
       setNewMessage(data);
     });
 
@@ -49,28 +47,24 @@ export const SocketProvider = ({ children }) => {
     };
   }, []);
 
-const sendMessageSoket = (messageData) => {
+  const sendMessageSoket = (messageData) => {
     if (!socket) return;
-    console.log(messageData)
-    const res =  socket.emit("send-message", messageData);
+    const res = socket.emit("send-message", messageData);
     return res;
   };
 
- const getMessage = (userId) => {
-  return new Promise((resolve) => {
-    if (!socket) return resolve(null);
+  const getMessage = (userId) => {
+    return new Promise((resolve) => {
+      if (!socket) return resolve(null);
 
-    // Use 'on' instead of 'once' for continuous listening to incoming messages
-    socket.on(`message-${userId}`, (data) => {
-      console.log("Message received:", data);
-      resolve(data);
+      socket.on(`message-${userId}`, (data) => {
+        resolve(data);
+      });
     });
-  });
-};
+  };
 
   const seenMessage = (messageData) => {
     if (!socket) return;
-  console.log("Emitting seen-message:", messageData);
     socket.emit("seen", messageData);
   }
 

@@ -23,11 +23,10 @@ const ServiceListing = () => {
     category: selectedCategory !== "all" ? selectedCategory : "",
     sortBy: selectedSortBy,
   });
-  
-  console.log("service data", servicesData)
+
 
   const { data: categoriesData, isLoading: categoriesLoading } = useGetAllCategoriesQuery();
-  
+
   useEffect(() => {
     console.log(" DEBUG - API Call Parameters:", {
       page: currentPage,

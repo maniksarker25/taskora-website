@@ -8,7 +8,7 @@ import { useGetMyProfileQuery, useUpdateProfileMutation } from "@/lib/features/a
 import { useSelector } from "react-redux";
 
 const ServiceProfileInfoUpdate = () => {
- const [profileImage, setProfileImage] = useState(client);
+  const [profileImage, setProfileImage] = useState(client);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef(null);
   const documentInputRef = useRef(null);
@@ -18,8 +18,6 @@ const ServiceProfileInfoUpdate = () => {
   const [updateProfile] = useUpdateProfileMutation();
 
   const userData = profileData?.data;
-
-  console.log("User Data from API:", userData);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -142,10 +140,8 @@ const ServiceProfileInfoUpdate = () => {
       });
 
       const result = await updateProfile(formDataToSend).unwrap();
-      console.log("Full API Response:", result);
 
       if (result && result.success === true) {
-        console.log(" Profile update successful!");
 
         toast.success("Profile updated successfully!", {
           style: {
@@ -153,7 +149,7 @@ const ServiceProfileInfoUpdate = () => {
             color: "#065f46",
             borderLeft: "6px solid #10b981",
           },
-          duration: 3000, 
+          duration: 3000,
         });
 
         // Reset file states
@@ -164,7 +160,7 @@ const ServiceProfileInfoUpdate = () => {
         if (fileInputRef.current) fileInputRef.current.value = "";
         if (documentInputRef.current) documentInputRef.current.value = "";
       } else {
-        
+
         const errorMessage = result?.message || "Failed to update profile";
         console.error(" Update failed:", errorMessage);
         throw new Error(errorMessage);

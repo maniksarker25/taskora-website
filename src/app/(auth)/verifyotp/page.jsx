@@ -11,23 +11,16 @@ const VerfiyOtp = () => {
   const [otp, setOtp] = useState(Array(6).fill(""));
   const inputRefs = useRef([]);
   const router = useRouter();
-  
+
 
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const userEmail = user?.email;
-  
+
   const [verifyResetOtp, { isLoading, isError, error, isSuccess }] = useVerifyResetOtpMutation();
-  
-
-  console.log("verifyResetOtp function:", verifyResetOtp)
-
-
 
 
   useEffect(() => {
     console.log("Logged in user:", user);
-    console.log("User email:", userEmail);
-    console.log("Is authenticated:", isAuthenticated);
   }, [user, userEmail, isAuthenticated]);
 
   useEffect(() => {
@@ -102,7 +95,7 @@ const VerfiyOtp = () => {
 
   const handleVerify = async (e) => {
     e.preventDefault();
-    
+
     // Check if user is authenticated and has email
     if (!isAuthenticated || !userEmail) {
       toast.error("User not authenticated. Please login again.", {
@@ -116,15 +109,15 @@ const VerfiyOtp = () => {
     }
 
     const resetCode = otp.join("");
-    
 
-    
+
+
     try {
       const result = await verifyResetOtp({
         email: userEmail, // Use logged in user's email
         resetCode: resetCode
       }).unwrap();
-      
+
       toast.success("OTP verified successfully!", {
         style: {
           backgroundColor: "#d1fae5",
@@ -132,9 +125,9 @@ const VerfiyOtp = () => {
           borderLeft: "6px solid #10b981",
         },
       });
-      
+
       // router.push("/reset-password");
-      
+
     } catch (err) {
       console.error("Failed to verify OTP:", err);
       toast.error(err?.data?.message || "Invalid OTP. Please try again.", {
@@ -180,7 +173,7 @@ const VerfiyOtp = () => {
                       )}
                     </p>
 
-             
+
 
                     {/* -------------------form------------------------------ */}
                     <div className="flex flex-col items-center justify-center py-6">
