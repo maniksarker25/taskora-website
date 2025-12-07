@@ -7,7 +7,8 @@ import {
     useGetCancellationRequestByTaskQuery,
     useDeleteCancellationRequestMutation,
     useAcceptCancellationRequestMutation,
-    useRejectCancellationRequestMutation
+    useRejectCancellationRequestMutation,
+    useMakeCancellationDisputeMutation
 } from "@/lib/features/cancelApi/cancellationApi";
 import { toast } from "sonner";
 
@@ -31,6 +32,12 @@ const StatusIcon = ({ status }) => {
             return (
                 <div className="w-6 h-6 bg-red-600 rounded-full flex items-center justify-center">
                     <X className="w-4 h-4 text-white" />
+                </div>
+            );
+        case "DISPUTED":
+            return (
+                <div className="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-xs">⚖️</span>
                 </div>
             );
         default:
@@ -74,20 +81,22 @@ const FilePreview = ({ url, name, onDownload, onPreview }) => {
     );
 };
 
-const ActionButton = ({ onClick, variant = "primary", children, className = "" }) => {
-    const baseClasses = "px-6 py-2.5 text-white rounded-md transition-colors font-medium cursor-pointer";
+const ActionButton = ({ onClick, variant = "primary", children, className = "", disabled = false }) => {
+    const baseClasses = "px-6 py-2.5 text-white rounded-md transition-colors font-medium cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
 
     const variantClasses = {
         primary: "bg-[#115e59] hover:bg-teal-700",
-        accept: "bg-green-600 hover:bg-green-700",
+        accept: "bg-[#115E59] hover:bg-[#115E59]/90",
         reject: "bg-red-600 hover:bg-red-700",
         delete: "bg-red-600 hover:bg-red-700",
+        dispute: "bg-purple-600 hover:bg-purple-700",
     };
 
     return (
         <button
             onClick={onClick}
             className={`${baseClasses} ${variantClasses[variant]} ${className}`}
+            disabled={disabled}
         >
             {children}
         </button>
@@ -104,15 +113,18 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
     const [rejectEvidence, setRejectEvidence] = useState([]);
     const [isSubmittingReject, setIsSubmittingReject] = useState(false);
     const [isDeleted, setIsDeleted] = useState(false);
+    const [isProcessingDispute, setIsProcessingDispute] = useState(false);
 
     // API Hooks
     const { data: cancellationResponse, isLoading, error, refetch } = useGetCancellationRequestByTaskQuery(taskId);
     const [deleteCancellationRequest] = useDeleteCancellationRequestMutation();
     const [acceptCancellationRequest] = useAcceptCancellationRequestMutation();
     const [rejectCancellationRequest] = useRejectCancellationRequestMutation();
+    const [makeDispute] = useMakeCancellationDisputeMutation();
 
     const cancellationRequest = cancellationResponse?.data;
-    console.log("Cancellation Request:", cancellationRequest)
+    console.log("Cancellation Request ID:", cancellationRequest?._id);
+    console.log("Cancellation Request Status:", cancellationRequest?.status);
 
     // Hide component if deleted or no request
     if (isDeleted || !cancellationRequest?._id) return null;
@@ -143,6 +155,12 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
                 statusColor: "text-red-600",
                 bgColor: "bg-red-100",
                 actions: [{ label: "Request Ruling on Dispute", action: "dispute" }]
+            },
+            DISPUTED: {
+                statusText: "Under Dispute Resolution",
+                statusColor: "text-purple-600",
+                bgColor: "bg-purple-100",
+                actions: []
             }
         }[statusUpper] || {
             statusText: "In Progress",
@@ -176,37 +194,101 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
         document.body.removeChild(link);
     };
 
+    // ✅ FIXED: Direct dispute function - no need to wrap in actionCallbacks
+    const handleDisputeRequest = async () => {
+        if (!cancellationRequest?._id) {
+            toast.error("No cancellation request found");
+            return;
+        }
+
+        // Confirmation dialog
+        if (!confirm("Are you sure you want to request a dispute ruling? This will escalate the matter for official resolution.")) {
+            return;
+        }
+
+        setIsProcessingDispute(true);
+        try {
+            console.log("Making dispute request with ID:", cancellationRequest._id);
+            const result = await makeDispute(cancellationRequest._id).unwrap();
+            console.log("Dispute successful, result:", result);
+            
+            toast.success("Dispute request submitted successfully! The case is now under official review.");
+            
+            // Refetch to update UI
+            setTimeout(async () => {
+                try {
+                    await refetch();
+                } catch (e) {
+                    console.error("Refetch error after dispute:", e);
+                }
+            }, 500);
+        } catch (error) {
+            console.error("Dispute action failed:", error);
+            
+            // Show specific error messages
+            if (error?.data?.message === "Cancellation Request not found") {
+                toast.error("Cancellation request not found. Please refresh the page.");
+            } else if (error?.status === 404) {
+                toast.error("API endpoint not found. Please check the backend configuration.");
+            } else {
+                toast.error(error?.data?.message || "Failed to submit dispute request");
+            }
+        } finally {
+            setIsProcessingDispute(false);
+        }
+    };
+
+    // ✅ FIXED: Simplified handleAction function
     const handleAction = async (actionType, extraData = null) => {
-        const actionCallbacks = {
-            accept: () => acceptCancellationRequest(cancellationRequest._id),
-            reject: () => {
-                const reason = prompt("Please provide a reason for rejection:");
-                return reason ? rejectCancellationRequest({ id: cancellationRequest._id, reason }) : Promise.reject();
-            },
-            delete: () => deleteCancellationRequest(cancellationRequest._id),
-            view: () => Promise.resolve(console.log("View details")),
-            refund: () => Promise.resolve(console.log("Request refund")),
-            dispute: () => Promise.resolve(console.log("Request dispute")),
-        };
+        console.log(`Handling action: ${actionType}`);
 
         try {
-            const result = await actionCallbacks[actionType]().unwrap();
-            console.log(`${actionType} successful, result:`, result);
+            switch (actionType) {
+                case "accept":
+                    if (confirm("Are you sure you want to accept this cancellation request?")) {
+                        const result = await acceptCancellationRequest(cancellationRequest._id).unwrap();
+                        console.log("Accept successful, result:", result);
+                        toast.success("Cancellation request accepted successfully");
+                    }
+                    break;
+                    
+                case "reject":
+                    // Show reject modal instead
+                    setShowRejectModal(true);
+                    break;
+                    
+                case "delete":
+                    if (confirm("Are you sure you want to delete this cancellation request?")) {
+                        const result = await deleteCancellationRequest(cancellationRequest._id).unwrap();
+                        console.log("Delete successful, result:", result);
+                        toast.success("Cancellation request deleted successfully");
+                        setIsDeleted(true);
+                    }
+                    break;
+                    
+                case "dispute":
+                    // Directly call dispute function
+                    await handleDisputeRequest();
+                    break;
+                    
+                case "view":
+                    console.log("View details");
+                    break;
+                    
+                case "refund":
+                    console.log("Request refund");
+                    toast.info("Refund feature coming soon");
+                    break;
+                    
+                default:
+                    console.log("Unknown action type:", actionType);
+            }
 
-            if (actionType !== "view" && actionType !== "refund" && actionType !== "dispute") {
-                toast.success(`Cancellation request ${actionType}ed successfully`);
-
-                // If delete, immediately hide component from UI
-                if (actionType === "delete") {
-                    setIsDeleted(true);
-                }
-
-                // Refetch to update UI for all viewers (both requester and recipient)
-                console.log("Calling refetch after action:", actionType);
+            // Refetch after successful action (except for refund/view)
+            if (actionType !== "view" && actionType !== "refund" && actionType !== "reject") {
                 setTimeout(async () => {
                     try {
-                        const refetchResult = await refetch();
-                        console.log("Refetch completed:", refetchResult);
+                        await refetch();
                     } catch (e) {
                         console.error("Refetch error:", e);
                     }
@@ -330,6 +412,8 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
     const renderActionButtons = () => {
         const { status } = cancellationRequest;
         const isPending = status.toUpperCase() === "PENDING";
+        const isRejected = status.toUpperCase() === "REJECTED";
+        const isDisputed = status.toUpperCase() === "DISPUTED";
 
         return (
             <div className="flex flex-wrap gap-3">
@@ -338,9 +422,17 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
                     <ActionButton
                         key={index}
                         onClick={() => handleAction(action.action)}
-                        variant="primary"
+                        variant={action.action === "dispute" ? "dispute" : "primary"}
+                        disabled={action.action === "dispute" && isProcessingDispute}
                     >
-                        {action.label}
+                        {action.action === "dispute" && isProcessingDispute ? (
+                            <>
+                                <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                                Processing...
+                            </>
+                        ) : (
+                            action.label
+                        )}
                     </ActionButton>
                 ))}
 
@@ -350,7 +442,7 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
                         <ActionButton onClick={() => handleAction("accept")} variant="accept">
                             Accept Request
                         </ActionButton>
-                        <ActionButton onClick={() => setShowRejectModal(true)} variant="reject">
+                        <ActionButton onClick={() => handleAction("reject")} variant="reject">
                             Reject Request
                         </ActionButton>
                     </>
@@ -361,6 +453,13 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
                     <ActionButton onClick={() => handleAction("delete")} variant="delete">
                         Delete Request
                     </ActionButton>
+                )}
+
+                {/* Dispute already requested message */}
+                {isDisputed && (
+                    <div className="px-4 py-2 bg-purple-100 text-purple-800 rounded-md">
+                        ⚖️ Dispute resolution in progress
+                    </div>
                 )}
             </div>
         );
@@ -448,7 +547,16 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
                     <div className="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6">
                         <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-semibold">Reject Cancellation Request</h3>
-                            <button onClick={() => setShowRejectModal(false)} className="text-gray-500 hover:text-gray-700">Close</button>
+                            <button 
+                                onClick={() => {
+                                    setShowRejectModal(false);
+                                    setRejectReason("");
+                                    setRejectEvidence([]);
+                                }} 
+                                className="text-gray-500 hover:text-gray-700"
+                            >
+                                <X className="w-5 h-5" />
+                            </button>
                         </div>
 
                         <div className="mb-4">
@@ -509,7 +617,11 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
                         <div className="flex justify-end gap-3 mt-6">
                             <button
                                 type="button"
-                                onClick={() => setShowRejectModal(false)}
+                                onClick={() => {
+                                    setShowRejectModal(false);
+                                    setRejectReason("");
+                                    setRejectEvidence([]);
+                                }}
                                 className="px-6 py-2.5 bg-gray-100 text-gray-800 rounded-md"
                                 disabled={isSubmittingReject}
                             >
@@ -524,9 +636,15 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
                                     }
                                     setIsSubmittingReject(true);
                                     try {
-                                        await rejectCancellationRequest({ id: cancellationRequest._id, reason: rejectReason, evidence: rejectEvidence }).unwrap();
+                                        await rejectCancellationRequest({ 
+                                            id: cancellationRequest._id, 
+                                            reason: rejectReason, 
+                                            evidence: rejectEvidence 
+                                        }).unwrap();
                                         toast.success('Cancellation request rejected successfully');
                                         setShowRejectModal(false);
+                                        setRejectReason("");
+                                        setRejectEvidence([]);
                                         // refetch to sync views
                                         setTimeout(() => { try { refetch(); } catch (e) { } }, 400);
                                     } catch (err) {
@@ -534,14 +652,17 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
                                         toast.error(err?.data?.message || 'Failed to reject request');
                                     } finally {
                                         setIsSubmittingReject(false);
-                                        setRejectReason('');
-                                        setRejectEvidence([]);
                                     }
                                 }}
                                 className="px-6 py-2.5 bg-[#115E59] text-white rounded-md"
                                 disabled={isSubmittingReject}
                             >
-                                {isSubmittingReject ? 'Submitting...' : 'Submit'}
+                                {isSubmittingReject ? (
+                                    <>
+                                        <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></span>
+                                        Submitting...
+                                    </>
+                                ) : 'Submit'}
                             </button>
                         </div>
                     </div>
