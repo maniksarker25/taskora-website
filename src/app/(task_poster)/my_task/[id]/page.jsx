@@ -6,7 +6,7 @@ import Bids from "@/components/my_tasks/Bids";
 import Progress from "@/components/my_tasks/Progress";
 import Completed from "@/components/my_tasks/Completed";
 import Cancelled from "@/components/my_tasks/Cancelled";
-import { Handshake, Calendar, MapPin, DollarSign, Clock, AlertCircle } from "lucide-react";
+import { Handshake, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useParams } from "next/navigation";
@@ -159,8 +159,8 @@ const TaskDetails = () => {
               href="/my_task"
               className="inline-flex items-center gap-3 px-4 py-3 bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 hover:border-teal-200 group"
             >
-              <FaArrowLeftLong className="text-teal-600 text-lg font-bold group-hover:-translate-x-1 transition-transform" />
-              <span className="font-semibold text-gray-900 group-hover:text-teal-700 transition-colors">
+              <FaArrowLeftLong className="text-[#115E59] text-lg font-bold group-hover:-translate-x-1 transition-transform" />
+              <span className="font-semibold text-gray-900 group-hover:text-[#115E59] transition-colors">
                 Back To My Tasks
               </span>
             </Link>
@@ -169,7 +169,7 @@ const TaskDetails = () => {
           {currentStatus === "Progress" && (
             <button
               onClick={() => setShowResolutionModal(true)}
-              className="inline-flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 hover:from-teal-700 hover:to-teal-800 cursor-pointer group"
+              className="inline-flex items-center gap-3 px-6 py-3.5 bg-gradient-to-r from-[#115E59] to-teal-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 hover:from-teal-700 hover:to-teal-800 cursor-pointer group justify-center"
             >
               <Handshake className="w-5 h-5 group-hover:scale-110 transition-transform" />
               <span className="font-semibold">Resolution Center</span>

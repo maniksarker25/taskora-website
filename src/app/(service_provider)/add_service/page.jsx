@@ -531,7 +531,7 @@ const ServicesManagementPage = () => {
           </div>
 
           {/* Location */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1">
               <label className="block text-sm font-medium text-gray-700">
                 City
@@ -565,10 +565,10 @@ const ServicesManagementPage = () => {
                 />
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Experience */}
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <label className="block text-sm font-medium text-gray-700">
               Experience
             </label>
@@ -583,7 +583,7 @@ const ServicesManagementPage = () => {
                 className="w-full pl-10 pr-3 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00786f] focus:border-transparent transition-all duration-200"
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Service Description */}
           <div className="space-y-1">
@@ -606,7 +606,7 @@ const ServicesManagementPage = () => {
           </div>
 
           {/* Service Features */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
               Service Features
             </label>
@@ -636,7 +636,7 @@ const ServicesManagementPage = () => {
                 </label>
               ))}
             </div>
-          </div>
+          </div> */}
 
           {/* Submit Button */}
           <div className="pt-4 border-t">

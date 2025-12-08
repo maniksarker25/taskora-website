@@ -155,7 +155,7 @@ const ProviderProgress = ({
 
 
 
-      {!isCompleted && (
+      {/* {!isCompleted && (
         <div>
           <button
             onClick={handleMarkAsComplete}
@@ -168,7 +168,7 @@ const ProviderProgress = ({
             {isCompleting ? "Marking Complete..." : "Mark As Complete"}
           </button>
         </div>
-      )}
+      )} */}
     </div>
   );
 };

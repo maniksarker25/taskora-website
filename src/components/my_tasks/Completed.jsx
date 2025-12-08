@@ -7,6 +7,7 @@ import { BsChatLeftText } from "react-icons/bs";
 import srvcporvider from "../../../public/women.svg";
 import { useCreateFeedbackMutation } from "@/lib/features/feedback/feedbackApi";
 import { toast } from "sonner";
+import { useSelector } from "react-redux";
 
 const Completed = ({ bidsData, taskDetails }) => {
   const [showFeedback, setShowFeedback] = useState(false);
@@ -14,6 +15,10 @@ const Completed = ({ bidsData, taskDetails }) => {
   const [rating, setRating] = useState(5);
   const [existingFeedback, setExistingFeedback] = useState(null);
   const [loading, setLoading] = useState(false);
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+  console.log(user.role)
+  
 
   const [createFeedback, { isLoading: isCreating }] = useCreateFeedbackMutation();
 
@@ -447,25 +452,29 @@ const Completed = ({ bidsData, taskDetails }) => {
       )}
 
       {/* No Feedback - Show Give Feedback Button */}
-      {!existingFeedback && !showFeedback && (
-        <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-          <div className="w-16 h-16 rounded-full bg-[#d8e4e3] flex items-center justify-center">
-            <FaStar className="text-[#115E59] text-2xl" />
-          </div>
-          <div className="text-center">
-            <h3 className="text-xl font-semibold mb-2">How was your experience?</h3>
-            <p className="text-gray-600 mb-4">
-              Your feedback helps {providerInfo.name} improve and helps other users make better decisions.
-            </p>
-            <button
-              onClick={() => setShowFeedback(true)}
-              className="px-8 py-3 bg-[#115E59] hover:bg-teal-700 text-white rounded-lg font-medium transition duration-300 transform hover:scale-105 cursor-pointer"
-            >
-              Give Feedback
-            </button>
-          </div>
-        </div>
-      )}
+
+     {
+  user && user?.role === "customer" && !existingFeedback && !showFeedback && (
+    <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+      <div className="w-16 h-16 rounded-full bg-[#d8e4e3] flex items-center justify-center">
+        <FaStar className="text-[#115E59] text-2xl" />
+      </div>
+      <div className="text-center">
+        <h3 className="text-xl font-semibold mb-2">How was your experience?</h3>
+        <p className="text-gray-600 mb-4">
+          Your feedback helps {providerInfo.name} improve and helps other users make better decisions.
+        </p>
+        <button
+          onClick={() => setShowFeedback(true)}
+          className="px-8 py-3 bg-[#115E59] hover:bg-teal-700 text-white rounded-lg font-medium transition duration-300 transform hover:scale-105 cursor-pointer"
+        >
+          Give Feedback
+        </button>
+      </div>
+    </div>
+  )
+}
+    
     </div>
   );
 };

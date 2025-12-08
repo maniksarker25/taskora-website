@@ -8,6 +8,7 @@ import Image from "next/image";
 import userImage from "../../../public/task_img.png";
 
 const ServiceCard = ({ task, isActive = false }) => {
+  console.log("taskkkskjfkasdjflksj===>>>>>>>",task)
   const formatTaskData = (task) => {
     return {
       id: task?._id,
@@ -17,13 +18,13 @@ const ServiceCard = ({ task, isActive = false }) => {
       userName: typeof task?.customer === 'object' ? task?.customer?.name : "Unknown User",
       place: task?.address || task?.city || "Location not specified",
       city: task?.city || "City not specified",
-      month: task?.preferredDate
-        ? new Date(task.preferredDate).toLocaleDateString("en-US", {
+      month: task?.preferredDeliveryDateTime
+        ? new Date(task.preferredDeliveryDateTime).toLocaleDateString("en-US", {
             day: "numeric",
             month: "short",
             year: "numeric",
           }) + (task.preferredTime ? ` ${task.preferredTime}` : "")
-        : "Schedule not set",
+        : "Flexible",
       status: task?.status === "OPEN_FOR_BID" ? "open" : "closed",
       price: `₦ ${task?.budget || "0"}`,
       description: task?.description,
