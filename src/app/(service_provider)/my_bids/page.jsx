@@ -56,7 +56,7 @@ const MyBids = () => {
   const [activeTab, setActiveTab] = useState("bidMade");
   const { data, isLoading, error, refetch } = useGetMyBidsQuery(activeTab);
 
-  // Get the display name for the active tab
+
   const getActiveTabDisplayName = () => {
     const activeCategory = bidStatusCategories.find(cat => cat.name === activeTab);
     return activeCategory ? activeCategory.displayName : activeTab;
@@ -71,7 +71,6 @@ const MyBids = () => {
     setActiveTab(tabName);
   };
 
-  // Refresh data when tab changes
   useEffect(() => {
     refetch();
   }, [activeTab, refetch]);
@@ -191,14 +190,14 @@ const MyBids = () => {
           </div>
 
           {/* Active Tab Info */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-900 mb-1">
               {getActiveTabDisplayName()}
             </h2>
             <p className="text-gray-600">
               {getActiveTabDescription()}
             </p>
-          </div>
+          </div> */}
 
           {/* Bids Grid */}
           {tasks.length === 0 ? (
@@ -265,6 +264,7 @@ const MyBids = () => {
       </div>
     </section>
   );
+  
 };
 
 export default MyBids;
