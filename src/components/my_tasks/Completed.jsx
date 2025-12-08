@@ -1,15 +1,56 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Check, Calendar } from "lucide-react";
 import Image from "next/image";
 import { FaCalendar, FaMapPin, FaStar } from "react-icons/fa6";
 import { BsChatLeftText } from "react-icons/bs";
 import srvcporvider from "../../../public/women.svg";
+import { useCreateFeedbackMutation } from "@/lib/features/feedback/feedbackApi";
+import { toast } from "sonner";
 
 const Completed = ({ bidsData, taskDetails }) => {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [rating, setRating] = useState(5);
+  const [existingFeedback, setExistingFeedback] = useState(null);
+  const [loading, setLoading] = useState(false);
 
+  const [createFeedback, { isLoading: isCreating }] = useCreateFeedbackMutation();
+
+  const handleSubmitFeedback = async () => {
+    if (!feedback.trim()) {
+      toast.error("Please enter feedback details");
+      return;
+    }
+
+    if (!taskDetails?._id) {
+      toast.error("Task ID not found");
+      return;
+    }
+
+    try {
+      const feedbackData = {
+        task: taskDetails._id,
+        rating: rating,
+        details: feedback
+      };
+
+      const result = await createFeedback(feedbackData).unwrap();
+      
+      if (result.success) {
+
+         setFeedback("");
+         setRating(5);
+         setShowFeedback(false);
+  
+
+        toast.success("Feedback submitted successfully!");
+  
+      }
+    } catch (error) {
+       toast.error(error?.data?.message || "Failed to submit feedback. Please try again." );
+    }
+  };
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -52,7 +93,8 @@ const Completed = ({ bidsData, taskDetails }) => {
     if (taskDetails?.provider && typeof taskDetails.provider === "object") {
       return {
         name: taskDetails.provider.name,
-        profile_image: taskDetails.provider.profile_image || srvcporvider
+        profile_image: taskDetails.provider.profile_image || srvcporvider,
+        _id: taskDetails.provider._id
       };
     }
     
@@ -64,14 +106,16 @@ const Completed = ({ bidsData, taskDetails }) => {
       if (matchedBid?.provider) {
         return {
           name: matchedBid.provider.name,
-          profile_image: matchedBid.provider.profile_image || srvcporvider
+          profile_image: matchedBid.provider.profile_image || srvcporvider,
+          _id: matchedBid.provider._id
         };
       }
     }
     
     return {
       name: "Not assigned",
-      profile_image: srvcporvider
+      profile_image: srvcporvider,
+      _id: null
     };
   };
 
@@ -99,6 +143,26 @@ const Completed = ({ bidsData, taskDetails }) => {
   ];
 
   const progressWidth = "100%";
+
+  // Render stars based on rating
+  const renderStars = (ratingValue, interactive = false, size = "text-lg") => {
+    return (
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <button
+            key={star}
+            type="button"
+            onClick={() => interactive && setRating(star)}
+            className={`${interactive ? 'cursor-pointer transform hover:scale-110 transition-transform' : 'cursor-default'} ${size}`}
+          >
+            <FaStar 
+              className={star <= ratingValue ? "text-[#115E59]" : "text-gray-300"} 
+            />
+          </button>
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="flex flex-col gap-12 pb-20">
@@ -148,11 +212,12 @@ const Completed = ({ bidsData, taskDetails }) => {
         </div>
 
         {/* Right side */}
-        <div>
-          <button className="px-6 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer flex gap-2 items-center justify-center mt-12">
+        <div className="flex flex-col gap-3">
+          <button className="px-6 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer flex gap-2 items-center justify-center mt-8 md:mt-12 w-full md:w-auto">
             <BsChatLeftText />
             Chat Now
           </button>
+          
         </div>
       </div>
 
@@ -262,107 +327,145 @@ const Completed = ({ bidsData, taskDetails }) => {
           </div>
         </div>
       )}
-            
-      {/* Review Section */}
-      <div className="flex flex-col md:flex-row gap-4 p-4 border rounded-lg">
-        <div className="w-16 h-16 rounded-full overflow-clip">
-          <Image
-            src={providerInfo.profile_image}
-            alt={providerInfo.name}
-            width={64}
-            height={64}
-            className="w-full h-full object-cover"
-          />
-        </div>
-        
-        <div className="flex-1 flex flex-col justify-between">
-          <div className="flex justify-between items-center">
-            <h4 className="font-semibold">{providerInfo.name}</h4>
-            <p className="text-sm text-gray-500">
-              {taskDetails?.updatedAt ? formatDate(taskDetails.updatedAt) : ""}
-            </p>
-          </div>
-          <div className="flex gap-1 mt-1 mb-1">
-            <FaStar className="text-yellow-400"/>
-            <FaStar className="text-yellow-400"/>
-            <FaStar className="text-yellow-400"/>
-            <FaStar className="text-yellow-400"/>
-            <FaStar className="text-yellow-400"/>
-          </div>
-          <div>
-            <p className="text-gray-600 text-sm mt-2">
-              The task was completed successfully and met all expectations. {providerInfo.name} was professional 
-              and delivered high-quality work within the agreed timeframe. Highly recommended for future tasks!
-            </p>
-          </div>
-        </div>
-      </div>
 
-      {/* Feedback section */}
-      <div className="flex flex-col gap-4 bg-gray-50 p-6 rounded-xl shadow">
-        {!showFeedback ? (
-          <button
-            onClick={() => setShowFeedback(true)}
-            className="px-6 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer"
-          >
-            Give Feedback
-          </button>
-        ) : (
-          <div className="flex flex-col gap-4">
+      {/* Existing Feedback Section */}
+      {existingFeedback && (
+        <div className="flex flex-col md:flex-row gap-4 p-6 border rounded-lg shadow-sm bg-white">
+          <div className="flex-shrink-0 w-16 h-16 rounded-full overflow-hidden mx-auto md:mx-0">
+            <Image
+              src={providerInfo.profile_image}
+              alt={providerInfo.name}
+              width={64}
+              height={64}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          
+          <div className="flex-1 flex flex-col justify-between text-center md:text-left">
+            <div className="flex flex-col md:flex-row justify-between items-center mb-3">
+              <h4 className="font-semibold text-lg">{providerInfo.name}</h4>
+              <p className="text-sm text-gray-500 mt-1 md:mt-0">
+                {existingFeedback.createdAt ? formatDate(existingFeedback.createdAt) : "Recently"}
+              </p>
+            </div>
+            <div className="flex justify-center md:justify-start mb-3">
+              {renderStars(existingFeedback.rating || 5, false, "text-xl")}
+              <span className="ml-2 font-semibold text-gray-700">
+                {existingFeedback.rating || 5}/5
+              </span>
+            </div>
+            <div>
+              <p className="text-gray-600 text-base leading-relaxed">
+                {existingFeedback.details || "No detailed feedback provided."}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Form Section */}
+      {showFeedback && !existingFeedback && (
+        <div className="flex flex-col gap-6 bg-gray-50 p-6 rounded-xl shadow border">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full overflow-hidden">
+              <Image
+                src={providerInfo.profile_image}
+                alt={providerInfo.name}
+                width={48}
+                height={48}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">Rate {providerInfo.name}</h3>
+              <p className="text-gray-600 text-sm">Share your experience with this service provider</p>
+            </div>
+          </div>
+          
+          {/* Star Rating */}
+          <div className="flex flex-col gap-2">
+            <label className="font-medium">Your Rating</label>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              {renderStars(rating, true, "text-2xl")}
+              <span className="text-lg font-semibold text-gray-700">
+                {rating}/5
+              </span>
+            </div>
+          </div>
+          
+          {/* Feedback Textarea */}
+          <div className="flex flex-col gap-2">
+            <label className="font-medium">Feedback Details</label>
             <textarea
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Share your feedback or comments about the completed task..."
-              className="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-[#115e59]"
-              rows={4}
+              placeholder="Share your detailed feedback about the completed task. What did you like? Any suggestions for improvement?"
+              className="w-full border border-gray-300 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-[#115e59] focus:border-transparent resize-none"
+              rows={5}
             />
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  alert(`Feedback submitted: ${feedback}`);
-                  setShowFeedback(false);
-                  setFeedback("");
-                }}
-                className="px-6 py-2 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition duration-300 cursor-pointer"
-              >
-                Submit
-              </button>
-              <button
-                onClick={() => {
-                  setShowFeedback(false);
-                  setFeedback("");
-                }}
-                className="px-6 py-2 border-2 border-[#115e59] rounded-md hover:bg-[#115e59] hover:text-white transition transform duration-300 cursor-pointer text-[#115e59]"
-              >
-                Cancel
-              </button>
-            </div>
+            <p className="text-sm text-gray-500">
+              Your feedback helps improve the quality of service for everyone.
+            </p>
           </div>
-        )}
-      </div>
-
-      {/* Task Information Summary */}
-      {/* <div className="bg-blue-50 p-6 rounded-lg">
-        <h3 className="text-lg font-semibold text-blue-900 mb-4">Task Summary</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-          <div>
-            <span className="font-medium text-blue-800">Task ID:</span> 
-            <span className="ml-2 text-blue-700">{taskDetails?._id}</span>
-          </div>
-          <div>
-            <span className="font-medium text-blue-800">Category:</span> 
-            <span className="ml-2 text-blue-700">{taskDetails?.category?.name}</span>
-          </div>
-          <div>
-            <span className="font-medium text-blue-800">Payment Status:</span> 
-            <span className="ml-2 text-blue-700">{taskDetails?.paymentStatus}</span>
-          </div>
-          <div>
-            <span className="font-medium text-blue-800">Total Offers:</span> 
-            <span className="ml-2 text-blue-700">{taskDetails?.totalOffer || 0}</span>
+          
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-3 justify-end">
+            <button
+              onClick={() => {
+                setShowFeedback(false);
+                setFeedback("");
+                setRating(5);
+              }}
+              className="px-6 py-3 border-2 border-[#115e59] rounded-lg hover:bg-gray-50 transition duration-300 cursor-pointer text-[#115e59] font-medium order-2 sm:order-1"
+              disabled={isCreating}
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmitFeedback}
+              disabled={isCreating || !feedback.trim()}
+              className={`
+                px-6 py-3 rounded-lg font-medium transition duration-300 cursor-pointer
+                ${isCreating || !feedback.trim()
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-[#115e59] hover:bg-teal-800 text-white transform hover:scale-105'
+                }
+                order-1 sm:order-2
+              `}
+            >
+              {isCreating ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Submitting...
+                </span>
+              ) : (
+                "Submit Feedback"
+              )}
+            </button>
           </div>
         </div>
-      </div> */}
+      )}
+
+      {/* No Feedback - Show Give Feedback Button */}
+      {!existingFeedback && !showFeedback && (
+        <div className="flex flex-col items-center gap-4 p-6 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+          <div className="w-16 h-16 rounded-full bg-[#d8e4e3] flex items-center justify-center">
+            <FaStar className="text-[#115E59] text-2xl" />
+          </div>
+          <div className="text-center">
+            <h3 className="text-xl font-semibold mb-2">How was your experience?</h3>
+            <p className="text-gray-600 mb-4">
+              Your feedback helps {providerInfo.name} improve and helps other users make better decisions.
+            </p>
+            <button
+              onClick={() => setShowFeedback(true)}
+              className="px-8 py-3 bg-[#115E59] hover:bg-teal-700 text-white rounded-lg font-medium transition duration-300 transform hover:scale-105 cursor-pointer"
+            >
+              Give Feedback
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

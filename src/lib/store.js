@@ -12,6 +12,7 @@ import providerServiceApi from './features/providerService/providerServiceApi';
 import { chatApi } from './features/chatApi/chatApi';
 import extensionApi from './features/extensionApi/extensionApi';
 import fileApi from './features/fileApi/fileApi';
+import feedbackApi from './features/feedback/feedbackApi';
 
 export const makeStore = () =>
   configureStore({
@@ -28,7 +29,8 @@ export const makeStore = () =>
       [providerServiceApi.reducerPath]: providerServiceApi.reducer,
       [chatApi.reducerPath]: chatApi.reducer,
       [extensionApi.reducerPath]: extensionApi.reducer,
-      [fileApi.reducerPath]: fileApi.reducer
+      [fileApi.reducerPath]: fileApi.reducer,
+      [feedbackApi.reducerPath]: feedbackApi.reducer
     },
     middleware:(getDefaultMiddleware) => getDefaultMiddleware()
     .concat(
@@ -43,7 +45,8 @@ export const makeStore = () =>
       providerServiceApi.middleware,
       chatApi.middleware,
       extensionApi.middleware,
-      fileApi.middleware
+      fileApi.middleware,
+      feedbackApi.middleware
     ),
     devTools: process.env.NODE_ENV !== 'production',
   });
