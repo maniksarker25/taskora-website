@@ -86,7 +86,7 @@ const RegisterContent = () => {
       if (result.success) {
         localStorage.setItem('email', formData.email); 
         
-        toast.success("Registration successful! Please check your email to verify your account.", {
+        toast.success("Registration successful! Please check your phone to verify your account.", {
           style: {
             backgroundColor: "#d1fae5",
             color: "#065f46",
