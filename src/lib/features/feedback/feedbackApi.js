@@ -37,12 +37,21 @@ const feedbackApi = createApi({
         body: { taskId }, // GET request এর সাথে body
       }),
     }),
+
+      getMyFeedback: builder.query({
+      query: () => ({
+        url: "/feedback/my-feedback",
+        method: "GET",
+      }),
+      providesTags: ["Feedback"],
+    }),
   }),
 });
 
 export const { 
   useCreateFeedbackMutation,
-  useGetTaskFeedbackMutation
+  useGetTaskFeedbackMutation,
+  useGetMyFeedbackQuery
 } = feedbackApi;
 
 export default feedbackApi;

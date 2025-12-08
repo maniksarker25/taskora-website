@@ -254,16 +254,6 @@ const TaskDetails = () => {
             </div>
           )}
 
-          {/* Task Description */}
-          {taskDetails?.description && (
-            <div className="p-6 lg:p-8 border-b border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Description</h3>
-              <p className="text-gray-700 leading-relaxed bg-gray-50 rounded-lg p-4">
-                {taskDetails.description}
-              </p>
-            </div>
-          )}
-
           {/* Dynamic Content Section */}
           <div className="p-6 lg:p-8">
             <div className="min-h-[400px]">
