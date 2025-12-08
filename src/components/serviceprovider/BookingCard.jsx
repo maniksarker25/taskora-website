@@ -44,13 +44,13 @@ const BookingCard = ({ signgleServiceData }) => {
             <>
               <div className="space-y-3">
 
-                <Link
+                {/* <Link
                   href="/chat"
                   className="w-full flex items-center justify-center gap-2 bg-white border px-4 py-3 rounded-lg hover:bg-teal-50 transition-colors border-teal-700 text-teal-700"
                 >
                   <MessageCircle className="w-4 h-4" />
                   Chat Now
-                </Link>
+                </Link> */}
 
                 <button
                   onClick={handleSubmitOffer}
