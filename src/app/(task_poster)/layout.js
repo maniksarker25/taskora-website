@@ -10,6 +10,7 @@ const TaskPosterLayout = ({ children }) => {
   return (
     <>
       <CustomerProtectedRoute>
+        <Toaster position="top-right" />
         <Navbar />
         <div>{children}</div>
         <Toaster
