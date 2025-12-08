@@ -146,7 +146,7 @@ const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsDa
       </div>
 
 
-      {/* ✅ CHAT MODAL */}
+      {/*  CHAT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/30 bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white w-11/12 max-w-md p-5 rounded-lg shadow-lg">
