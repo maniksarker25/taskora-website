@@ -90,12 +90,13 @@ const Progress = ({
       return;
     }
 
-    if (!confirm("Are you sure you want to mark this task as complete?")) {
-      return;
-    }
+    // if (!confirm("Are you sure you want to mark this task as complete?")) {
+    //   return;
+    // }
 
     try {
       const result = await completeTask(taskDetails._id).unwrap();
+      console.log("complete task customer",result)
       if (result.success) {
         toast.success("Task marked as complete successfully!");
         window.location.reload();
