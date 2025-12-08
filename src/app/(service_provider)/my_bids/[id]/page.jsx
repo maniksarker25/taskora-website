@@ -62,15 +62,15 @@ const BidsDetails = () => {
   } = useGetBidsByTaskIdQuery(taskId);
 
   return (
-    <div className="mx-auto px-3 py-6 md:p-6">
+    <div className="max-w-[1240px] mx-auto px-4 pb-28 pt-8">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
         <Link
-          href="/my_task"
+          href="/my_bids"
           className="flex items-center gap-4 ">
           <FaArrowLeftLong className="text-color text-xl font-bold" />
           <p className="font-semibold text-md md:text-xl text-color">
-            Back To My Tasks
+            Back To My Bids
           </p>
         </Link>
 
