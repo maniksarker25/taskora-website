@@ -13,6 +13,7 @@ import { chatApi } from './features/chatApi/chatApi';
 import extensionApi from './features/extensionApi/extensionApi';
 import fileApi from './features/fileApi/fileApi';
 import feedbackApi from './features/feedback/feedbackApi';
+import notificationApi from './features/notification/notificationApi';
 
 export const makeStore = () =>
   configureStore({
@@ -30,7 +31,8 @@ export const makeStore = () =>
       [chatApi.reducerPath]: chatApi.reducer,
       [extensionApi.reducerPath]: extensionApi.reducer,
       [fileApi.reducerPath]: fileApi.reducer,
-      [feedbackApi.reducerPath]: feedbackApi.reducer
+      [feedbackApi.reducerPath]: feedbackApi.reducer,
+      [notificationApi.reducerPath]: notificationApi.reducer
     },
     middleware:(getDefaultMiddleware) => getDefaultMiddleware()
     .concat(
@@ -46,7 +48,8 @@ export const makeStore = () =>
       chatApi.middleware,
       extensionApi.middleware,
       fileApi.middleware,
-      feedbackApi.middleware
+      feedbackApi.middleware,
+      notificationApi.middleware
     ),
     devTools: process.env.NODE_ENV !== 'production',
   });

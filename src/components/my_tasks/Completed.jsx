@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Check, Calendar } from "lucide-react";
 import Image from "next/image";
 import { FaCalendar, FaMapPin, FaStar } from "react-icons/fa6";
@@ -21,7 +21,16 @@ const Completed = ({ bidsData, taskDetails }) => {
   const [createFeedback, { isLoading: isCreating }] = useCreateFeedbackMutation();
 
   const {data: feedbacks} = useGetMyFeedbackQuery()
-  console.log(feedbacks)
+ 
+
+  const restFeedback = feedbacks?.data || null
+
+  const taskSpecificFeedback = restFeedback?.find(
+  feedback => feedback.task === taskDetails?._id
+);
+
+  
+   console.log("=====>",restFeedback)
 
   const handleSubmitFeedback = async () => {
     if (!feedback.trim()) {
@@ -149,6 +158,7 @@ const Completed = ({ bidsData, taskDetails }) => {
   ];
 
   const progressWidth = "100%";
+
 
   // Render stars based on rating
   const renderStars = (ratingValue, interactive = false, size = "text-lg") => {
@@ -451,6 +461,54 @@ const Completed = ({ bidsData, taskDetails }) => {
           </div>
         </div>
       )}
+
+
+      {
+         user && user?.role === "provider" && (
+          <p className="text-xl font-semibold">Feedback</p>
+         )
+      }
+
+{/* // 2. Then use taskSpecificFeedback instead of existingFeedback */}
+{taskSpecificFeedback  && (
+  
+  <div className="flex flex-col md:flex-row gap-4 p-6 border rounded-lg shadow-sm bg-white">
+    <div className="flex-shrink-0 w-16 h-16 rounded-full overflow-hidden mx-auto md:mx-0">
+      <Image
+        src={taskSpecificFeedback.customer?.profile_image || srvcporvider}
+        alt={taskSpecificFeedback.customer?.name || "Customer"}
+        width={64}
+        height={64}
+        className="w-full h-full object-cover"
+      />
+    </div>
+    
+    <div className="flex-1 flex flex-col justify-between text-center md:text-left">
+      <div className="flex flex-col md:flex-row justify-between items-center mb-3">
+        <h4 className="font-semibold text-lg">
+          {taskSpecificFeedback.customer?.name || "Customer"}
+        </h4>
+        <p className="text-sm text-gray-500 mt-1 md:mt-0">
+          {taskSpecificFeedback.createdAt ? formatDate(taskSpecificFeedback.createdAt) : "Recently"}
+        </p>
+      </div>
+      <div className="flex justify-center md:justify-start mb-3">
+        {renderStars(taskSpecificFeedback.rating || 5, false, "text-xl")}
+        <span className="ml-2 font-semibold text-gray-700">
+          {taskSpecificFeedback.rating || 5}/5
+        </span>
+      </div>
+      <div>
+        <p className="text-gray-600 text-base leading-relaxed">
+          {taskSpecificFeedback.details || "No detailed feedback provided."}
+        </p>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
 
       {/* No Feedback - Show Give Feedback Button */}
 
