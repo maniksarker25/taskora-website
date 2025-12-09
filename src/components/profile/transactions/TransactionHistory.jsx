@@ -30,7 +30,6 @@ const TransactionHistory = () => {
         params.date = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         break;
       case "weekly":
-        // Calculate week number
         const firstDayOfYear = new Date(year, 0, 1);
         const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
         const weekNumber = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
@@ -46,7 +45,6 @@ const TransactionHistory = () => {
         params.year = year;
         break;
       case "lifetime":
-        // No specific params needed
         break;
     }
     
@@ -99,13 +97,11 @@ const TransactionHistory = () => {
     setCurrentDate(newDate);
   };
 
-  // Handle tab change
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
     setCurrentDate(new Date()); 
   };
 
-  // Format current period for display
   const formatCurrentPeriod = () => {
     switch (activeTab) {
       case "daily":
@@ -115,7 +111,6 @@ const TransactionHistory = () => {
           year: 'numeric' 
         });
       case "weekly":
-        // Calculate week number
         const firstDayOfYear = new Date(currentDate.getFullYear(), 0, 1);
         const pastDaysOfYear = (currentDate - firstDayOfYear) / 86400000;
         const weekNumber = Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
@@ -135,7 +130,6 @@ const TransactionHistory = () => {
     }
   };
 
-  // Transform API data to table format
   const transformTransactions = () => {
     if (!transactionsData?.data || !Array.isArray(transactionsData.data)) {
       return [];
@@ -155,7 +149,6 @@ const TransactionHistory = () => {
       }),
       fullDate: new Date(transaction.createdAt),
       status: transaction.type === 'DEBIT' ? 'Completed' : 'Pending',
-      // Mock data for UI (আপনার API থেকে আসলে replace করবেন)
       providerName: transaction.reason || "Service Provider",
       service: transaction.userType || "Service",
       avatar: "https://i.pravatar.cc/150?img=" + Math.floor(Math.random() * 70)

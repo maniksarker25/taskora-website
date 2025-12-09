@@ -1,7 +1,7 @@
 import React from "react";
 
 const TransactionTable = ({ transactions }) => {
-  console.log("transactionssss====>>>>>>>>",transactions)
+  // console.log("transactionssss====>>>>>>>>",transactions)
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "completed":
