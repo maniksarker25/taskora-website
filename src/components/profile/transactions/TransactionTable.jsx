@@ -1,6 +1,7 @@
 import React from "react";
 
 const TransactionTable = ({ transactions }) => {
+  console.log("transactionssss====>>>>>>>>",transactions)
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "completed":
@@ -16,6 +17,17 @@ const TransactionTable = ({ transactions }) => {
     }
   };
 
+  const getTypeColor = (type) => {
+    switch (type?.toLowerCase()) {
+      case "debit":
+        return "text-red-600 font-medium";
+      case "credit":
+        return "text-green-600 font-medium";
+      default:
+        return "text-gray-600";
+    }
+  };
+
   if (!transactions || transactions.length === 0) {
     return (
       <div className="text-center py-16">
@@ -23,17 +35,19 @@ const TransactionTable = ({ transactions }) => {
           <div className="w-8 h-8 border-2 border-gray-300 rounded border-dashed"></div>
         </div>
         <p className="text-gray-500 text-lg">No Transaction Found</p>
+        <p className="text-gray-400 text-sm mt-2">Try selecting a different date or filter</p>
       </div>
     );
   }
+  
   return (
     <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
       {/* Mobile View */}
       <div className="block lg:hidden">
         <div className="space-y-1">
-          {transactions.map((transaction, index) => (
+          {transactions.map((transaction) => (
             <div
-              key={index}
+              key={transaction.id}
               className="p-4 border-b border-gray-100 hover:bg-gray-50"
             >
               <div className="flex items-center gap-3 mb-2">
@@ -49,22 +63,33 @@ const TransactionTable = ({ transactions }) => {
                   <p className="text-sm text-gray-500">{transaction.service}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900">
+                  <p className={`font-semibold ${getTypeColor(transaction.type)}`}>
                     ₦{transaction.amount}
                   </p>
+                  <p className="text-xs text-gray-500">{transaction.type}</p>
                 </div>
               </div>
               <div className="flex justify-between items-center">
-                <span
-                  className={`text-sm font-medium ${getStatusColor(
-                    transaction.status
-                  )}`}
-                >
-                  {transaction.status}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {transaction.date}
-                </span>
+                <div>
+                  <span
+                    className={`text-sm font-medium ${getStatusColor(
+                      transaction.status
+                    )}`}
+                  >
+                    {transaction.status}
+                  </span>
+                  <p className="text-xs text-gray-500 mt-1">
+                    ID: {transaction.transactionId}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-sm text-gray-500 block">
+                    {transaction.date}
+                  </span>
+                  <span className="text-xs text-gray-400">
+                    {transaction.reason}
+                  </span>
+                </div>
               </div>
             </div>
           ))}
@@ -77,10 +102,13 @@ const TransactionTable = ({ transactions }) => {
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
               <th className="text-left py-3 px-4 font-medium text-gray-900">
-                Provider Name
+                Transaction ID
               </th>
               <th className="text-left py-3 px-4 font-medium text-gray-900">
-                Service
+                Provider/Service
+              </th>
+              <th className="text-left py-3 px-4 font-medium text-gray-900">
+                Type
               </th>
               <th className="text-left py-3 px-4 font-medium text-gray-900">
                 Status
@@ -88,17 +116,23 @@ const TransactionTable = ({ transactions }) => {
               <th className="text-left py-3 px-4 font-medium text-gray-900">
                 Date
               </th>
+              <th className="text-left py-3 px-4 font-medium text-gray-900">
+                Reason
+              </th>
               <th className="text-right py-3 px-4 font-medium text-gray-900">
                 Amount
               </th>
             </tr>
           </thead>
           <tbody>
-            {transactions.map((transaction, index) => (
+            {transactions.map((transaction) => (
               <tr
-                key={index}
+                key={transaction.id}
                 className="border-b border-gray-100 hover:bg-gray-50"
               >
+                <td className="py-4 px-4 text-gray-700 font-mono text-sm">
+                  {transaction.transactionId}
+                </td>
                 <td className="py-4 px-4">
                   <div className="flex items-center gap-3">
                     <img
@@ -106,13 +140,20 @@ const TransactionTable = ({ transactions }) => {
                       alt={transaction.providerName}
                       className="w-10 h-10 rounded-full object-cover"
                     />
-                    <span className="font-medium text-gray-900">
-                      {transaction.providerName}
-                    </span>
+                    <div>
+                      <span className="font-medium text-gray-900 block">
+                        {transaction.providerName}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        {transaction.service}
+                      </span>
+                    </div>
                   </div>
                 </td>
-                <td className="py-4 px-4 text-gray-700">
-                  {transaction.service}
+                <td className="py-4 px-4">
+                  <span className={`${getTypeColor(transaction.type)}`}>
+                    {transaction.type}
+                  </span>
                 </td>
                 <td className="py-4 px-4">
                   <span
@@ -123,9 +164,16 @@ const TransactionTable = ({ transactions }) => {
                     {transaction.status}
                   </span>
                 </td>
-                <td className="py-4 px-4 text-gray-700">{transaction.date}</td>
-                <td className="py-4 px-4 text-right font-semibold text-gray-900">
-                  ₦{transaction.amount}
+                <td className="py-4 px-4 text-gray-700">
+                  {transaction.date}
+                </td>
+                <td className="py-4 px-4 text-gray-700">
+                  <span className="text-sm">{transaction.reason}</span>
+                </td>
+                <td className="py-4 px-4 text-right">
+                  <span className={`font-semibold text-lg ${getTypeColor(transaction.type)}`}>
+                    ₦{transaction.amount}
+                  </span>
                 </td>
               </tr>
             ))}
