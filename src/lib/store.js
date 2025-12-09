@@ -14,6 +14,7 @@ import extensionApi from './features/extensionApi/extensionApi';
 import fileApi from './features/fileApi/fileApi';
 import feedbackApi from './features/feedback/feedbackApi';
 import notificationApi from './features/notification/notificationApi';
+import { transactionApi } from './features/transactionApi/transactionApi';
 
 export const makeStore = () =>
   configureStore({
@@ -32,7 +33,8 @@ export const makeStore = () =>
       [extensionApi.reducerPath]: extensionApi.reducer,
       [fileApi.reducerPath]: fileApi.reducer,
       [feedbackApi.reducerPath]: feedbackApi.reducer,
-      [notificationApi.reducerPath]: notificationApi.reducer
+      [notificationApi.reducerPath]: notificationApi.reducer,
+      [transactionApi.reducerPath]: transactionApi.reducer
     },
     middleware:(getDefaultMiddleware) => getDefaultMiddleware()
     .concat(
@@ -49,7 +51,8 @@ export const makeStore = () =>
       extensionApi.middleware,
       fileApi.middleware,
       feedbackApi.middleware,
-      notificationApi.middleware
+      notificationApi.middleware,
+      transactionApi.middleware
     ),
     devTools: process.env.NODE_ENV !== 'production',
   });
