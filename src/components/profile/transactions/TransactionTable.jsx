@@ -1,7 +1,7 @@
 import React from "react";
 
 const TransactionTable = ({ transactions }) => {
-  // console.log("transactionssss====>>>>>>>>",transactions)
+  console.log("transactionssss====>>>>>>>>",transactions)
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
       case "completed":
@@ -104,15 +104,15 @@ const TransactionTable = ({ transactions }) => {
               <th className="text-left py-3 px-4 font-medium text-gray-900">
                 Transaction ID
               </th>
-              <th className="text-left py-3 px-4 font-medium text-gray-900">
+              {/* <th className="text-left py-3 px-4 font-medium text-gray-900">
                 Provider/Service
-              </th>
+              </th> */}
               <th className="text-left py-3 px-4 font-medium text-gray-900">
                 Type
               </th>
-              <th className="text-left py-3 px-4 font-medium text-gray-900">
+              {/* <th className="text-left py-3 px-4 font-medium text-gray-900">
                 Status
-              </th>
+              </th> */}
               <th className="text-left py-3 px-4 font-medium text-gray-900">
                 Date
               </th>
@@ -133,7 +133,7 @@ const TransactionTable = ({ transactions }) => {
                 <td className="py-4 px-4 text-gray-700 font-mono text-sm">
                   {transaction.transactionId}
                 </td>
-                <td className="py-4 px-4">
+                {/* <td className="py-4 px-4">
                   <div className="flex items-center gap-3">
                     <img
                       src={transaction.avatar}
@@ -149,13 +149,13 @@ const TransactionTable = ({ transactions }) => {
                       </span>
                     </div>
                   </div>
-                </td>
+                </td> */}
                 <td className="py-4 px-4">
                   <span className={`${getTypeColor(transaction.type)}`}>
                     {transaction.type}
                   </span>
                 </td>
-                <td className="py-4 px-4">
+                {/* <td className="py-4 px-4">
                   <span
                     className={`font-medium ${getStatusColor(
                       transaction.status
@@ -163,7 +163,7 @@ const TransactionTable = ({ transactions }) => {
                   >
                     {transaction.status}
                   </span>
-                </td>
+                </td> */}
                 <td className="py-4 px-4 text-gray-700">
                   {transaction.date}
                 </td>

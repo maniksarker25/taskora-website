@@ -85,7 +85,7 @@ const BidModal = ({ isOpen, onClose, task, onSubmit, isLoading }) => {
           {/* Message (Optional) */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Message (Optional)
+              Message
             </label>
             <div className="relative">
               <div className="absolute top-3 left-3 pointer-events-none">
