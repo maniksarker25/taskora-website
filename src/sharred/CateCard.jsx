@@ -1,13 +1,15 @@
 import Image from 'next/image'
 import React from 'react'
+import taskalleyLogo from "../../public/Group (5).svg";
+
 
 const CateCard = ({item}) => {
 
   return (
     <div className='border-2 border-[#115E59] rounded-lg p-4 flex items-center hover:shadow-lg transition transform duration-300 hover:scale-101 cursor-pointer pl-8 py-8 gap-4'>
         <div>
-            <Image src={item?.category_image}
-             alt={item.category_image} 
+            <Image src={item?.category_image || taskalleyLogo}
+             alt={item?.name || "Category Image"} 
              height={60}
              width={60}
              />
