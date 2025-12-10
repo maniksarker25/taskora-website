@@ -25,10 +25,10 @@ const ServiceCard = ({ service }) => {
       <div className="p-4">
         {/* Location and Rating */}
         <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-1 text-gray-500 text-sm">
+          {/* <div className="flex items-center gap-1 text-gray-500 text-sm">
             <MapPin className="w-4 h-4 text-[#115E59]" />
             <span className="text-black">{service.city || service.address}</span>
-          </div>
+          </div> */}
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
             <span className="text-sm font-medium">{service.averageRating || "New"}</span>
@@ -50,7 +50,7 @@ const ServiceCard = ({ service }) => {
         {/* Price */}
         {service.price && (
           <p className="text-gray-800 font-semibold text-lg mb-3">
-            N {service.price}
+            ₦ {service.price}
           </p>
         )}
 

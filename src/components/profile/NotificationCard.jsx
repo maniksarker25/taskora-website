@@ -11,10 +11,8 @@ const NotificationCard = ({ notification, userRole = "customer", onMarkAsSeen })
   const [isMarkingAsSeen, setIsMarkingAsSeen] = useState(false);
   const [markNotificationAsSeen] = useMarkNotificationAsSeenMutation();
   
-  // ইসসিন চেক করো - প্রথমে seenBy, তারপর isSeen
   const isUnread = notification.seenBy?.length === 0 || !notification.isSeen;
   
-  // Get icon based on type
   const getIcon = () => {
     switch(notification.type) {
       case 'TASK_ACCEPTED': return <CheckCircle className="w-5 h-5 text-green-500" />;
@@ -39,11 +37,10 @@ const NotificationCard = ({ notification, userRole = "customer", onMarkAsSeen })
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
   
-  // Get redirect path
   const getRedirectPath = () => {
     if (!notification.redirectLink) return null;
     
-    if (notification.type === 'TASK_ACCEPTED' || notification.type === 'EXTENSION_REQUEST') {
+    if (notification) {
       return userRole === "customer" 
         ? `/my_task/${notification.redirectLink}`
         : `/my_bids/${notification.redirectLink}`;
@@ -54,23 +51,19 @@ const NotificationCard = ({ notification, userRole = "customer", onMarkAsSeen })
   
   const redirectPath = getRedirectPath();
   
-  // Handle notification click
   const handleClick = async () => {
-    // First mark as seen if unread
     if (isUnread) {
       await handleMarkAsSeen();
     }
     
-    // Then navigate if there's a redirect path
     if (redirectPath) {
       router.push(redirectPath);
     }
   };
   
-  // Handle mark as seen separately
   const handleMarkAsSeen = async (e) => {
     if (e) {
-      e.stopPropagation(); // Prevent triggering the main click
+      e.stopPropagation(); 
     }
     
     if (!isUnread || isMarkingAsSeen) return;
@@ -81,7 +74,6 @@ const NotificationCard = ({ notification, userRole = "customer", onMarkAsSeen })
       
       if (result.success) {
         toast.success("Notification marked as read");
-        // Call parent callback if provided
         if (onMarkAsSeen) {
           onMarkAsSeen(notification._id);
         }

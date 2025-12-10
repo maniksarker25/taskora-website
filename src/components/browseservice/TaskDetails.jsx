@@ -82,6 +82,7 @@ const TaskDetails = ({ task }) => {
   };
 
   const bids = bidsData?.data.result || [];
+  // console.log("bids======================>",bids)
 
   const questions = questionsData?.data || questionsData || [];
 
@@ -506,11 +507,11 @@ const TaskDetails = ({ task }) => {
                         <div className="flex items-center gap-1">
                           <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                           <span className="text-sm font-medium text-gray-900">
-                            {bid?.provider?.rating || "0"}
+                            {bid?.provider?.avgRating || "0"}
                           </span>
                         </div>
                         <span className="text-xs text-gray-500">
-                          ({bid?.provider?.reviewCount || "0"} Reviews)
+                          ({bid?.provider?.totalRatingCount || "0"} Reviews)
                         </span>
                       </div>
 

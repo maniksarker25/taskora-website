@@ -25,6 +25,7 @@ const Notifications = () => {
   const [markNotificationAsSeen] = useMarkNotificationAsSeenMutation();
   
   const notifications = notificationsData?.data?.result || [];
+  console.log("notifications====>",notifications)
   const meta = notificationsData?.data?.meta;
   
   // Calculate unread count

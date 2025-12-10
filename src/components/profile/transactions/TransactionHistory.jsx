@@ -17,6 +17,7 @@ const TransactionHistory = () => {
     error,
     refetch 
   } = useGetMyTransactionsQuery(filterParams);
+  console.log('first==========>', transactionsData)
 
   const updateFilterParams = (tab, date) => {
     const params = { filterType: tab };
@@ -147,11 +148,11 @@ const TransactionHistory = () => {
         month: 'short',
         year: 'numeric'
       }),
-      fullDate: new Date(transaction.createdAt),
+      // fullDate: new Date(transaction.createdAt),
       status: transaction.type === 'DEBIT' ? 'Completed' : 'Pending',
-      providerName: transaction.reason || "Service Provider",
-      service: transaction.userType || "Service",
-      avatar: "https://i.pravatar.cc/150?img=" + Math.floor(Math.random() * 70)
+      // providerName: transaction.reason || "Service Provider",
+      service: transaction.userType ,
+      // avatar: "https://i.pravatar.cc/150?img=" + Math.floor(Math.random() * 70)
     }));
   };
 

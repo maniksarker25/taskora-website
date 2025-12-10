@@ -8,7 +8,7 @@ import Image from "next/image";
 import userImage from "../../../public/task_img.png";
 
 const ServiceCard = ({ task, isActive = false }) => {
-  console.log("taskkkskjfkasdjflksj===>>>>>>>",task)
+  // console.log("taskkkskjfkasdjflksj===>>>>>>>",task)
   const formatTaskData = (task) => {
     return {
       id: task?._id,
