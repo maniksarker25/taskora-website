@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { MdMenu, MdClose } from "react-icons/md";
+import { MdMenu, MdClose, MdAccountBox } from "react-icons/md";
 import taskalleyLogo from "../../../public/Group (5).svg";
 import { FaCalendarAlt } from "react-icons/fa";
 import { FaMessage } from "react-icons/fa6";
@@ -13,6 +13,8 @@ import { RiUserSettingsFill } from "react-icons/ri";
 import { PiSignOutBold } from "react-icons/pi";
 import { FaHandshake } from "react-icons/fa";
 import { logout } from "@/lib/features/auth/authSlice";
+import { toast } from "sonner";
+import { useUpgradeAccountMutation } from "@/lib/features/auth/authApi";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -20,16 +22,44 @@ const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [mounted, setMounted] = useState(false);
-
   const [profileOpen, setProfileOpen] = useState(false);
   const [desktopProfileOpen, setDesktopProfileOpen] = useState(false);
-    const dispatch = useDispatch();
-    const router = useRouter();
+  
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const [upgradeAccount, { isLoading: isUpgrading }] = useUpgradeAccountMutation();
 
-   const handleLogout = () => {
+  const handleLogout = () => {
     dispatch(logout());
     setDesktopProfileOpen(false);
-   router.push("/login");
+    router.push("/login");
+  };
+
+  const handleUpgradeAccount = async () => {
+    console.log("Upgrade Account button clicked");
+    
+    try {
+      console.log("Calling upgradeAccount API...");
+      const result = await upgradeAccount().unwrap();
+      
+      console.log("Upgrade API Response:======================>>>>", result);
+      
+      if (result.success) {
+        toast.success(result.message || "Account upgraded successfully");
+        console.log("Account upgraded successfully. New role:", result.data?.role);
+        setDesktopProfileOpen(false);
+        setProfileOpen(false);
+
+      }
+    } catch (error) {
+      console.error("Upgrade Account Error:", error?.data?.message);
+      console.error("Error Details:", {
+        message: error.message,
+        data: error.data,
+        status: error.status
+      });
+      toast.error(error?.data?.message || "Account upgrade failed");
+    }
   };
 
   useEffect(() => {
@@ -56,8 +86,6 @@ const Navbar = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [desktopProfileOpen]);
-
-
 
   const getLinkClass = (path, isButton = false) => {
     const isActive = pathname === path;
@@ -241,8 +269,30 @@ const Navbar = () => {
           </Link>
 
           <button
+            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${
+              isUpgrading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+            onClick={handleUpgradeAccount}
+            disabled={isUpgrading}
+          >
+            {isUpgrading ? (
+              <>
+                <svg className="animate-spin h-5 w-5 mr-2 text-[#115E59]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Upgrading...
+              </>
+            ) : (
+              <>
+                <MdAccountBox className="text-[#115E59]" /> Upgrade Account
+              </>
+            )}
+          </button>
+
+          <button
             className="flex items-center gap-2 text-lg hover:bg-red-50 hover:text-red-600 px-3 py-2 rounded-md transition-colors"
-             onClick={handleLogout}
+            onClick={handleLogout}
           >
             <PiSignOutBold className="text-red-500" /> Sign Out
           </button>
@@ -315,9 +365,30 @@ const Navbar = () => {
           </Link>
 
           <button
+            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${
+              isUpgrading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+            onClick={handleUpgradeAccount}
+            disabled={isUpgrading}
+          >
+            {isUpgrading ? (
+              <>
+                <svg className="animate-spin h-5 w-5 mr-2 text-[#115E59]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Upgrading...
+              </>
+            ) : (
+              <>
+                <MdAccountBox className="text-[#115E59]" /> Upgrade Account
+              </>
+            )}
+          </button>
+
+          <button
             className="flex items-center gap-2 text-lg hover:bg-red-50 hover:text-red-600 px-3 py-2 rounded-md transition-colors"
-           
-           onClick={handleLogout}
+            onClick={handleLogout}
           >
             <PiSignOutBold className="text-red-500" /> Sign Out
           </button>
@@ -371,6 +442,28 @@ const Navbar = () => {
           >
             <RiUserSettingsFill className="text-[#115e59]" /> My Profile
           </Link>
+
+          <button
+            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${
+              isUpgrading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+            onClick={handleUpgradeAccount}
+            disabled={isUpgrading}
+          >
+            {isUpgrading ? (
+              <>
+                <svg className="animate-spin h-5 w-5 mr-2 text-[#115E59]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Upgrading...
+              </>
+            ) : (
+              <>
+                <MdAccountBox className="text-[#115E59]" /> Upgrade Account
+              </>
+            )}
+          </button>
 
           <button
             className="flex items-center gap-2 text-lg hover:bg-red-50 hover:text-red-600 px-3 py-2 rounded-md transition-colors"
@@ -429,12 +522,34 @@ const Navbar = () => {
             <RiUserSettingsFill className="text-[#115e59]" /> My Profile
           </Link>
 
-          <Link
+          <button
+            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${
+              isUpgrading ? "opacity-70 cursor-not-allowed" : ""
+            }`}
+            onClick={handleUpgradeAccount}
+            disabled={isUpgrading}
+          >
+            {isUpgrading ? (
+              <>
+                <svg className="animate-spin h-5 w-5 mr-2 text-[#115E59]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Upgrading...
+              </>
+            ) : (
+              <>
+                <MdAccountBox className="text-[#115E59]" /> Upgrade Account
+              </>
+            )}
+          </button>
+
+          <button
             className="flex items-center gap-2 text-lg hover:bg-red-50 hover:text-red-600 px-3 py-2 rounded-md transition-colors"
-            href="/logout"
+            onClick={handleLogout}
           >
             <PiSignOutBold className="text-red-500" /> Sign Out
-          </Link>
+          </button>
         </div>
       </div>
     </div>
