@@ -14,7 +14,7 @@ import { PiSignOutBold } from "react-icons/pi";
 import { FaHandshake } from "react-icons/fa";
 import { logout } from "@/lib/features/auth/authSlice";
 import { toast } from "sonner";
-import { useUpgradeAccountMutation } from "@/lib/features/auth/authApi";
+import { useGetMyProfileQuery, useUpgradeAccountMutation } from "@/lib/features/auth/authApi";
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -28,6 +28,9 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const [upgradeAccount, { isLoading: isUpgrading }] = useUpgradeAccountMutation();
+  const { data, isLoading, error } = useGetMyProfileQuery();
+  const multiUserverify = data?.data.user.isMultiRole
+  console.log("user=======================>>>>>>>>>>>>>",multiUserverify)
 
   const handleLogout = () => {
     dispatch(logout());
@@ -299,7 +302,7 @@ const handleUpgradeAccount = async () => {
               </>
             ) : (
               <>
-                <MdAccountBox className="text-[#115E59]" /> Upgrade Account
+                <MdAccountBox className="text-[#115E59]" /> {multiUserverify ? "Switch Profile" : " Upgrade Account"}
               </>
             )}
           </button>
