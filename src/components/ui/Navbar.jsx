@@ -35,32 +35,46 @@ const Navbar = () => {
     router.push("/login");
   };
 
-  const handleUpgradeAccount = async () => {
-    console.log("Upgrade Account button clicked");
-    
-    try {
-      console.log("Calling upgradeAccount API...");
-      const result = await upgradeAccount().unwrap();
-      
-      console.log("Upgrade API Response:======================>>>>", result);
-      
-      if (result.success) {
-        toast.success(result.message || "Account upgraded successfully");
-        console.log("Account upgraded successfully. New role:", result.data?.role);
-        setDesktopProfileOpen(false);
-        setProfileOpen(false);
+const handleUpgradeAccount = async () => {
+  console.log("Upgrade Account button clicked");
 
+  try {
+    const result = await upgradeAccount().unwrap();
+    const data = result?.data;
+
+    console.log("Upgrade API Response:", data);
+
+    if (data?.role === "provider") {
+      if (!data.isAddressProvided) {
+        router.push("/verify");
+        return;
       }
-    } catch (error) {
-      console.error("Upgrade Account Error:", error?.data?.message);
-      console.error("Error Details:", {
-        message: error.message,
-        data: error.data,
-        status: error.status
-      });
-      toast.error(error?.data?.message || "Account upgrade failed");
+
+      if (!data.isBankNumberVerified) {
+        router.push("/bank_verification");
+        return;
+      }
+
+      if (!data.isIdentificationDocumentVerified) {
+        router.push("/id_verification");
+        return;
+      }
+
+      router.push("/"); 
     }
-  };
+
+    if (result?.success) {
+      toast.success(result.message || "Account upgraded successfully");
+      setDesktopProfileOpen(false);
+      setProfileOpen(false);
+    }
+
+  } catch (error) {
+    console.error("Upgrade Account Error:", error);
+    toast.error(error?.data?.message || "Account upgrade failed");
+  }
+};
+
 
   useEffect(() => {
     setMounted(true);
