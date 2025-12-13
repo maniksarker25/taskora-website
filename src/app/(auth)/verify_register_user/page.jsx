@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const VerifyUserCode = () => {
-  const [otp, setOtp] = useState(Array(6).fill("")); // Changed to 6 digits
+  const [otp, setOtp] = useState(Array(6).fill("")); 
   const [email, setEmail] = useState("");
   const [isResending, setIsResending] = useState(false);
   const inputRefs = useRef([]);
@@ -131,22 +131,14 @@ const VerifyUserCode = () => {
           <div className="lg:w-1/2 w-full p-6 sm:p-8 lg:p-12">
             <div className="max-w-md mx-auto w-full">
               <div className="text-center mb-8">
-                <div className="w-16 h-16 bg-teal-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </div>
+                
                 <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-3">
                   Verify Your Account
                 </h1>
                 <p className="text-gray-600 mb-2">
-                  Enter the 6-digit verification code sent to
+                  Enter the 6-digit verification code sent to your provided phone number
                 </p>
-                {email && (
-                  <p className="text-teal-600 font-medium text-lg">
-                    {email}
-                  </p>
-                )}
+               
               </div>
 
               {/* OTP Input Section */}
@@ -164,7 +156,7 @@ const VerifyUserCode = () => {
                       onFocus={handleFocus}
                       onPaste={handlePaste}
                       ref={(el) => (inputRefs.current[index] = el)}
-                      className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex items-center justify-center text-center text-2xl sm:text-3xl font-bold text-gray-800 bg-white border-2 border-gray-300 rounded-xl focus:border-teal-500 focus:ring-4 focus:ring-teal-200 outline-none transition-all duration-200 shadow-sm"
+                      className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 flex items-center justify-center text-center text-2xl sm:text-3xl font-bold text-gray-800 bg-white border-2 border-gray-300 rounded-xl focus:border-[#115E59] focus:ring-1 focus:ring-[#115E59] outline-none transition-all duration-200 shadow-sm"
                     />
                   ))}
                 </form>
@@ -211,23 +203,13 @@ const VerifyUserCode = () => {
                     </>
                   ) : (
                     <>
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4" fill="none" stroke="#115E59" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                       </svg>
-                      <span>Resend Verification Code</span>
+                      <span className="text-[#115E59]">Resend Verification Code</span>
                     </>
                   )}
                 </button>
-              </div>
-
-              {/* Progress indicator */}
-              <div className="mt-8 flex justify-center">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                  <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                  <div className="w-2 h-2 bg-teal-500 rounded-full"></div>
-                  <div className="w-2 h-2 bg-gray-300 rounded-full"></div>
-                </div>
               </div>
             </div>
           </div>
