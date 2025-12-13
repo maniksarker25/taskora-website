@@ -71,7 +71,7 @@ const baseQuery = async (args, api, extraOptions) => {
 const bankVerificationApi = createApi({
   reducerPath: "bankVerificationApi",
   baseQuery,
-  tagTypes: ["BankVerification"],
+  tagTypes: ["BankVerification", "IdentityVerification"], // দুইটা tag যোগ করুন
   endpoints: (builder) => ({
     // BVN Verification Endpoint
     verifyBVN: builder.mutation({
@@ -83,24 +83,52 @@ const bankVerificationApi = createApi({
       }),
       invalidatesTags: ["BankVerification"],
       
-      // Optional: Response handling
       transformResponse: (response) => {
+        console.log("BVN Response:", response);
         if (response.success) {
           return response.data;
         }
         throw new Error(response.message || "BVN verification failed");
       },
       
-      // Optional: On successful verification
       async onQueryStarted(bvnData, { dispatch, queryFulfilled }) {
         try {
           const { data } = await queryFulfilled;
           console.log("BVN Verified Successfully:", data);
-          
-          // You can dispatch any action here if needed
-          // For example, update user profile with bank verification status
         } catch (error) {
           console.error("BVN Verification Error:", error);
+        }
+      },
+    }),
+
+    // Complete Identity Verification Endpoint
+    completeIdentityVerification: builder.mutation({
+      query: (formData) => {
+        console.log("Sending FormData to API...");
+        
+        // FormData এর জন্য headers সেট করব না
+        return {
+          url: "/provider/complete-identity-verification",
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["IdentityVerification"], 
+      
+      transformResponse: (response) => {
+        console.log("Identity Verification Raw Response:", response);
+        if (response.success) {
+          return response.data;
+        }
+        throw new Error(response.message || "Identity verification failed");
+      },
+      
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          console.log("Identity Verification Successful:", data);
+        } catch (error) {
+          console.error("Identity Verification Error:", error);
         }
       },
     }),
@@ -110,6 +138,7 @@ const bankVerificationApi = createApi({
 
 export const {
   useVerifyBVNMutation,
+  useCompleteIdentityVerificationMutation
 } = bankVerificationApi;
 
 export default bankVerificationApi;

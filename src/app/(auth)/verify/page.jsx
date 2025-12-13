@@ -60,7 +60,7 @@ const VerifyReg = () => {
         
         setTimeout(() => {
           if (user?.role === 'provider') {
-            router.push('/service_provider_profile');
+            router.push('/bank_verification');
           } else {
             router.push('/');
           }
