@@ -210,6 +210,47 @@ const authApi = createApi({
       }),
       providesTags: ["Auth"],
     }),
+
+     // Account Upgrade API 
+    upgradeAccount: builder.mutation({
+      query: () => ({
+        url: "/user/upgrade-account",
+        method: "POST",
+      }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          console.log("Account upgrade response:", data);
+          
+          if (data.success && data.data) {
+            const { accessToken, refreshToken, role, isAddressProvided } = data.data;
+            
+            storeTokens(accessToken, refreshToken);
+            dispatch(
+              setCredentials({ 
+                accessToken, 
+                refreshToken, 
+                isAddressProvided,
+                role 
+              })
+            );
+            
+            if (typeof window !== "undefined") {
+              localStorage.setItem(
+                "isAddressProvided",
+                isAddressProvided ? "true" : "false"
+              );
+            }
+            
+            console.log("Account upgraded successfully. Role:", role);
+          }
+        } catch (error) {
+          console.error("Account upgrade error:", error);
+        }
+      },
+      invalidatesTags: ["Auth"],
+    }),
+    
   }),
 });
 
@@ -221,5 +262,6 @@ export const {
   useVerifyResetOtpMutation,
   useVerifyUserCodeMutation,
   useGetMyProfileQuery,
+  useUpgradeAccountMutation
 } = authApi;
 export default authApi;
