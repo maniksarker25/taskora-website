@@ -158,22 +158,22 @@ const Location = ({ value, onChange }) => {
       {/* Suggestions dropdown */}
       {showSuggestions && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-xl overflow-hidden">
-          {suggestions.length > 0 ? (
+          {suggestions?.length > 0 ? (
             <ul className="py-1 max-h-60 overflow-y-auto">
-              {suggestions.map((suggestion) => (
+              {suggestions?.map((suggestion) => (
                 <li
-                  key={suggestion.place_id}
+                  key={suggestion?.place_id}
                   className="px-4 py-2.5 hover:bg-gray-50 cursor-pointer flex items-center gap-3 transition-colors"
                   onMouseDown={() => handleSelectSuggestion(suggestion)}
                 >
                   <MapPin className="h-5 w-5 text-gray-400 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">
-                      {suggestion.structured_formatting?.main_text || suggestion.description}
+                      {suggestion?.structured_formatting?.main_text || suggestion?.description}
                     </p>
-                    {suggestion.structured_formatting?.secondary_text && (
+                    {suggestion?.structured_formatting?.secondary_text && (
                       <p className="text-xs text-gray-500 truncate">
-                        {suggestion.structured_formatting.secondary_text}
+                        {suggestion?.structured_formatting?.secondary_text}
                       </p>
                     )}
                   </div>
