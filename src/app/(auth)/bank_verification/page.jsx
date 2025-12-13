@@ -4,29 +4,37 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { useVerifyBVNMutation } from "@/lib/features/bankVerificationApi/bankVerificationApi";
 import { toast } from "sonner";
+import { useAuth } from "@/components/auth/useAuth";
+import { useRouter } from "next/navigation";
 
 
 const BankVerification = () => {
 
   const [bvn, setBvn] = useState("");
   const [verifyBVN, { isLoading, error, data }] = useVerifyBVNMutation();
+  const { user, accessToken } = useAuth();
+   const router = useRouter();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submitting BVN:", bvn);
     
     try {
-      console.log("API call started...");
       const result = await verifyBVN({ bvn: bvn }).unwrap();
       console.log("API Response Success:", result);
       
       if (result.isBankVerificationNumberApproved) {
-        console.log("BVN Approved! Redirecting or showing success...", result.message);
         toast.success("Bank Verification Number verified successfully")
+          setTimeout(() => {
+          if (user?.role === 'provider') {
+            router.push('/id_card_verify');
+          } else {
+            router.push('/');
+          }
+        }, 1000);
        
       }
     } catch (err) {
-      console.error("API Error:", err);
       console.error("Error Details:", {
         message: err.message,
         data: err.data,
@@ -91,8 +99,6 @@ const BankVerification = () => {
                             }}
                             className="w-full text-[#6B7280] text-sm border border-slate-300 px-4 py-3 pr-8 rounded-md outline-blue-600"
                             placeholder="Enter your 11-digit BVN"
-                            // maxLength="11"
-                            // pattern="[0-9]{11}"
                             required
                           />
                         </div>
@@ -105,7 +111,7 @@ const BankVerification = () => {
                       <div className="mt-4 rounded-sm overflow-clip transition transform duration-300 hover:scale-101">
                         <button
                           type="submit"
-                          disabled={isLoading }
+                          disabled={isLoading}
                           className={`bg-[#115E59] w-full py-3 text-white cursor-pointer rounded-md ${
                             (isLoading ) 
                             ? "opacity-50 cursor-not-allowed" 
