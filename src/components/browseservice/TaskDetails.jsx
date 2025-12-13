@@ -519,7 +519,6 @@ const TaskDetails = ({ task }) => {
                         {bid.details || "No message provided."}
                       </p>
 
-                      {/* Customer Accept Bid Action */}
                       {role === "customer" && (taskStatus || taskData.status) === "OPEN_FOR_BID" && (
                         <div className="mt-2">
                           <button
@@ -544,7 +543,6 @@ const TaskDetails = ({ task }) => {
         </div>
       ) : (
         <div className="bg-white">
-          {/* Ask Question Form */}
           <div className="p-4 border-b border-gray-200">
             <div className="flex gap-3">
               <Image
@@ -563,7 +561,6 @@ const TaskDetails = ({ task }) => {
                   rows="3"
                 />
 
-                {/* Image Upload Section */}
                 <div className="mt-3">
                   {questionImagePreview ? (
                     <div className="relative inline-block">
