@@ -398,7 +398,7 @@ const handleUpgradeAccount = async () => {
               </>
             ) : (
               <>
-                <MdAccountBox className="text-[#115E59]" /> Upgrade Account
+                <MdAccountBox className="text-[#115E59]" /> {multiUserverify ? "Switch Profile" : " Upgrade Account"}
               </>
             )}
           </button>
@@ -477,7 +477,7 @@ const handleUpgradeAccount = async () => {
               </>
             ) : (
               <>
-                <MdAccountBox className="text-[#115E59]" /> Upgrade Account
+                <MdAccountBox className="text-[#115E59]" /> {multiUserverify ? "Switch Profile" : " Upgrade Account"}
               </>
             )}
           </button>
@@ -556,7 +556,7 @@ const handleUpgradeAccount = async () => {
               </>
             ) : (
               <>
-                <MdAccountBox className="text-[#115E59]" /> Upgrade Account
+                <MdAccountBox className="text-[#115E59]" /> {multiUserverify ? "Switch Profile" : " Upgrade Account"}
               </>
             )}
           </button>
