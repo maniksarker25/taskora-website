@@ -30,7 +30,8 @@ const Navbar = () => {
   const [upgradeAccount, { isLoading: isUpgrading }] = useUpgradeAccountMutation();
   const { data, isLoading, error } = useGetMyProfileQuery();
   const multiUserverify = data?.data.user.isMultiRole
-  console.log("user=======================>>>>>>>>>>>>>",multiUserverify)
+  
+  const userData = data?.data
 
   const handleLogout = () => {
     dispatch(logout());
@@ -39,13 +40,13 @@ const Navbar = () => {
   };
 
 const handleUpgradeAccount = async () => {
-  console.log("Upgrade Account button clicked");
+
 
   try {
     const result = await upgradeAccount().unwrap();
     const data = result?.data;
 
-    console.log("Upgrade API Response:", data);
+  
 
     if (data?.role === "provider") {
       if (!data.isAddressProvided) {
@@ -73,7 +74,7 @@ const handleUpgradeAccount = async () => {
     }
 
   } catch (error) {
-    console.error("Upgrade Account Error:", error);
+   
     toast.error(error?.data?.message || "Account upgrade failed");
   }
 };
@@ -330,7 +331,7 @@ const handleUpgradeAccount = async () => {
         <div className="w-12 rounded-full overflow-hidden">
           <img
             alt="User Avatar"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+            src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
             className="w-full h-full object-cover"
           />
         </div>
@@ -344,14 +345,14 @@ const handleUpgradeAccount = async () => {
             <div className="w-16 h-16 overflow-hidden rounded-xl">
               <img
                 alt="Profile"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
                 className="w-full h-full object-cover"
               />
             </div>
             <div>
-              <p className="text-xl font-bold">Mr.Provider</p>
-              <p className="text-gray-600">provider@gmail.com</p>
-              <p className="text-sm text-[#115e59] font-medium">Service Provider</p>
+              <p className="text-xl font-bold">{userData?.name}</p>
+              <p className="text-gray-600">{user?.email}</p>
+              <p className="text-sm text-[#115e59] font-medium">{user?.role}</p>
             </div>
           </div>
 
