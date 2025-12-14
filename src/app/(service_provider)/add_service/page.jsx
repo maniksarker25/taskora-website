@@ -89,18 +89,17 @@ const ServicesManagementPage = () => {
     setIsModalOpen(true);
   };
 
-  const handleDeleteService = async (serviceId) => {
-    if (confirm("Are you sure you want to delete this service?")) {
-      try {
-        await deleteService(serviceId).unwrap();
-        toast.success("Service deleted successfully");
-        refetchServices();
-      } catch (error) {
-        console.error("Delete failed:", error);
-        toast.error(error?.data?.message || "Failed to delete service");
-      }
-    }
-  };
+ const handleDeleteService = async (serviceId) => {
+  try {
+    await deleteService(serviceId).unwrap();
+    toast.success("Service deleted successfully");
+    refetchServices();
+  } catch (error) {
+    console.error("Delete failed:", error);
+    toast.error(error?.data?.message || "Failed to delete service");
+  }
+};
+
 
   const resetForm = () => {
     setFormData({

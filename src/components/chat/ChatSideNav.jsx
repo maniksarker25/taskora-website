@@ -1,9 +1,8 @@
 // components/chat/ChatSideNav.jsx
 "use client";
-import { Menu, Search, ArrowLeft } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import { Search, ArrowLeft } from "lucide-react";
+import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { FaHome } from "react-icons/fa";
 import Link from "next/link";
 import { useGetChatListQuery } from "@/lib/features/chatApi/chatApi";
 import { useSocketContext } from "@/app/context/SocketProvider";
