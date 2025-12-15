@@ -20,6 +20,7 @@ import {
   useAcceptBidMutation,
   useCreateBidMutation,
   useGetBidsByTaskIdQuery,
+  useDeleteBidMutation 
 } from "@/lib/features/bidApi/bidApi";
 import {
   useCreateQuestionMutation,
@@ -41,6 +42,7 @@ const TaskDetails = ({ task }) => {
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
 
   const [createQuestion, { isLoading: isSubmittingQuestion }] = useCreateQuestionMutation();
+   const [deleteBid, { isLoading: isDeleting }] = useDeleteBidMutation();
 
   const {
     data: bidsData,
@@ -176,6 +178,54 @@ const TaskDetails = ({ task }) => {
       );
     }
   };
+
+  const handleDeleteBid = async (bidId) => {
+    // Confirm with user before deletion
+   
+
+    try {
+      const result = await deleteBid(bidId).unwrap();
+
+      console.log("afaskjfsadkjfsldjf",result)
+
+      if (result.success) {
+        toast.success("Bid deleted successfully!", {
+          style: {
+            backgroundColor: "#d1fae5",
+            color: "#065f46",
+            borderLeft: "6px solid #10b981",
+          },
+          duration: 3000,
+        });
+        
+        // Refetch bids to update the UI
+        refetchBids();
+      } else {
+        toast.error(result?.message || "Failed to delete bid", {
+          style: {
+            backgroundColor: "#fee2e2",
+            color: "#991b1b",
+            borderLeft: "6px solid #ef4444",
+          },
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Failed to delete bid:", error);
+      toast.error(
+        error?.data?.message || "Failed to delete bid. Please try again.",
+        {
+          style: {
+            backgroundColor: "#fee2e2",
+            color: "#991b1b",
+            borderLeft: "6px solid #ef4444",
+          },
+          duration: 3000,
+        }
+      );
+    }
+  };
+
 
   const handleImageSelect = (e) => {
     const file = e.target.files[0];
@@ -519,7 +569,8 @@ const TaskDetails = ({ task }) => {
                         {bid.details || "No message provided."}
                       </p>
 
-                      {role === "customer" && (taskStatus || taskData.status) === "OPEN_FOR_BID" && (
+                    <div className="flex gap-6 flex-wrap">
+                         {role === "customer" && (taskStatus || taskData.status) === "OPEN_FOR_BID" && (
                         <div className="mt-2">
                           <button
                             onClick={() => handleAcceptBid(bid._id)}
@@ -533,6 +584,21 @@ const TaskDetails = ({ task }) => {
                           </button>
                         </div>
                       )}
+                      {role === "provider" && (taskStatus || taskData.status) === "OPEN_FOR_BID" && (
+                        <div className="mt-2">
+                          <button
+                            onClick={() => handleDeleteBid(bid._id)}
+                            disabled={isAcceptingBid}
+                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isAcceptingBid
+                                ? "bg-red-400 text-white hover:bg-red-700 cursor-pointer  hover:text-white"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              }`}
+                          >
+                            {isAcceptingBid ? "Deleting..." : "Delete Bid"}
+                          </button>
+                        </div>
+                      )}
+                    </div>
 
                     </div>
                   </div>
