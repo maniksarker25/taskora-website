@@ -16,14 +16,14 @@ const ProviderProtectedRoute = ({ children }) => {
       return;
     }
 
-    if (!isLoading && isAuthenticated && user?.role !== 'provider') {
-      dispatch(logout());
+    if (!isLoading && isAuthenticated && user?.role !== 'provider' ) {
+      // dispatch(logout());
       
-      if (typeof document !== 'undefined') {
-        document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
-      }
+      // if (typeof document !== 'undefined') {
+      //   document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
+      // }
       
-      router.push("/login");
+      router.push("/");
       return;
     }
   }, [isAuthenticated, isLoading, user, router, dispatch]);
