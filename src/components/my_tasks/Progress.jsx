@@ -127,7 +127,9 @@ const Progress = ({
         bidsData={bidsData}
       />
 
-      <PricingSection budget={budget} />
+      <PricingSection 
+      bidsData={bidsData}
+      budget={budget} />
 
       <ProgressBarComponent steps={steps} progressWidth={progressWidth} />
 

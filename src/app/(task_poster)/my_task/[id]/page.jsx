@@ -29,6 +29,8 @@ const TaskDetails = () => {
   } = useGetTaskByIdQuery(taskId);
   const taskDetails = taskData?.data;
 
+  console.log("taskDetails",taskDetails)
+
   const {
     data: questionsData,
     isLoading: isLoadingQuestions,
@@ -200,7 +202,7 @@ const TaskDetails = () => {
                   {taskDetails?.budget && (
                     <div className="flex items-center gap-2 text-gray-700">
                       
-                      <span className="font-semibold text-xl">₦ {taskDetails.budget}</span>
+                      <span className="font-semibold text-xl">₦ {taskDetails?.customerPayingAmount}</span>
                     </div>
                   )}
                   

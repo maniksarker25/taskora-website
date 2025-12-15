@@ -28,6 +28,7 @@ const BidsDetails = () => {
     error
   } = useGetTaskByIdQuery(taskId);
   const taskDetails = taskData?.data;
+  console.log("ajdklfasjdlkfj",taskDetails)
 
   const {
     data: questionsData,
@@ -199,15 +200,15 @@ const BidsDetails = () => {
                   
                   {taskDetails?.budget && (
                     <div className="flex items-center gap-2 text-gray-700">
-                      <span className="font-semibold text-xl">₦ {taskDetails.budget.toLocaleString()}</span>
+                      <span className="font-semibold text-xl">₦ {taskDetails?.customerPayingAmount}</span>
                     </div>
                   )}
                   
-                  {taskDetails?.category?.name && (
+                  {/* {taskDetails?.category?.name && (
                     <div className="flex items-center gap-2 text-gray-600 bg-gray-50 px-3 py-1.5 rounded-lg">
                       <span className="font-medium">{taskDetails.category.name}</span>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>

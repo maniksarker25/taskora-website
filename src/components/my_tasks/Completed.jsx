@@ -29,8 +29,7 @@ const Completed = ({ bidsData, taskDetails }) => {
   feedback => feedback.task === taskDetails?._id
 );
 
-  
-   console.log("=====>",restFeedback)
+ console.log("hiiii====>>>",bidsData)
 
   const handleSubmitFeedback = async () => {
     if (!feedback.trim()) {
