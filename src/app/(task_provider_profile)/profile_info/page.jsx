@@ -14,6 +14,10 @@ const ProfileInfo = () => {
   // User data from API
   const userData = data?.data;
 
+  console.log("profile_info==>", userData)
+
+  
+
   // Loading state
   if (isLoading) {
     return (
@@ -84,7 +88,7 @@ const ProfileInfo = () => {
           {/* Mobile Header Section */}
           <div className="lg:hidden bg-gradient-to-r from-[#115e59] to-[#0d4a42] px-6 py-8 text-center">
             <Image
-              src={userData?.profileImage || client}
+              src={userData?.profile_image || client}
               alt="profile"
               width={120}
               height={120}
@@ -107,11 +111,11 @@ const ProfileInfo = () => {
               {/* Profile Image - Desktop */}
               <div className="flex-shrink-0">
                 <Image
-                  src={userData?.profileImage || client}
+                  src={userData?.profile_image || client}
                   alt="profile"
                   width={200}
                   height={200}
-                  className="rounded-full border-4 border-gray-100 shadow-lg"
+                  className="rounded-full h-44 w-44 border-4 border-gray-100 shadow-lg"
                 />
               </div>
 

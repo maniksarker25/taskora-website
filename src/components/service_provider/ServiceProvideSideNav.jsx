@@ -8,8 +8,9 @@ import { IoIosNotifications } from "react-icons/io";
 import { IoIosSettings } from "react-icons/io";
 import { TbDiscount } from "react-icons/tb";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
-import { FaHome } from "react-icons/fa";
 import { MdManageAccounts } from "react-icons/md";
+import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";
+import { useSelector } from "react-redux";
 
 const sidebarLinks = [
   { name: "Profile Info", href: "/service_profile_info", icon: <CgProfile /> },
@@ -31,6 +32,11 @@ const sidebarLinks = [
 
 const ServiceProvideSideNav = ({ open, onClose }) => {
   const pathname = usePathname();
+   const { data, isLoading, error } = useGetMyProfileQuery();
+     const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+   const userData = data?.data;
+   console.log("user info",userData)
 
   // Function to determine if link is active and return appropriate classes
   const getLinkClass = (href) => {
@@ -58,14 +64,14 @@ const ServiceProvideSideNav = ({ open, onClose }) => {
       <div className="flex flex-col items-center py-6 gap-2">
         {/* Profile Image */}
         <Image
-          src={client}
+          src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
           alt="profile"
           width={80}
           height={80}
           className="rounded-full shadow"
         />
-        <h2 className="font-semibold text-gray-800">Wade Warren</h2>
-        <p className="text-xs text-gray-600">Service Provider</p>
+        <h2 className="font-semibold text-xl text-gray-800">{userData?.name}</h2>
+        <p className="text-xs text-gray-600">{user?.role}</p>
       </div>
 
       {/* Navigation */}

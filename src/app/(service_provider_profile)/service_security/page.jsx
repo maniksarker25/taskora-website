@@ -1,13 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { FaUserXmark } from "react-icons/fa6";
 import { IoIosSettings } from "react-icons/io";
 import { toast } from "sonner";
+import { useChangePasswordMutation } from "@/lib/features/auth/authApi";
 
-/* =========================
-   Password Input Component
-========================= */
 const ServicePasswordInput = ({
   label,
   placeholder,
@@ -48,10 +45,9 @@ const ServicePasswordInput = ({
   );
 };
 
-/* =========================
-   Main Component
-========================= */
 const ServiceChangePassword = () => {
+  const [changePassword, { isLoading, error: apiError }] = useChangePasswordMutation();
+  
   const [formData, setFormData] = useState({
     oldPassword: "",
     newPassword: "",
@@ -65,7 +61,6 @@ const ServiceChangePassword = () => {
   });
 
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({
@@ -112,23 +107,38 @@ const ServiceChangePassword = () => {
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    setIsLoading(true);
-
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      toast.success("Password updated successfully!");
+      const result = await changePassword({
+        oldPassword: formData.oldPassword,
+        newPassword: formData.newPassword,
+        confirmNewPassword: formData.confirmPassword
+      }).unwrap();
 
-      setFormData({
-        oldPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
-    } catch {
-      setErrors({
-        submit: "Failed to update password. Please try again.",
-      });
-    } finally {
-      setIsLoading(false);
+      if (result?.success) {
+        toast.success(result?.message || "Password updated successfully!");
+        
+        setFormData({
+          oldPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        
+        setErrors({});
+      } else {
+        const errorMessage = result?.message || "Failed to update password";
+        toast.error(errorMessage);
+        setErrors({ submit: errorMessage });
+      }
+    } catch (error) {
+      console.error("Password change error:", error);
+      
+      const errorMessage = 
+        error?.data?.message || 
+        error?.message || 
+        "Failed to update password. Please try again.";
+      
+      toast.error(errorMessage);
+      setErrors({ submit: errorMessage });
     }
   };
 
@@ -142,10 +152,6 @@ const ServiceChangePassword = () => {
             Security Settings
           </h1>
         </div>
-
-        {/* <button className="flex gap-2 items-center bg-red-600 hover:bg-red-400 text-white px-4 py-2 md:px-6 md:py-3 rounded-md">
-          <FaUserXmark /> Delete Account
-        </button> */}
       </div>
 
       {/* Form */}
@@ -186,22 +192,34 @@ const ServiceChangePassword = () => {
           }
         />
 
-        {errors.submit && (
+        {(errors.submit || apiError) && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-            <p className="text-sm text-red-600">{errors.submit}</p>
+            <p className="text-sm text-red-600">
+              {errors.submit || 
+               apiError?.data?.message || 
+               apiError?.message || 
+               "An error occurred"}
+            </p>
           </div>
         )}
 
         <button
           onClick={handleSubmit}
           disabled={isLoading}
-          className={`w-full py-3 px-4 rounded-md font-medium ${
+          className={`w-full py-3 px-4 rounded-md font-medium transition-colors ${
             isLoading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-[#115e59] hover:bg-teal-700"
           } text-white`}
         >
-          {isLoading ? "Updating..." : "Update Password"}
+          {isLoading ? (
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              Updating...
+            </div>
+          ) : (
+            "Update Password"
+          )}
         </button>
       </div>
     </div>

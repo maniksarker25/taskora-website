@@ -30,7 +30,7 @@ const Navbar = () => {
   const [upgradeAccount, { isLoading: isUpgrading }] = useUpgradeAccountMutation();
   const { data, isLoading, error } = useGetMyProfileQuery();
   const multiUserverify = data?.data.user.isMultiRole
-  console.log("multiUserverify=====================>>>>>>>", data?.data )
+ 
   
   const userData = data?.data
 

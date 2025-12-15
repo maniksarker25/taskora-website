@@ -114,7 +114,7 @@ const VerfiyOtp = () => {
 
     try {
       const result = await verifyResetOtp({
-        email: userEmail, // Use logged in user's email
+        email: userEmail,
         resetCode: resetCode
       }).unwrap();
 
