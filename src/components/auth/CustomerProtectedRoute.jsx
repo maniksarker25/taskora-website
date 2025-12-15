@@ -26,15 +26,15 @@ const CustomerProtectedRoute = ({ children }) => {
     // If authenticated but not a customer, logout and redirect to login
     if (!isLoading && isAuthenticated && user?.role !== 'customer') {
       // Logout the user
-      dispatch(logout());
+      // dispatch(logout());
 
       // Clear refreshToken cookie
-      if (typeof document !== 'undefined') {
-        document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
-      }
+      // if (typeof document !== 'undefined') {
+      //   document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
+      // }
 
       // Redirect to login
-      router.push("/login");
+      router.push("/");
       return;
     }
   }, [isAuthenticated, isLoading, user, router, dispatch]);

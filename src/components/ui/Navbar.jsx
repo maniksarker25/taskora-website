@@ -30,6 +30,7 @@ const Navbar = () => {
   const [upgradeAccount, { isLoading: isUpgrading }] = useUpgradeAccountMutation();
   const { data, isLoading, error } = useGetMyProfileQuery();
   const multiUserverify = data?.data.user.isMultiRole
+  console.log("multiUserverify=====================>>>>>>>", data?.data )
   
   const userData = data?.data
 
@@ -230,12 +231,12 @@ const handleUpgradeAccount = async () => {
         id="desktop-avatar-button"
         onClick={() => setDesktopProfileOpen(!desktopProfileOpen)}
         className="btn btn-ghost btn-circle avatar focus:outline-none cursor-pointer"
-        aria-label="Toggle profile menu"
+       
       >
         <div className="w-12 rounded-full overflow-hidden">
           <img
-            alt="User Avatar"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+            alt={userData?.name}
+            src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
             className="w-full h-full object-cover"
           />
         </div>
@@ -249,14 +250,14 @@ const handleUpgradeAccount = async () => {
             <div className="w-16 h-16 overflow-hidden rounded-xl">
               <img
                 alt="Profile"
-                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+                src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
                 className="w-full h-full object-cover"
               />
             </div>
             <div>
-              <p className="text-xl font-bold">Mr.Kashem</p>
-              <p className="text-gray-600">email@gmail.com</p>
-              <p className="text-sm text-[#115e59] font-medium">Customer</p>
+              <p className="text-xl font-bold">{userData?.name}</p>
+              <p className="text-gray-600">{user?.email}</p>
+              <p className="text-sm text-[#115e59] font-medium">{user?.role}</p>
             </div>
           </div>
 
