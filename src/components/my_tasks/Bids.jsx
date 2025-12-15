@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useAcceptBidMutation } from '@/lib/features/bidApi/bidApi';
 import { useAuth } from '@/components/auth/useAuth';
 import { Calendar } from 'lucide-react';
+import { useSelector } from 'react-redux';
 
 const questions = [
   {
@@ -32,6 +33,7 @@ const questions = [
 const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
   const info = bidsData?.data.result
+  const role = useSelector((state) => state?.auth?.user?.role);
 
   const [activeTab, setActiveTab] = useState("bids");
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
@@ -40,54 +42,109 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   const { user } = useAuth();
   const router = useRouter();
 
-  const handleAcceptBid = async (bidId) => {
-    if (taskStatus !== "OPEN_FOR_BID") {
-      toast.error("Task is no longer open for bids.");
-      return;
-    }
-    if (!confirm("Are you sure you want to accept this bid?")) return;
-    try {
-      const result = await acceptBid({ bidID: bidId }).unwrap();
-      if (result?.success) {
-        const paymentLink = result?.data?.paymentLink;
-        const reference = result?.data?.reference;
-
-        toast.success(
-          paymentLink
-            ? "Bid accepted! Redirecting to payment..."
-            : "Bid accepted successfully!",
+   const handleAcceptBid = async (bidId) => {
+      if ((taskStatus || taskData.status) !== "OPEN_FOR_BID") {
+        toast.error("Task is no longer open for bids.");
+        return;
+      }
+  
+      try {
+  
+        const result = await acceptBid({ bidID: bidId }).unwrap();
+  
+        if (result.success) {
+          const paymentLink = result?.data?.paymentLink;
+          const reference = result?.data?.reference;
+  
+          toast.success(
+            paymentLink
+              ? "Bid accepted! Redirecting to payment..."
+              : "Bid accepted successfully!",
+            {
+              style: {
+                backgroundColor: "#d1fae5",
+                color: "#065f46",
+                borderLeft: "6px solid #10b981",
+              },
+              duration: 3500,
+            }
+          );
+  
+          if (paymentLink && typeof window !== "undefined") {
+            window.open(paymentLink, "_blank");
+          }
+  
+          if (reference) {
+            console.log("Payment reference:", reference);
+          }
+  
+          setTaskStatus(result?.data?.status || "IN_PROGRESS");
+          refetchBids();
+        }
+      } catch (error) {
+        console.error("Failed to accept bid:", error);
+        toast.error(
+          error?.data?.message || "Failed to accept bid. Please try again.",
           {
             style: {
-              backgroundColor: "#d1fae5",
-              color: "#065f46",
-              borderLeft: "6px solid #10b981",
+              backgroundColor: "#fee2e2",
+              color: "#991b1b",
+              borderLeft: "6px solid #ef4444",
             },
-            duration: 3500,
+            duration: 3000,
           }
         );
-
-        if (paymentLink && typeof window !== "undefined") {
-          window.open(paymentLink, "_blank");
-        }
-
-        if (reference) {
-          console.log("Payment reference:", reference);
-        }
-
-        setTaskStatus(result?.data?.status || "IN_PROGRESS");
       }
-    } catch (error) {
-      console.error("Failed to accept bid:", error);
-      toast.error(error?.data?.message || "Failed to accept bid. Please try again.", {
-        style: {
-          backgroundColor: "#fee2e2",
-          color: "#991b1b",
-          borderLeft: "6px solid #ef4444",
-        },
-        duration: 3000,
-      });
-    }
-  };
+    };
+
+  // const handleAcceptBid = async (bidId) => {
+  //   if (taskStatus !== "OPEN_FOR_BID") {
+  //     toast.error("Task is no longer open for bids.");
+  //     return;
+  //   }
+  //   if (!confirm("Are you sure you want to accept this bid?")) return;
+  //   try {
+  //     const result = await acceptBid({ bidID: bidId }).unwrap();
+  //     if (result?.success) {
+  //       const paymentLink = result?.data?.paymentLink;
+  //       const reference = result?.data?.reference;
+
+  //       toast.success(
+  //         paymentLink
+  //           ? "Bid accepted! Redirecting to payment..."
+  //           : "Bid accepted successfully!",
+  //         {
+  //           style: {
+  //             backgroundColor: "#d1fae5",
+  //             color: "#065f46",
+  //             borderLeft: "6px solid #10b981",
+  //           },
+  //           duration: 3500,
+  //         }
+  //       );
+
+  //       if (paymentLink && typeof window !== "undefined") {
+  //         window.open(paymentLink, "_blank");
+  //       }
+
+  //       if (reference) {
+  //         console.log("Payment reference:", reference);
+  //       }
+
+  //       setTaskStatus(result?.data?.status || "IN_PROGRESS");
+  //     }
+  //   } catch (error) {
+  //     console.error("Failed to accept bid:", error);
+  //     toast.error(error?.data?.message || "Failed to accept bid. Please try again.", {
+  //       style: {
+  //         backgroundColor: "#fee2e2",
+  //         color: "#991b1b",
+  //         borderLeft: "6px solid #ef4444",
+  //       },
+  //       duration: 3000,
+  //     });
+  //   }
+  // };
 
   const handleChatClick = (bid) => {
 
@@ -250,7 +307,23 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                 </div>
                 {/* accept and chat button */}
                 <div className="flex flex-col sm:flex-row gap-3  ">
-                  {taskStatus === "OPEN_FOR_BID" && (
+
+                      {role === "customer" && (taskStatus || taskData.status) === "OPEN_FOR_BID" && (
+                        <div className="mt-2">
+                          <button
+                            onClick={() => handleAcceptBid(bid._id)}
+                            disabled={isAcceptingBid}
+                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isAcceptingBid
+                                ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                              }`}
+                          >
+                            {isAcceptingBid ? "Accepting..." : "Accept Bid"}
+                          </button>
+                        </div>
+                      )}
+
+                  {/* {taskStatus === "OPEN_FOR_BID" && (
                     <button
                       onClick={() => handleAcceptBid(bid._id)}
                       disabled={isAcceptingBid}
@@ -261,7 +334,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                     >
                       {isAcceptingBid ? "Accepting..." : "Accept the Bid"}
                     </button>
-                  )}
+                  )} */}
                   <button
                     onClick={() => handleChatClick(bid)}
                     className="px-6 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer flex gap-2 items-center justify-center"
@@ -274,7 +347,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
               {/* right side */}
 
               <div className="flex-1">
-                <p className="text-gray-600 text-sm mt-2">{bid.details}</p>
+                <p className="text-gray-600 text-sm mt-2">{bid?.details}</p>
                 <div className="flex justify-between items-center mt-6">
                   <p className="text-sm text-gray-500">{bid.date}</p>
                 </div>
