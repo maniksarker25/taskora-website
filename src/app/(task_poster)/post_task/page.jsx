@@ -126,14 +126,29 @@ const TaskCreationApp = () => {
         }
         break;
 
-      case 3:
-        if (!formData.budget || parseInt(formData.budget) <= 0) {
-          errors.budget = "Please enter a valid budget";
-        }
-        if (!formData.agreedToTerms) {
-          errors.agreedToTerms = "You must agree to the terms";
-        }
-        break;
+        case 3: {
+  const budget = Number(formData.budget);
+
+  if (!budget || budget < 5000) {
+    errors.budget = "Please fill all required fields";
+  }
+
+  if (!formData.agreedToTerms) {
+    errors.agreedToTerms = "You must agree to the terms";
+  }
+
+  break;
+}
+
+
+      // case 3:
+      //   if (!formData.budget || parseInt(formData.budget) <= 0) {
+      //     errors.budget = "Minimum budget 5000";
+      //   }
+      //   if (!formData.agreedToTerms) {
+      //     errors.agreedToTerms = "You must agree to the terms";
+      //   }
+      //   break;
     }
 
     setFormErrors(errors);
@@ -174,12 +189,32 @@ const TaskCreationApp = () => {
   };
 
   const handleNext = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+  const isValid = validateStep(currentStep);
+
+  if (isValid) {
+    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+  } else {
+    if (formErrors?.budget) {
+      
+      toast.error(formErrors.budget);
+      if (!validateStep(3)) {
+      toast.error("Minimum budget must be at least 5000 ");
+      return;
+    }
     } else {
       toast.error("Please fill all required fields");
     }
-  };
+  }
+};
+
+
+  // const handleNext = () => {
+  //   if (validateStep(currentStep)) {
+  //     setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+  //   } else {
+  //     toast.error("Please fill all required fields");
+  //   }
+  // };
 
   const handlePrevious = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
@@ -187,7 +222,7 @@ const TaskCreationApp = () => {
 
   const handleSubmit = async () => {
     if (!validateStep(3)) {
-      toast.error("Please fill all required fields");
+      toast.error("Minimum budget must be at least 5000");
       return;
     }
 
@@ -488,7 +523,7 @@ const TaskCreationApp = () => {
             {providerId && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-sm text-green-700">
-                  💡 Since you're submitting to a specific provider, they'll see your offer first!
+                   Since you're submitting to a specific provider, they'll see your offer first!
                 </p>
               </div>
             )}
@@ -503,11 +538,11 @@ const TaskCreationApp = () => {
                 </span>
                 <input
                   type="number"
-                  placeholder="1,500"
+                  placeholder="Minimum budget 5000"
                   value={formData.budget}
                   onChange={(e) => handleInputChange("budget", e.target.value)}
                   className="w-full pl-8 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-800"
-                  min="1"
+                  min={1}
                 />
               </div>
               {formErrors.budget && (
