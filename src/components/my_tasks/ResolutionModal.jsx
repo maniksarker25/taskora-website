@@ -1,13 +1,14 @@
 "use client";
-
+import { useRef } from "react";
 import { useState } from "react";
-import { Calendar, Ban, X } from "lucide-react";
+import { Calendar, Ban, X, Clock } from "lucide-react";
 import Image from "next/image";
 import { IoIosArrowForward } from "react-icons/io";
 import popularcateIcon from "../../../public/popularcate.svg";
 import { toast } from "sonner";
 import { useCreateCancellationRequestMutation } from "@/lib/features/cancelApi/cancellationApi";
 import { useCreateExtensionRequestMutation } from "@/lib/features/extensionApi/extensionApi";
+import { useSelector } from "react-redux";
 
 const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
   const [openModal, setOpenModal] = useState(null);
@@ -15,6 +16,11 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
   const [cancellationDescription, setCancellationDescription] = useState("");
   const [evidenceFile, setEvidenceFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
+    const role = useSelector((state) => state?.auth?.user?.role);
+    
+const dateRef = useRef(null);
+const timeRef = useRef(null);
+  
 
   // Date extension state
   const [dateExtensionData, setDateExtensionData] = useState({
@@ -28,7 +34,7 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
 
   const options = [
     {
-      title: "Ask Service Provider to Change Completion Date",
+      title: `Ask ${role === "customer" ?"Service Provider" : "Customer" }  to Change Completion Date`,
       icon: <Calendar className="w-6 h-6 text-color" />,
       action: () => setOpenModal("date"),
     },
@@ -282,34 +288,86 @@ const ResolutionModal = ({ taskId, taskDetails, onClose }) => {
 
             <form onSubmit={handleDateExtensionSubmit} className="space-y-4 md:space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                <div>
-                  <label className="block text-gray-700 font-medium mb-1 text-sm md:text-base">
-                    New Proposed Date *
-                  </label>
-                  <input
-                    type="date"
-                    value={dateExtensionData.newDate}
-                    onChange={(e) => setDateExtensionData({...dateExtensionData, newDate: e.target.value})}
-                    required
-                    min={getTomorrowDate()}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 md:py-3 text-sm focus:ring-2 focus:ring-[#115E59] focus:outline-none text-[#6B7280]"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Must be a future date
-                  </p>
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-1 text-sm md:text-base">
-                    New Proposed Time *
-                  </label>
-                  <input
-                    type="time"
-                    value={dateExtensionData.newTime}
-                    onChange={(e) => setDateExtensionData({...dateExtensionData, newTime: e.target.value})}
-                    required
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 md:py-3 text-sm focus:ring-2 focus:ring-[#115E59] focus:outline-none"
-                  />
-                </div>
+                <div className="relative w-full">
+      <label className="block text-gray-700 font-medium mb-1 text-sm md:text-base">
+        New Proposed Date *
+      </label>
+
+      <input
+        ref={dateRef}
+        type="date"
+        value={dateExtensionData.newDate}
+        onChange={(e) =>
+          setDateExtensionData({
+            ...dateExtensionData,
+            newDate: e.target.value,
+          })
+        }
+        required
+        min={getTomorrowDate()}
+        style={{ MozAppearance: "textfield" }}
+        className="w-full border border-gray-300 rounded-lg px-3 pr-10 py-2 md:py-3 text-sm
+                   focus:ring-2 focus:ring-[#115E59] focus:outline-none text-[#6B7280]
+                   appearance-none
+                   [&::-webkit-calendar-picker-indicator]:opacity-0"
+      />
+
+      {/* Clickable Calendar Icon */}
+      <Calendar
+        onClick={() => {
+          if (dateRef.current?.showPicker) {
+            dateRef.current.showPicker();
+          } else {
+            dateRef.current.focus();
+            dateRef.current.click();
+          }
+        }}
+        className="absolute right-3 top-[42px] md:top-[41px]
+                   w-4 h-4 md:w-5 md:h-5 text-gray-400 cursor-pointer"
+      />
+
+      <p className="text-xs text-gray-500 mt-1">
+        Must be a future date
+      </p>
+    </div>
+
+               <div className="relative w-full">
+  <label className="block text-gray-700 font-medium mb-1 text-sm md:text-base">
+    New Proposed Time *
+  </label>
+
+  <input
+    ref={timeRef}
+    type="time"
+    value={dateExtensionData.newTime}
+    onChange={(e) =>
+      setDateExtensionData({
+        ...dateExtensionData,
+        newTime: e.target.value,
+      })
+    }
+    required
+    style={{ MozAppearance: "textfield" }}
+    className="w-full border border-gray-300 rounded-lg px-3 pr-10 py-2 md:py-3 text-sm
+               focus:ring-2 focus:ring-[#115E59] focus:outline-none
+               appearance-none
+               [&::-webkit-calendar-picker-indicator]:opacity-0"
+  />
+
+  {/* Time Icon */}
+  <Clock
+    onClick={() => {
+      if (timeRef.current?.showPicker) {
+        timeRef.current.showPicker();
+      } else {
+        timeRef.current.focus();
+        timeRef.current.click();
+      }
+    }}
+    className="absolute right-3 top-[42px] md:top-[41px]
+               w-4 h-4 md:w-5 md:h-5 text-gray-400 cursor-pointer"
+  />
+</div>
               </div>
 
               <div>
