@@ -61,6 +61,14 @@ const bidApi = createApi({
       },
       providesTags: ["Bid"],
     }),
+     
+    deleteBid: builder.mutation({
+      query: (bidId) => ({
+        url: `/bid/delete-bid/${bidId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Bid"],
+    }),
   }),
 });
 
@@ -69,6 +77,7 @@ export const {
   useGetBidsByTaskIdQuery,
   useAcceptBidMutation,
   useGetMyBidsQuery,
+  useDeleteBidMutation
 } = bidApi;
 
 export default bidApi;
