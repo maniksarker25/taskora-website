@@ -299,6 +299,15 @@ background: linear-gradient(90deg, rgba(133, 172, 170, 1) 0%, rgba(155, 188, 186
   /* :focus { outline: none !important; box-shadow: none !important; } */
 }
 
+/* app/globals.css */
+
+/* input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 100;
+  display: block;
+  cursor: pointer;
+} */
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
