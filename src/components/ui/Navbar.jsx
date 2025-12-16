@@ -42,7 +42,6 @@ const Navbar = () => {
 
 const handleUpgradeAccount = async () => {
 
-
   try {
     const result = await upgradeAccount().unwrap();
     const data = result?.data;
