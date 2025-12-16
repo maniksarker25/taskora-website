@@ -61,7 +61,7 @@ const handleUpgradeAccount = async () => {
       }
 
       if (!data.isIdentificationDocumentVerified) {
-        router.push("/id_verification");
+        router.push("/id_card_verify");
         return;
       }
 
