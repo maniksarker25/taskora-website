@@ -51,7 +51,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
       try {
   
         const result = await acceptBid({ bidID: bidId }).unwrap();
-  
+       
         if (result.success) {
           const paymentLink = result?.data?.paymentLink;
           const reference = result?.data?.reference;
@@ -148,10 +148,10 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
   const handleChatClick = (bid) => {
 
-    if ((taskStatus || taskDetails?.status) !== "IN_PROGRESS") {
-      toast.info("Chat is available only while the task is In Progress.");
-      return;
-    }
+    // if ((taskStatus || taskDetails?.status) !== "IN_PROGRESS") {
+    //   toast.info("Chat is available only while the task is In Progress.");
+    //   return;
+    // }
 
     // Determine receiverId - pick the other participant (not the current user)
     const providerId = bid?.provider?._id || bid?.provider || bid?.providerId;
@@ -300,7 +300,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                   </div>
                   <div>
                     {" "}
-                    <p className="font-semibold text-xl md:text-3xl">
+                    <p className="font-semibold text-xl md:text-xl">
                       ₦ {bid.price}
                     </p>
                   </div>
@@ -335,13 +335,13 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                       {isAcceptingBid ? "Accepting..." : "Accept the Bid"}
                     </button>
                   )} */}
-                  <button
+                  {/* <button
                     onClick={() => handleChatClick(bid)}
                     className="px-6 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer flex gap-2 items-center justify-center"
                   >
                     <BsChatLeftText />
                     Chat Now
-                  </button>
+                  </button> */}
                 </div>
               </div>
               {/* right side */}

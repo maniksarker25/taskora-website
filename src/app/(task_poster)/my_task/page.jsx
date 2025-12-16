@@ -176,7 +176,7 @@ const MyTasks = () => {
                   }
                 </p>
                 <Link 
-                  href="/create-task" 
+                  href="/post_task" 
                   className="inline-block px-6 py-2 bg-[#115e59] text-white rounded-lg hover:bg-teal-700 transition-colors"
                 >
                   Create Your First Task
