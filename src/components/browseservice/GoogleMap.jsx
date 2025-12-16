@@ -3,24 +3,49 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useGetAllTasksQuery } from '@/lib/features/task/taskApi';
 
-const GoogleMap = () => {
+const GoogleMap = ({ filters = {} }) => {
   const mapRef = useRef(null);
   const [map, setMap] = useState(null);
   const [markers, setMarkers] = useState([]);
   const [infoWindow, setInfoWindow] = useState(null);
   const [isScriptLoaded, setIsScriptLoaded] = useState(false);
 
-  // Fetch all tasks without filters
+  // Fetch all tasks with filters
   const { data, isLoading, error } = useGetAllTasksQuery({
     page: 1,
     limit: 100,
+    searchTerm: filters.search || "",
+    category: filters.category || "",
+    sortBy: filters.sort || "",
   });
 
   const tasks = data?.data?.result || [];
 
   // Prepare markers data - useMemo to prevent unnecessary recalculations
   const tasksWithLocation = React.useMemo(() => {
-    return tasks
+    let filteredTasks = tasks;
+
+    // Price filter
+    if (filters.minPrice || filters.maxPrice) {
+      filteredTasks = filteredTasks.filter(task => {
+        const taskBudget = task.budget || 0;
+        const minPrice = parseInt(filters.minPrice) || 0;
+        const maxPrice = parseInt(filters.maxPrice) || Infinity;
+
+        return taskBudget >= minPrice && taskBudget <= maxPrice;
+      });
+    }
+
+    // Location filter
+    if (filters.location) {
+      const searchLocation = filters.location.toLowerCase();
+      filteredTasks = filteredTasks.filter(task => {
+        const taskLocation = (task.city + ' ' + task.address).toLowerCase();
+        return taskLocation.includes(searchLocation);
+      });
+    }
+
+    return filteredTasks
       .map((task) => {
         const coords = task.location?.coordinates || [];
         if (!coords || coords.length < 2) return null;
@@ -41,7 +66,7 @@ const GoogleMap = () => {
         };
       })
       .filter(Boolean);
-  }, [tasks]);
+  }, [tasks, filters]);
 
   // Load Google Maps script
   const loadGoogleMapsScript = useCallback(() => {
@@ -79,12 +104,12 @@ const GoogleMap = () => {
     if (!window.google || !mapRef.current) return;
 
     const google = window.google;
-    
+
     // Calculate bounds to fit all markers
     const bounds = new google.maps.LatLngBounds();
-    
+
     // Set default center if no tasks with location
-    const defaultCenter = tasksWithLocation.length > 0 
+    const defaultCenter = tasksWithLocation.length > 0
       ? { lat: tasksWithLocation[0].lat, lng: tasksWithLocation[0].lng }
       : { lat: 23.8103, lng: 90.4125 };
 
@@ -109,7 +134,7 @@ const GoogleMap = () => {
     // Add markers to map
     const newMarkers = tasksWithLocation.map((task) => {
       const position = { lat: task.lat, lng: task.lng };
-      
+
       // Extend bounds to include this marker
       bounds.extend(position);
 
@@ -128,11 +153,10 @@ const GoogleMap = () => {
           ${task.budget ? `<p class="text-sm text-green-600 font-medium mt-1">Budget: ₦${task.budget}</p>` : ''}
           ${task.address ? `<p class="text-xs text-gray-500 mt-1">📍 ${task.address}</p>` : ''}
           <div class="mt-2 flex justify-between items-center">
-            <span class="text-xs px-2 py-1 rounded ${
-              task.status === 'OPEN_FOR_BID' 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-gray-100 text-gray-800'
-            }">
+            <span class="text-xs px-2 py-1 rounded ${task.status === 'OPEN_FOR_BID'
+          ? 'bg-green-100 text-green-800'
+          : 'bg-gray-100 text-gray-800'
+        }">
               ${task.status === 'OPEN_FOR_BID' ? 'Open for Bid' : 'In Progress'}
             </span>
             <a href="/browseservice/${task.id}" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
@@ -154,7 +178,7 @@ const GoogleMap = () => {
     // Fit map to show all markers
     if (tasksWithLocation.length > 0) {
       mapInstance.fitBounds(bounds);
-      
+
       // Add some padding
       if (tasksWithLocation.length === 1) {
         mapInstance.setZoom(14);
@@ -222,19 +246,19 @@ const GoogleMap = () => {
 
   return (
     <div className="w-full h-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
-      <div 
-        ref={mapRef} 
+      <div
+        ref={mapRef}
         className="w-full h-full min-h-[500px]"
       />
-      
+
       {/* Map Legend */}
       <div className="bg-white p-3 border-t border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z" fill="#FBBF24"/>
-                <path d="M12 11.5C13.3807 11.5 14.5 10.3807 14.5 9C14.5 7.61929 13.3807 6.5 12 6.5C10.6193 6.5 9.5 7.61929 9.5 9C9.5 10.3807 10.6193 11.5 12 11.5Z" fill="white"/>
+                <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z" fill="#FBBF24" />
+                <path d="M12 11.5C13.3807 11.5 14.5 10.3807 14.5 9C14.5 7.61929 13.3807 6.5 12 6.5C10.6193 6.5 9.5 7.61929 9.5 9C9.5 10.3807 10.6193 11.5 12 11.5Z" fill="white" />
               </svg>
             </div>
             <span className="text-sm text-gray-600">
