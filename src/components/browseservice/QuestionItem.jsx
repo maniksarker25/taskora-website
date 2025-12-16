@@ -1,11 +1,22 @@
-import React from "react";
+"use client"
+import React, { useState } from "react";
 import Image from "next/image";
 import client from "../../../public/client.png";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import { useSocketContext } from "@/app/context/SocketProvider";
+import { MessageCircle } from "lucide-react";
 
 const QuestionItem = ({ question, task }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+   const [message, setMessage] = useState("");
   const userID = useSelector((state) => state?.auth?.user?.profileId);
+  const user = useSelector((state) => state?.auth?.user?.role);
+  const users = useSelector((state) => state?.auth?.user);
   const customerId = task?.customer?._id;
+  const { socket, isConnected, sendMessageSoket, seenMessage } = useSocketContext();
+
+  console.log("tasksksfksdjlfksadj",task)
 
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
@@ -19,6 +30,44 @@ const QuestionItem = ({ question, task }) => {
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays === 1) return "1 day ago";
     return `${diffInDays} days ago`;
+  };
+
+//   modal
+  const handleChatClick = () => {
+    // if (!user?.role) {
+    //   toast.error("Please log in to access the chat feature.");
+    //   return;
+    // }
+
+    setIsModalOpen(true);
+  };
+
+//   send sms
+ const handleSend = () => {
+    const userIDrole = users?.role !== "customer" ? task?.customer?._id : task?.provider?._id;
+    if (!message.trim()) {
+      toast.error("Message cannot be empty");
+      return;
+    }
+    if (!userIDrole) {
+      toast.error("Unable to identify the recipient.");
+      return;
+    }
+
+    const data = {
+      text: message,
+      imageUrl: [""],
+      pdfUrl: [""],
+      receiver: userIDrole
+    }
+
+
+    sendMessageSoket(data);
+    setMessage("");
+    setIsModalOpen(false)
+    if (window !== undefined) {
+      window.location.href = "/chat";
+    }
   };
 
   return (
@@ -58,13 +107,48 @@ const QuestionItem = ({ question, task }) => {
 
           {userID === customerId && (
             <div className="flex mt-10">
-              <button className="px-10 py-2 bg-[#115E59] text-white rounded-md hover:bg-[#0d726b] cursor-pointer">
+              <button 
+              onClick={handleChatClick}
+              className="px-10 py-2 bg-[#115E59] text-white rounded-md hover:bg-[#0d726b] cursor-pointer">
                 Chat
               </button>
             </div>
           )}
         </div>
       </div>
+
+        {/*  CHAT MODAL */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/30 bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white w-11/12 max-w-md p-5 rounded-lg shadow-lg">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-semibold">Chat Box</h2>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-500 text-xl">
+                ✕
+              </button>
+            </div>
+
+            {/* Message Input */}
+            <textarea
+              className="w-full border rounded-md p-3 h-24 outline-none"
+              placeholder="Type your message..."
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            ></textarea>
+
+            {/* Send Button */}
+          <button
+          onClick={() => handleSend()}
+          disabled={task?.status && task.status !== "IN_PROGRESS"}
+          className={`px-6 py-2.5 rounded-md transition transform duration-300 hover:scale-105 flex gap-2 items-center justify-center mt-12 ${task?.status && task.status !== "IN_PROGRESS" ? "bg-gray-300 text-gray-700 cursor-not-allowed" : "bg-[#115e59] text-white hover:bg-teal-800 cursor-pointer"}`}
+        >
+          <MessageCircle className="w-4 h-4" />
+          Chat Now
+        </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
