@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 
 const AllServicePage = ({ filters }) => {
   const pathname = usePathname();
-  const currentTaskId = pathname.split('/').pop(); 
+  const currentTaskId = pathname.split('/').pop();
   const {
     data: tasksData,
     isLoading,
@@ -21,36 +21,35 @@ const AllServicePage = ({ filters }) => {
     sortBy: filters.sort || "",
   });
 
-const filteredTasks = React.useMemo(() => {
-  if (!tasksData?.data?.result) return [];
-  
-  let tasks = tasksData.data.result;
-  
-  // Price filter
-  if (filters.minPrice || filters.maxPrice) {
-    tasks = tasks.filter(task => {
-      const taskBudget = task.budget || 0;
-      const minPrice = parseInt(filters.minPrice) || 0;
-      const maxPrice = parseInt(filters.maxPrice) || Infinity;
-      
-      return taskBudget >= minPrice && taskBudget <= maxPrice;
-    });
-  }
-  
-  // Location and distance filter
-  if (filters.location && filters.location.location) {
-    const searchLocation = filters.location.location.toLowerCase();
-    const searchDistance = filters.location.distance || 20;
-    
-    tasks = tasks.filter(task => {
-      const taskLocation = (task.city + ' ' + task.address).toLowerCase();
-      return taskLocation.includes(searchLocation);
-      // এখানে actual distance calculation logic add করতে পারেন
-    });
-  }
-  
-  return tasks;
-}, [tasksData, filters]);
+  const filteredTasks = React.useMemo(() => {
+    if (!tasksData?.data?.result) return [];
+
+    let tasks = tasksData.data.result;
+
+    // Price filter
+    if (filters.minPrice || filters.maxPrice) {
+      tasks = tasks.filter(task => {
+        const taskBudget = task.budget || 0;
+        const minPrice = parseInt(filters.minPrice) || 0;
+        const maxPrice = parseInt(filters.maxPrice) || Infinity;
+
+        return taskBudget >= minPrice && taskBudget <= maxPrice;
+      });
+    }
+
+    // Location and distance filter
+    if (filters.location) {
+      const searchLocation = filters.location.toLowerCase();
+
+      tasks = tasks.filter(task => {
+        const taskLocation = (task.city + ' ' + task.address).toLowerCase();
+        return taskLocation.includes(searchLocation);
+        // এখানে actual distance calculation logic add করতে পারেন
+      });
+    }
+
+    return tasks;
+  }, [tasksData, filters]);
 
 
   const formatTaskData = (task) => {
@@ -67,10 +66,10 @@ const filteredTasks = React.useMemo(() => {
       monthIcon: <IoTimerOutline />,
       month: task.preferredDate
         ? new Date(task.preferredDate).toLocaleDateString("en-US", {
-            day: "numeric",
-            month: "short",
-            year: "numeric",
-          }) + (task.preferredTime ? ` ${task.preferredTime}` : "")
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        }) + (task.preferredTime ? ` ${task.preferredTime}` : "")
         : "Schedule not set",
       open: task.status === "OPEN_FOR_BID" ? "open" : "closed",
       close: task.status === "OPEN_FOR_BID" ? "close" : "closed",
@@ -106,8 +105,8 @@ const filteredTasks = React.useMemo(() => {
         {tasks.map((task) => (
           <div key={task._id}>
             <Link href={`/browseservice/${task?._id}`}>
-              <ServiceCard 
-                task={task} 
+              <ServiceCard
+                task={task}
                 isActive={currentTaskId === task?._id}
               />
             </Link>

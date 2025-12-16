@@ -54,6 +54,7 @@ const Location = ({ value, onChange }) => {
     );
   }
 
+  // Show error state if script fails to load
   if (loadError) {
     return (
       <div className="w-full max-w-sm">
@@ -68,7 +69,7 @@ const Location = ({ value, onChange }) => {
     const value = e.target.value;
     setInputValue(value);
     setHasSearched(!!value);
-    
+
     if (value.length >= 2) {
       fetchPredictions(value);
     } else {
@@ -79,19 +80,19 @@ const Location = ({ value, onChange }) => {
 
   const fetchPredictions = (input) => {
     if (!autocompleteService.current) return;
-    
+
     setIsLoading(true);
-    
+
     autocompleteService.current.getPlacePredictions(
       {
         input,
-        componentRestrictions: { country: 'ng' },
+        // componentRestrictions: { country: 'ng' },
         types: ['(regions)'],
       },
       (predictions, status) => {
         setIsLoading(false);
         if (status === 'OK' && predictions) {
-          setSuggestions(predictions.slice(0, 5)); 
+          setSuggestions(predictions.slice(0, 5));
           setShowSuggestions(true);
         } else {
           setSuggestions([]);
