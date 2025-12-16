@@ -115,6 +115,7 @@ const timeRef = useRef(null);
       });
     }
   };
+  console.log("lkasdfjlksdajflkasjfl=-=-0",taskDetails)
 
   const handleCancellationSubmit = async (e) => {
     e.preventDefault();
@@ -281,7 +282,7 @@ const timeRef = useRef(null);
                   Current Completion Date
                 </p>
                 <p className="text-gray-600 text-xs md:text-sm">
-                  {formatDate(taskDetails?.preferredDate)}
+                  {formatDate(taskDetails?.preferredDeliveryDateTime)}
                 </p>
               </div>
             </div>

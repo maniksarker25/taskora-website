@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link";
 import React from "react";
 import bg_image from "../../../public/shadow bg.svg";
@@ -5,8 +6,49 @@ import Image from "next/image";
 import image1 from "../../../public/image-1.svg";
 import image2 from "../../../public/image-2.svg";
 import image3 from "../../../public/image-3.svg";
+import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+
+
 
 const HeroSection = () => {
+
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const router = useRouter();
+  const userRole = user?.role;
+
+  const handlePostTaskClick = (e) => {
+  e.preventDefault();
+
+  if (!isAuthenticated) {
+    toast.error("Please login first to post a task");
+    return;
+  }
+
+  if (userRole !== "customer") {
+    toast.error("You need to upgrade your account to post a task")
+    return;
+  }
+
+  router.push("/post_task");
+};
+  const handleBrowseServiceClick = (e) => {
+  e.preventDefault();
+
+  if (!isAuthenticated) {
+    toast.error("Please login first to post a task");
+    return;
+  }
+
+  if (userRole !== "customer") {
+    toast.error("You need to upgrade your account to Browse Service")
+    return;
+  }
+
+  router.push("/service-listing");
+};
+
   return (
     <section className="max-w-[1240px] mx-auto px-4 pt-8">
       <div className="flex flex-col lg:flex-row justify-between items-center lg:mt-24 gap-10 lg:gap-20">
@@ -23,12 +65,14 @@ const HeroSection = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <Link
               href="/service-listing"
+              onClick={handleBrowseServiceClick}
               className="flex items-center justify-center px-5 py-3 bg-color text-white rounded-md hover:bg-teal-900 transition transform duration-300 hover:scale-105 text-base md:text-lg"
             >
               Browse Services
             </Link>
             <Link
               href="/post_task"
+              onClick={handlePostTaskClick}
               className="px-5 py-3 border-2 text-color border-teal-800 rounded-md hover:bg-teal-800 hover-white transition transform duration-300 text-base md:text-lg"
             >
               Post a task
