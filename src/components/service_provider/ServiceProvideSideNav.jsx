@@ -63,13 +63,15 @@ const ServiceProvideSideNav = ({ open, onClose }) => {
     >
       <div className="flex flex-col items-center py-6 gap-2">
         {/* Profile Image */}
-        <Image
+       <div className="w-20 h-20 rounded-full overflow-hidden">
+            <Image
           src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
           alt="profile"
           width={80}
           height={80}
-          className="rounded-full shadow"
+          className="w-full h-full object-cover"
         />
+       </div>
         <h2 className="font-semibold text-xl text-gray-800">{userData?.name}</h2>
         <p className="text-xs text-gray-600">{user?.role}</p>
       </div>

@@ -54,7 +54,6 @@ const Location = ({ value, onChange }) => {
     );
   }
 
-  // Show error state if script fails to load
   if (loadError) {
     return (
       <div className="w-full max-w-sm">
