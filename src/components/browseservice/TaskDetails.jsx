@@ -37,6 +37,11 @@ const TaskDetails = ({ task }) => {
   const [questionImagePreview, setQuestionImagePreview] = useState(null);
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const role = useSelector((state) => state?.auth?.user?.role);
+  const userID = useSelector((state) => state?.auth?.user?.profileId);
+
+ 
+  const customerId = task?.customer?._id
+ 
 
   const [createBid, { isLoading: isSubmittingBid }] = useCreateBidMutation();
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
@@ -572,7 +577,11 @@ const TaskDetails = ({ task }) => {
                     <div className="flex gap-6 flex-wrap">
                          {role === "customer" && (taskStatus || taskData.status) === "OPEN_FOR_BID" && (
                         <div className="mt-2">
-                          <button
+
+
+                            {
+                            userID === customerId ? (
+                               <button
                             onClick={() => handleAcceptBid(bid._id)}
                             disabled={isAcceptingBid}
                             className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isAcceptingBid
@@ -582,6 +591,11 @@ const TaskDetails = ({ task }) => {
                           >
                             {isAcceptingBid ? "Accepting..." : "Accept Bid"}
                           </button>
+                            ):(<></>)
+                          }
+
+
+                         
                         </div>
                       )}
                       {role === "provider" && (taskStatus || taskData.status) === "OPEN_FOR_BID" && (
@@ -610,7 +624,10 @@ const TaskDetails = ({ task }) => {
       ) : (
         <div className="bg-white">
           <div className="p-4 border-b border-gray-200">
-            <div className="flex gap-3">
+            {/* role wise show question */}
+
+            {
+              role === "customer"?(<div> </div>):(<div className="flex gap-3">
               <Image
                 src={client}
                 alt="Your profile"
@@ -653,7 +670,10 @@ const TaskDetails = ({ task }) => {
                         className="hidden"
                       />
                     </label>
-                  )}
+                    
+                  )
+                   
+                  }
                 </div>
 
                 <div className="flex justify-end items-center mt-3">
@@ -669,7 +689,9 @@ const TaskDetails = ({ task }) => {
                   </button>
                 </div>
               </div>
-            </div>
+            </div>)  
+            }
+            
           </div>
 
           {/* Questions List */}
@@ -740,11 +762,20 @@ const TaskDetails = ({ task }) => {
                                 className="max-w-xs rounded-lg border border-gray-200"
                               />
                             </div>
+                            
                           )}
+                          {
+                            userID === customerId ? (
+                              <div className="flex mt-10">
+                            <button className="px-10 py-2 bg-[#115E59] text-white rounded-md hover:bg-[#0d726b] cursor-pointer">Chat</button>
+                          </div>
+                            ):(<></>)
+                          }
+                           
                         </div>
 
                         {/* Answer */}
-                        {question.answer && (
+                        {/* {question.answer && (
                           <div className="bg-green-50 p-3 rounded-lg border border-green-100">
                             <div className="flex items-center gap-2 mb-2">
                               <span className="text-xs font-medium text-green-700">
@@ -759,8 +790,11 @@ const TaskDetails = ({ task }) => {
                             <p className="text-sm text-gray-700 leading-relaxed">
                               {question.answer}
                             </p>
+                         
+
                           </div>
-                        )}
+
+                        )} */}
                       </div>
                     </div>
                   ))
