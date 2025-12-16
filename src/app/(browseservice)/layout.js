@@ -7,6 +7,7 @@ import Footer from "@/components/ui/Footer";
 import Filter from "@/components/browseservice/Filter";
 import AllServicePage from "@/components/browseservice/AllServicePage";
 import { Toaster } from "sonner";
+import FilterContext from "@/context/FilterContext";
 
 const BrowseServiceLayout = ({ children }) => {
   const [filters, setFilters] = useState({});
@@ -26,12 +27,16 @@ const BrowseServiceLayout = ({ children }) => {
           <div>
             <AllServicePage filters={filters} />
           </div>
-          <div className="w-full pl-2">{children}</div>
-          <Toaster 
-          position="top-right"
-          expand={true}
-          richColors
-        />
+          <div className="w-full pl-2">
+            <FilterContext.Provider value={filters}>
+              {children}
+            </FilterContext.Provider>
+          </div>
+          <Toaster
+            position="top-right"
+            expand={true}
+            richColors
+          />
         </div>
       </div>
       <Footer />
