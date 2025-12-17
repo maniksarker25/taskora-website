@@ -1,12 +1,16 @@
 "use client";
 import React, { useState } from "react";
-import { ArrowLeft, Copy, Share, Check } from "lucide-react";
-import { CgProfile } from "react-icons/cg";
+import { Copy, Share, Check } from "lucide-react";
 import { TbDiscount } from "react-icons/tb";
+import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";
+import { toast } from "sonner";
 
-const ReferServiceDiscounts = ({ onBack }) => {
+const ReferDiscounts = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState("my-discounts");
   const [copied, setCopied] = useState(false);
+
+  const { data, isLoading, error } = useGetMyProfileQuery();
+  const refercode = data?.data?.referralCode;
 
   // Sample referral data
   const referralData = [
@@ -30,7 +34,7 @@ const ReferServiceDiscounts = ({ onBack }) => {
     },
   ];
 
-  const referralCode = "TASK-USR123";
+  const referralCode = refercode;
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -45,63 +49,107 @@ const ReferServiceDiscounts = ({ onBack }) => {
     }
   };
 
-  const handleCopyCode = async () => {
-    try {
-      await navigator.clipboard.writeText(referralCode);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
+  // Fallback function for copying to clipboard
+  const copyToClipboard = async (text) => {
+    const fallbackCopy = (text) => {
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.top = "0";
+        textArea.style.left = "0";
+        textArea.style.opacity = "0";
+
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+
+        return successful;
+      } catch (err) {
+        console.error('Fallback copy error:', err);
+        return false;
+      }
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch (err) {
+        console.error("Navigator copy failed:", err);
+        return fallbackCopy(text);
+      }
+    } else {
+      return fallbackCopy(text);
     }
   };
 
-  const handleShareLink = () => {
+  const handleCopyCode = async () => {
+    if (!referralCode) return;
+
+    const success = await copyToClipboard(referralCode);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleShareLink = async () => {
     const shareUrl = `https://taskalley.com/refer/${referralCode}`;
 
     if (navigator.share) {
-      navigator.share({
-        title: "Join TaskAlley",
-        text: "Join me on TaskAlley and get rewards!",
-        url: shareUrl,
-      });
+      try {
+        await navigator.share({
+          title: "Join TaskAlley",
+          text: "Join me on TaskAlley and get rewards!",
+          url: shareUrl,
+        });
+      } catch (err) {
+        console.error("Share failed:", err);
+      }
     } else {
       // Fallback: copy URL to clipboard
-      navigator.clipboard.writeText(shareUrl);
-      alert("Referral link copied to clipboard!");
+      const success = await copyToClipboard(shareUrl);
+      if (success) {
+        toast.success("Referral link copied to clipboard!");
+      } else {
+        toast.error("Failed to copy link. Please manually copy: " + shareUrl);
+      }
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto lg:px-8 py-4 lg:py-6 mt-12">
+    <div className="max-w-7xl mx-auto lg:px-8 py-4 lg:py-6 mt-12 h-screen ">
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-         <button className=" hover:bg-gray-100 rounded-lg transition-colors lg:p-0 lg:hover:bg-transparent">
-            <TbDiscount className="text-3xl text-gray-600 cursor-pointer hover:text-gray-800 transition-colors" />
-          </button>
-        <h1 className="text-xl lg:text-2xl font-semibold text-gray-900">
+      <div className="flex items-center gap-3 mb-6 lg:mb-8">
+        <button className=" hover:bg-gray-100 rounded-lg transition-colors lg:p-0 lg:hover:bg-transparent">
+          <TbDiscount className="text-2xl text-gray-600 cursor-pointer hover:text-gray-800 transition-colors" />
+        </button>
+        <h2 className="font-semibold text-gray-600 text-lg sm:text-xl lg:text-2xl">
           Referrals & Discounts
-        </h1>
+        </h2>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 mb-6">
         <button
           onClick={() => setActiveTab("my-discounts")}
-          className={`px-4 py-2 text-lg font-medium rounded-md transition-colors cursor-pointer ${
-            activeTab === "my-discounts"
-              ? "bg-[#115e59] text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
+          className={`px-4 py-2 text-lg font-medium rounded-md transition-colors cursor-pointer ${activeTab === "my-discounts"
+            ? "bg-[#115e59] text-white"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
         >
           My Discounts
         </button>
         <button
           onClick={() => setActiveTab("referral-program")}
-          className={`px-4 py-2 text-lg font-medium rounded-md transition-colors cursor-pointer ${
-            activeTab === "referral-program"
-              ? "bg-[#115e59] text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-          }`}
+          className={`px-4 py-2 text-lg font-medium rounded-md transition-colors cursor-pointer ${activeTab === "referral-program"
+            ? "bg-[#115e59] text-white"
+            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+            }`}
         >
           Referral Program
         </button>
@@ -232,7 +280,7 @@ const ReferServiceDiscounts = ({ onBack }) => {
               <div className="flex gap-2">
                 <button
                   onClick={handleCopyCode}
-                  className="flex items-center cursor-pointer gap-2 px-4 py-3 bg-[#115e59] hover:bg-teal-800 text-white rounded-md transition-colors text-lg font-medium"
+                  className="flex items-center cursor-pointer gap-2 px-4 py-3 bg-[#115e59] hover:bg-teal-700 text-white rounded-md transition-colors text-lg font-medium"
                 >
                   {copied ? (
                     <>
@@ -293,7 +341,7 @@ const ReferServiceDiscounts = ({ onBack }) => {
 };
 
 // Demo wrapper component
-const ReferServiceDiscountsDemo = () => {
+const ReferDiscountsDemo = () => {
   const [showComponent, setShowComponent] = useState(true);
 
   if (!showComponent) {
@@ -313,10 +361,10 @@ const ReferServiceDiscountsDemo = () => {
   }
 
   return (
-    <div className="  py-8">
-      <ReferServiceDiscounts onBack={() => setShowComponent(false)} />
+    <div className=" bg-gray-50 py-8">
+      <ReferDiscounts onBack={() => setShowComponent(false)} />
     </div>
   );
 };
 
-export default ReferServiceDiscountsDemo;
+export default ReferDiscountsDemo;
