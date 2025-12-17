@@ -72,7 +72,7 @@ const ServiceForm = ({ service, isUpdateMode, onClose, refetchServices }) => {
       } else {
         setExistingImages([]);
       }
-      
+
       setNewImages([]);
       setDeletedImages([]);
     }
@@ -134,6 +134,9 @@ const ServiceForm = ({ service, isUpdateMode, onClose, refetchServices }) => {
       newErrors.startingPrice = "Starting price is required";
     } else if (isNaN(formData.startingPrice) || parseFloat(formData.startingPrice) <= 0) {
       newErrors.startingPrice = "Please enter a valid price";
+    } else if (parseFloat(formData.startingPrice) < 5000) {
+      newErrors.startingPrice = "Minimum price is 5000";
+      toast.error("Minimum price is 5000");
     }
 
     if (!formData.serviceCategory) {
@@ -203,7 +206,7 @@ const ServiceForm = ({ service, isUpdateMode, onClose, refetchServices }) => {
       if (result?.success) {
         const message = isUpdateMode ? "Service updated successfully!" : "Service added successfully!";
         toast.success(message);
-        
+
         onClose();
         refetchServices();
       }
@@ -233,12 +236,12 @@ const ServiceForm = ({ service, isUpdateMode, onClose, refetchServices }) => {
       </div>
 
       {/* Form */}
-      <form 
+      <form
         onSubmit={(e) => {
           e.preventDefault();
           handleSubmit();
         }}
-        className="space-y-6"
+        className="space-y-6 mx-2"
       >
         <ImageUploadSection
           existingImages={existingImages}
