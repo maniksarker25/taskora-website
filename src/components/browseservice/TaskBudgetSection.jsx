@@ -21,7 +21,7 @@ const TaskBudgetSection = ({ task, role, onBidClick }) => {
       </div>
 
       <div>
-        {role === "provider" && (
+        {role === "provider" && task?.status === "OPEN_FOR_BID" && (
           <button
             onClick={onBidClick}
             className="bg-[#115E59] hover:bg-teal-700 cursor-pointer text-white py-3 px-8 rounded-lg font-medium transition-colors"

@@ -6,7 +6,7 @@ import QuestionItem from "./QuestionItem";
 
 const QuestionsList = ({ task }) => {
   const role = useSelector((state) => state?.auth?.user?.role);
-  
+
   const {
     data: questionsData,
     isLoading: isLoadingQuestions,
@@ -43,8 +43,8 @@ const QuestionsList = ({ task }) => {
   return (
     <div className="bg-white">
       <div className="p-4 border-b border-gray-200">
-        {role === "provider" && (
-          <QuestionForm 
+        {role === "provider" && task?.status === "OPEN_FOR_BID" && (
+          <QuestionForm
             task={task}
             refetchQuestions={refetchQuestions}
           />
@@ -58,9 +58,9 @@ const QuestionsList = ({ task }) => {
           </div>
         ) : (
           questions.map((question) => (
-            <QuestionItem 
-              key={question._id} 
-              question={question} 
+            <QuestionItem
+              key={question._id}
+              question={question}
               task={task}
             />
           ))
