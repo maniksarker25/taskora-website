@@ -1,10 +1,17 @@
+import { CloudCog } from "lucide-react";
 import React from "react";
+import { useSelector } from "react-redux";
 
 const TaskBudgetSection = ({ task, role, onBidClick }) => {
   const taskData = {
     budget: task?.budget?.toString() || "0",
     totalOffer: task?.totalOffer || 0,
   };
+
+  // console.log("asdfladjf===>",task)
+  //   const { user, isAuthenticated } = useSelector((state) => state.auth);
+  //   const userEmail = user
+  //   console.log("userEmail===>",userEmail)
 
   return (
     <div className="flex justify-between items-center border-t pt-6 px-4 bg-white">

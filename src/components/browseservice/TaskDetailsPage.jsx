@@ -52,16 +52,16 @@ const TaskDetailsPage = ({ task }) => {
   return (
     <div className="bg-gray-50 min-h-screen">
       <TaskHeader task={task} />
-      
+
       <TaskInfoSection task={task} />
-      
-      <TaskBudgetSection 
-        task={task} 
+
+      <TaskBudgetSection
+        task={task}
         role={role}
         onBidClick={() => setIsBidModalOpen(true)}
       />
 
-      <TabNavigation 
+      <TabNavigation
         activeTab={contentTab}
         onTabChange={setContentTab}
         tabs={["Bids", "Questions"]}
