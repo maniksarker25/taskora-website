@@ -63,8 +63,13 @@ const Filter = ({ onFilterChange }) => {
         minPrice={filters.minPrice}
         maxPrice={filters.maxPrice}
         onChange={(min, max) => {
-          handleFilterChange("minPrice", min);
-          handleFilterChange("maxPrice", max);
+          const newFilters = {
+            ...filters,
+            minPrice: min,
+            maxPrice: max
+          };
+          setFilters(newFilters);
+          onFilterChange(newFilters);
         }}
       />
       <Sort
