@@ -12,6 +12,7 @@ import { useAcceptBidMutation } from '@/lib/features/bidApi/bidApi';
 import { useAuth } from '@/components/auth/useAuth';
 import { Calendar } from 'lucide-react';
 import { useSelector } from 'react-redux';
+import ConfirmBookingModal from './ConfirmBookingModal';
 
 const questions = [
   {
@@ -42,60 +43,73 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   const { user } = useAuth();
   const router = useRouter();
 
-   const handleAcceptBid = async (bidId) => {
-      if ((taskStatus || taskData.status) !== "OPEN_FOR_BID") {
-        toast.error("Task is no longer open for bids.");
-        return;
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [selectedBid, setSelectedBid] = useState(null);
+
+  const executeAcceptBid = async (bidId, couponCode) => {
+    if ((taskStatus || taskDetails?.status) !== "OPEN_FOR_BID") {
+      toast.error("Task is no longer open for bids.");
+      return;
+    }
+
+    try {
+      const payload = { bidID: bidId };
+      if (couponCode && couponCode.trim()) {
+        payload.promoCode = couponCode.trim();
       }
-  
-      try {
-  
-        const result = await acceptBid({ bidID: bidId }).unwrap();
-       
-        if (result.success) {
-          const paymentLink = result?.data?.paymentLink;
-          const reference = result?.data?.reference;
-  
-          toast.success(
-            paymentLink
-              ? "Bid accepted! Redirecting to payment..."
-              : "Bid accepted successfully!",
-            {
-              style: {
-                backgroundColor: "#d1fae5",
-                color: "#065f46",
-                borderLeft: "6px solid #10b981",
-              },
-              duration: 3500,
-            }
-          );
-  
-          if (paymentLink && typeof window !== "undefined") {
-            window.open(paymentLink, "_blank");
-          }
-  
-          if (reference) {
-            console.log("Payment reference:", reference);
-          }
-  
-          setTaskStatus(result?.data?.status || "IN_PROGRESS");
-          refetchBids();
+
+      const result = await acceptBid(payload).unwrap();
+
+      if (result.success) {
+        setIsConfirmModalOpen(false);
+        const paymentLink = result?.data?.paymentLink;
+        const reference = result?.data?.reference;
+
+        // toast.success(
+        //   paymentLink
+        //     ? "Bid accepted! Redirecting to payment..."
+        //     : "Bid accepted successfully!",
+        //   {
+        //     style: {
+        //       backgroundColor: "#d1fae5",
+        //       color: "#065f46",
+        //       borderLeft: "6px solid #10b981",
+        //     },
+        //     duration: 3500,
+        //   }
+        // );
+
+        if (paymentLink && typeof window !== "undefined") {
+          window.open(paymentLink, "_blank");
         }
-      } catch (error) {
-        console.error("Failed to accept bid:", error);
-        toast.error(
-          error?.data?.message || "Failed to accept bid. Please try again.",
-          {
-            style: {
-              backgroundColor: "#fee2e2",
-              color: "#991b1b",
-              borderLeft: "6px solid #ef4444",
-            },
-            duration: 3000,
-          }
-        );
+
+        if (reference) {
+          console.log("Payment reference:", reference);
+        }
+
+        setTaskStatus(result?.data?.status || "IN_PROGRESS");
+        // refetchBids(); // refetchBids is not defined in the scope, kept original logic flow
       }
-    };
+    } catch (error) {
+      console.error("Failed to accept bid:", error);
+      toast.error(
+        error?.data?.message || "Failed to accept bid. Please try again.",
+        {
+          style: {
+            backgroundColor: "#fee2e2",
+            color: "#991b1b",
+            borderLeft: "6px solid #ef4444",
+          },
+          duration: 3000,
+        }
+      );
+    }
+  };
+
+  const openConfirmModal = (bid) => {
+    setSelectedBid(bid);
+    setIsConfirmModalOpen(true);
+  };
 
   // const handleAcceptBid = async (bidId) => {
   //   if (taskStatus !== "OPEN_FOR_BID") {
@@ -108,7 +122,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   //     if (result?.success) {
   //       const paymentLink = result?.data?.paymentLink;
   //       const reference = result?.data?.reference;
-
+  //
   //       toast.success(
   //         paymentLink
   //           ? "Bid accepted! Redirecting to payment..."
@@ -122,15 +136,15 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   //           duration: 3500,
   //         }
   //       );
-
+  //
   //       if (paymentLink && typeof window !== "undefined") {
   //         window.open(paymentLink, "_blank");
   //       }
-
+  //
   //       if (reference) {
   //         console.log("Payment reference:", reference);
   //       }
-
+  //
   //       setTaskStatus(result?.data?.status || "IN_PROGRESS");
   //     }
   //   } catch (error) {
@@ -190,6 +204,13 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
   return (
     <div>
+      <ConfirmBookingModal
+        isOpen={isConfirmModalOpen}
+        onClose={() => setIsConfirmModalOpen(false)}
+        onContinue={(code) => executeAcceptBid(selectedBid?._id || selectedBid?.id, code)}
+        bidAmount={selectedBid?.price}
+        isLoading={isAcceptingBid}
+      />
       <div className="flex flex-col lg:flex-row lg:justify-between gap-8 border rounded-2xl p-6 bg-white shadow mt-8 items-center">
         {/* Left side */}
         <div className="flex-1 space-y-6">
@@ -308,20 +329,20 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                 {/* accept and chat button */}
                 <div className="flex flex-col sm:flex-row gap-3  ">
 
-                      {role === "customer" && (taskStatus || taskData.status) === "OPEN_FOR_BID" && (
-                        <div className="mt-2">
-                          <button
-                            onClick={() => handleAcceptBid(bid._id)}
-                            disabled={isAcceptingBid}
-                            className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isAcceptingBid
-                                ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                              }`}
-                          >
-                            {isAcceptingBid ? "Accepting..." : "Accept Bid"}
-                          </button>
-                        </div>
-                      )}
+                  {role === "customer" && (taskStatus || taskDetails?.status) === "OPEN_FOR_BID" && (
+                    <div className="mt-2">
+                      <button
+                        onClick={() => openConfirmModal(bid)}
+                        disabled={isAcceptingBid}
+                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isAcceptingBid
+                          ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          }`}
+                      >
+                        Accept Bid
+                      </button>
+                    </div>
+                  )}
 
                   {/* {taskStatus === "OPEN_FOR_BID" && (
                     <button
