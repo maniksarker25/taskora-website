@@ -31,14 +31,6 @@ const TaskCreationApp = () => {
 
   const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
 
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const providerIdFromUrl = urlParams.get('providerId');
-      setProviderId(providerIdFromUrl);
-    }
-  }, []);
-
   const categories = data?.data?.result?.map(category => ({
     value: category?._id || category?.id,
     label: category?.name
@@ -126,19 +118,19 @@ const TaskCreationApp = () => {
         }
         break;
 
-        case 3: {
-  const budget = Number(formData.budget);
+      case 3: {
+        const budget = Number(formData.budget);
 
-  if (!budget || budget < 5000) {
-    errors.budget = "Please fill all required fields";
-  }
+        if (!budget || budget < 5000) {
+          errors.budget = "Please fill all required fields";
+        }
 
-  if (!formData.agreedToTerms) {
-    errors.agreedToTerms = "You must agree to the terms";
-  }
+        if (!formData.agreedToTerms) {
+          errors.agreedToTerms = "You must agree to the terms";
+        }
 
-  break;
-}
+        break;
+      }
 
 
       // case 3:
@@ -189,23 +181,23 @@ const TaskCreationApp = () => {
   };
 
   const handleNext = () => {
-  const isValid = validateStep(currentStep);
+    const isValid = validateStep(currentStep);
 
-  if (isValid) {
-    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
-  } else {
-    if (formErrors?.budget) {
-      
-      toast.error(formErrors.budget);
-      if (!validateStep(3)) {
-      toast.error("Minimum budget must be at least 5000 ");
-      return;
-    }
+    if (isValid) {
+      setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
     } else {
-      toast.error("Please fill all required fields");
+      if (formErrors?.budget) {
+
+        toast.error(formErrors.budget);
+        if (!validateStep(3)) {
+          toast.error("Minimum budget must be at least 5000 ");
+          return;
+        }
+      } else {
+        toast.error("Please fill all required fields");
+      }
     }
-  }
-};
+  };
 
 
   // const handleNext = () => {
@@ -297,8 +289,9 @@ const TaskCreationApp = () => {
           taskAttachments: [],
         });
 
-        localStorage.removeItem("formData");
-        localStorage.removeItem("currentStep");
+        const storageKey = providerId ? `task_draft_${providerId}` : "task_draft_general";
+        localStorage.removeItem(storageKey);
+        localStorage.removeItem(`${storageKey}_step`);
         setCurrentStep(0);
 
         setTimeout(() => {
@@ -312,27 +305,53 @@ const TaskCreationApp = () => {
   };
 
   useEffect(() => {
-    const savedStep = localStorage.getItem("currentStep");
-    const savedForm = localStorage.getItem("formData");
+    // Initialize from URL Params and LocalStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const providerIdFromUrl = urlParams.get('providerId');
+    const categoryIdFromUrl = urlParams.get('categoryId');
+
+    if (providerIdFromUrl) {
+      setProviderId(providerIdFromUrl);
+    }
+
+    const storageKey = providerIdFromUrl ? `task_draft_${providerIdFromUrl}` : "task_draft_general";
+    const savedStep = localStorage.getItem(`${storageKey}_step`);
+    const savedForm = localStorage.getItem(storageKey);
 
     if (savedStep) setCurrentStep(Number(savedStep));
+
     if (savedForm) {
-      const parsedForm = JSON.parse(savedForm);
-      setFormData({
-        ...parsedForm,
-        taskAttachments: []
-      });
+      try {
+        const parsedForm = JSON.parse(savedForm);
+        setFormData(prev => ({
+          ...prev,
+          ...parsedForm,
+          taskAttachments: [],
+          // URL category overrides saved category
+          taskCategory: categoryIdFromUrl || parsedForm.taskCategory || prev.taskCategory
+        }));
+      } catch (error) {
+        console.error("Error parsing saved form", error);
+      }
+    } else if (categoryIdFromUrl) {
+      // No saved form, but URL has category
+      setFormData(prev => ({
+        ...prev,
+        taskCategory: categoryIdFromUrl
+      }));
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("currentStep", currentStep);
-  }, [currentStep]);
+    const storageKey = providerId ? `task_draft_${providerId}` : "task_draft_general";
+    localStorage.setItem(`${storageKey}_step`, currentStep);
+  }, [currentStep, providerId]);
 
   useEffect(() => {
     const { taskAttachments, ...formDataWithoutFiles } = formData;
-    localStorage.setItem("formData", JSON.stringify(formDataWithoutFiles));
-  }, [formData]);
+    const storageKey = providerId ? `task_draft_${providerId}` : "task_draft_general";
+    localStorage.setItem(storageKey, JSON.stringify(formDataWithoutFiles));
+  }, [formData, providerId]);
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -523,7 +542,7 @@ const TaskCreationApp = () => {
             {providerId && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-sm text-green-700">
-                   Since you're submitting to a specific provider, they'll see your offer first!
+                  Since you're submitting to a specific provider, they'll see your offer first!
                 </p>
               </div>
             )}
