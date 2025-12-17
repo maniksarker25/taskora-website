@@ -98,7 +98,7 @@ const BankVerification = () => {
                               setBvn(e.target.value);
                             }}
                             className="w-full text-[#6B7280] text-sm border border-slate-300 px-4 py-3 pr-8 rounded-md outline-blue-600"
-                            placeholder="Enter your 11-digit BVN"
+                            placeholder="Enter your BVN"
                             required
                           />
                         </div>

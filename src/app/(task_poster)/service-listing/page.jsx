@@ -189,9 +189,9 @@ const ServiceListing = () => {
                 {selectedCategory !== "all" && ` in ${serviceCategories.find(cat => cat.id === selectedCategory)?.label}`}
                 {debouncedSearch && ` for "${debouncedSearch}"`}
               </div>
-              <div className="text-sm text-gray-500">
+              {/* <div className="text-sm text-gray-500">
                 Sorted by: {sortOptions.find(opt => opt.id === selectedSortBy)?.label || "Relevance"}
-              </div>
+              </div> */}
             </div>
 
             {/* Services Grid */}

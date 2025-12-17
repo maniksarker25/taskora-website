@@ -7,6 +7,7 @@ import Footer from "@/components/ui/Footer";
 import Navbar from "@/components/ui/Navbar";
 import StoreProvider from "../StoreProvider";
 import CustomerProtectedRoute from "@/components/auth/CustomerProtectedRoute";
+import { Toaster } from "sonner";
 
 const ProfileLayout = ({ children }) => {
   const [open, setOpen] = useState(false);
@@ -40,6 +41,7 @@ const ProfileLayout = ({ children }) => {
   return (
     <CustomerProtectedRoute>
       <Navbar />
+       <Toaster position="top-right" richColors />
       <div className="mb-12 md:max-w-10/12 mx-auto flex justify-center items-center">
         <div className="flex shadow-lg rounded-xl overflow-hidden min-h-[900px] w-full p-4">
           {/* Toggle Button - Now visible for mobile AND tablet */}
