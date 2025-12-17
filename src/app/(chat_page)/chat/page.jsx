@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
 import { FiSend } from "react-icons/fi";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
@@ -303,30 +304,63 @@ const ChatContent = ({ userId }) => {
 
     if (!hasImage && !hasVideo && !hasPdf) return null;
 
+    // Helper to check if URL is PDF
+    const isPdf = (url) => url?.toLowerCase().endsWith('.pdf');
+    // Helper to check if URL is Video
+    const isVideo = (url) => url?.toLowerCase().match(/\.(mp4|webm|ogg|mov)$/);
+
+    const renderPdf = (url, key) => (
+      <a
+        key={key}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-3 p-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors max-w-[240px] my-1"
+      >
+        <div className="bg-red-100 p-2 rounded flex-shrink-0">
+          <FaFilePdf className="text-red-600 text-lg" />
+        </div>
+        <div className="flex flex-col overflow-hidden">
+          <span className="text-sm font-medium text-gray-700 truncate">PDF Document</span>
+          <span className="text-xs text-blue-500">Click to view</span>
+        </div>
+      </a>
+    );
+
+    const renderVideo = (url, key) => (
+      <div key={key} className="relative w-full max-w-[240px] rounded-lg overflow-hidden border border-gray-200 my-1">
+        <video src={url} controls className="w-full h-auto" />
+      </div>
+    );
+
+    const renderImage = (url, key) => (
+      <div key={key} className="relative w-60 h-60 rounded-lg overflow-hidden border border-gray-200 my-1">
+        <Image src={url} alt="Shared image" fill className="object-cover" />
+      </div>
+    );
+
     return (
       <div className="mt-2 space-y-2">
-        {hasImage && (
-          <div className="flex items-center gap-2">
-            <FaImage className="text-blue-500" />
-            <span className="text-sm text-gray-600">Image</span>
-          </div>
+        {/* Images (and misclassified PDFs/Videos) */}
+        {message.imageUrl?.map((url, index) => {
+          if (!url || url.trim() === "") return null;
+          if (isPdf(url)) return renderPdf(url, `img-pdf-${index}`);
+          if (isVideo(url)) return renderVideo(url, `img-vid-${index}`);
+          return renderImage(url, `img-${index}`);
+        })}
+
+        {/* Videos */}
+        {message.videoUrl?.map((url, index) =>
+          (url && url.trim() !== "") && renderVideo(url, `vid-${index}`)
         )}
-        {hasVideo && (
-          <div className="flex items-center gap-2">
-            <FaVideo className="text-red-500" />
-            <span className="text-sm text-gray-600">Video</span>
-          </div>
-        )}
-        {hasPdf && (
-          <div className="flex items-center gap-2">
-            <FaFilePdf className="text-red-600" />
-            <span className="text-sm text-gray-600">PDF Document</span>
-          </div>
+
+        {/* PDFs */}
+        {message.pdfUrl?.map((url, index) =>
+          (url && url.trim() !== "") && renderPdf(url, `pdf-${index}`)
         )}
       </div>
     );
   };
-
   const groupMessagesByDate = () => {
     const groups = {};
     messageDataResult.forEach((msg) => {
@@ -559,8 +593,8 @@ const ChatContent = ({ userId }) => {
             onClick={sendMessage}
             disabled={(!message.trim() && Object.values(selectedFiles).every(file => file === null)) || uploading}
             className={`p-3 rounded-full transition-all ${(message.trim() || Object.values(selectedFiles).some(file => file !== null)) && !uploading
-                ? "bg-green-500 text-white hover:bg-green-600"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              ? "bg-green-500 text-white hover:bg-green-600"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
             title="Send message"
           >
