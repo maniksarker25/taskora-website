@@ -60,7 +60,7 @@ const PriceRange = ({ minPrice, maxPrice, onChange }) => {
 
       {/* Price Range Slider Dropdown */}
       {showSlider && (
-        <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-300 rounded-lg shadow-lg z-10 p-4">
+        <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Price Range

@@ -11,15 +11,23 @@ const BookingCard = ({ signgleServiceData }) => {
   const router = useRouter();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const providerUsr = user.role
-  
+
   const handleSubmitOffer = () => {
     const providerId = signgleServiceData?.provider?._id;
+    const categoryId = signgleServiceData?.category?._id;
 
     if (!providerId) {
       toast.warning("Provider information not available");
       return;
     }
-    router.push(`/post_task?providerId=${providerId}`);
+
+    // Construct URL with available parameters
+    let url = `/post_task?providerId=${providerId}`;
+    if (categoryId) {
+      url += `&categoryId=${categoryId}`;
+    }
+
+    router.push(url);
   };
 
   return (
