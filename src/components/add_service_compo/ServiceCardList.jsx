@@ -4,6 +4,7 @@ import React from "react";
 import { Edit, Trash2, Calendar, MapPin, Briefcase } from "lucide-react";
 import { useDeleteServiceMutation } from "@/lib/features/providerService/providerServiceApi";
 import { toast } from "sonner";
+import client from "../../../public/profile_image.jpg";
 
 const ServiceCard = ({ service, onEdit, refetchServices }) => {
   const [deleteService, { isLoading: isDeleting }] = useDeleteServiceMutation();
@@ -39,7 +40,7 @@ const handleDelete = (serviceId) => {
       {/* Service Image */}
       <div className="relative h-48 overflow-hidden">
         <img
-          src={service.images?.[0] || "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=400&h=300&fit=crop"}
+          src={service.images?.[0] || client}
           alt={service.title}
           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
         />

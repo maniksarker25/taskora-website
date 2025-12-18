@@ -1,18 +1,16 @@
 import React, { useState } from 'react'
 import { FaMapMarkerAlt } from "react-icons/fa";
 import { MdDateRange } from "react-icons/md";
-import { BsChatLeftText } from "react-icons/bs";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FaStar } from "react-icons/fa6";
-import srvcporvider from "../../../public/women.svg";
+import srvcporvider from "../../../public/profile_image.jpg";
 import Image from 'next/image';
 import { toast } from "sonner";
 import { useAcceptBidMutation } from '@/lib/features/bidApi/bidApi';
 import { useAuth } from '@/components/auth/useAuth';
-import { Calendar } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import ConfirmBookingModal from './ConfirmBookingModal';
+import client from "../../../public/profile_image.jpg";
 
 const questions = [
   {
@@ -384,7 +382,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
               className="flex gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
             >
               <Image
-                src={q?.provider?.profile_image || q?.user?.profileImage}
+                src={q?.provider?.profile_image || q?.user?.profileImage || client}
                 alt={q?.user?.name || "User"}
                 width={64}
                 height={64}

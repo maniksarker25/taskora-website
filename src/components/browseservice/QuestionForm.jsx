@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { ImageIcon, X } from "lucide-react";
-import client from "../../../public/client.png";
+import client from "../../../public/profile_image.jpg";
 import { useCreateQuestionMutation } from "@/lib/features/question/questionApi";
 import { toast } from "sonner";
 

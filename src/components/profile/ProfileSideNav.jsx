@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import client from "../../../public/client.png";
+import client from "../../../public/profile_image.jpg";
 import { CgProfile } from "react-icons/cg";
 import { IoIosNotifications } from "react-icons/io";
 import { IoIosSettings } from "react-icons/io";
@@ -63,7 +63,7 @@ const ProfileSideNav = ({ open, onClose }) => {
       <div className="flex flex-col items-center py-6 gap-2">
         {/* Profile Image */}
         <Image
-          src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
+          src={userData?.profile_image || client}
           alt="profile"
           width={80}
           height={80}

@@ -1,7 +1,7 @@
 import React from "react";
 import { MapPin, Calendar } from "lucide-react";
 import Image from "next/image";
-import client from "../../../public/client.png";
+import client from "../../../public/profile_image.jpg";
 
 const TaskInfoSection = ({ task }) => {
   const taskData = {

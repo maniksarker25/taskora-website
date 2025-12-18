@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { Star } from "lucide-react";
-import client from "../../../public/client.png";
+import client from "../../../public/profile_image.jpg";
 import { useAcceptBidMutation, useDeleteBidMutation } from "@/lib/features/bidApi/bidApi";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";

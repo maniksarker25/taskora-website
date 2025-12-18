@@ -9,6 +9,7 @@ import { useAuth } from '@/components/auth/useAuth';
 import { User } from 'lucide-react';
 import { FaStar } from 'react-icons/fa6';
 import BidModal from '../browseservice/BidModal';
+import client from "../../../public/profile_image.jpg";
 
 const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBids }) => {
   const info = bidsData?.data?.result || [];
@@ -230,7 +231,7 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
                 <div className="flex flex-wrap lg:justify-between items-center gap-4 md:gap-8">
                   <div className="w-14 h-14 md:w-24 md:h-24 rounded-full overflow-clip">
                     <Image
-                      src={bid?.provider?.profile_image || "/default-avatar.png"}
+                      src={bid?.provider?.profile_image || client}
                       alt={bid?.provider?.name || "Provider"}
                       width={500}
                       height={500}
@@ -294,7 +295,7 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
               className="flex gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
             >
               <Image
-                src={q?.provider?.profile_image || q?.user?.profileImage || "/default-avatar.png"}
+                src={q?.provider?.profile_image || q?.user?.profileImage || client}
                 alt={q?.user?.name || "User"}
                 width={64}
                 height={64}
