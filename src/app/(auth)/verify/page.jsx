@@ -11,7 +11,7 @@ import { useAuth } from "@/components/auth/useAuth";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; 
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const VerifyReg = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
@@ -53,22 +53,22 @@ const VerifyReg = () => {
       }
 
       const result = await updateProfile(formData).unwrap();
-      
+
       if (result.success) {
         toast.success("Address verified successfully!");
         dispatch(updateAddressStatus(true));
-        
+
         setTimeout(() => {
           if (user?.role === 'provider') {
             router.push('/bank_verification');
           } else {
-            router.push('/');
+            router.push('/referalcode');
           }
         }, 1000);
       }
     } catch (err) {
       console.error("Profile update failed:", err);
-      
+
       if (err.status === 401) {
         // Handle unauthorized error without logging out
         toast.error('Session expired. Please try again.');

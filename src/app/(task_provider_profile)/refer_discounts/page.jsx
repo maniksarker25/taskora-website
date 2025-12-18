@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import { Copy, Share, Check } from "lucide-react";
+import { Copy, Share, Check, CloudCog } from "lucide-react";
 import { TbDiscount } from "react-icons/tb";
 import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";
 import { toast } from "sonner";
@@ -10,8 +10,9 @@ const ReferDiscounts = ({ onBack }) => {
   const [copied, setCopied] = useState(false);
 
   const { data, isLoading, error } = useGetMyProfileQuery();
-  const refercode = data?.data?.referralCode;
 
+  const refercode = data?.data?.referralCode;
+  console.log("asfasf===>",refercode)
   // Sample referral data
   const referralData = [
     {
@@ -35,6 +36,7 @@ const ReferDiscounts = ({ onBack }) => {
   ];
 
   const referralCode = refercode;
+   console.log("asfasf++===>",referralCode)
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {

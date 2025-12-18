@@ -2,6 +2,7 @@ import { Geist, Geist_Mono, Poppins } from "next/font/google";
 import StoreProvider from "@/app/StoreProvider";
 import "./globals.css";
 import { SocketProvider } from "./context/SocketProvider";
+import AddressGuard from "@/components/auth/AddressGuard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,11 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} ${poppins.variable} antialiased`}
       >
         <StoreProvider>
-          <SocketProvider>{children}</SocketProvider>
+          <SocketProvider>
+            <AddressGuard>
+              {children}
+            </AddressGuard>
+          </SocketProvider>
         </StoreProvider>
       </body>
     </html>
