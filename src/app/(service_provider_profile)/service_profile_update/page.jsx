@@ -6,6 +6,7 @@ import client from "../../../../public/profile_image.jpg";
 import Link from "next/link";
 import { useGetMyProfileQuery, useUpdateProfileMutation } from "@/lib/features/auth/authApi";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
 
 const ServiceProfileInfoUpdate = () => {
   const [profileImage, setProfileImage] = useState(client);
