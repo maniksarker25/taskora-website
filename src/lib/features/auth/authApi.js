@@ -210,6 +210,14 @@ const authApi = createApi({
       }),
       invalidatesTags: ["Auth"],
     }),
+    getMyReferrals: builder.query({
+      query: (query) => ({
+        url: "/referralUse/my-referral",
+        method: "GET",
+        params: query,
+      }),
+      providesTags: ["Auth"],
+    }),
     // get single customer
     getMyProfile: builder.query({
       query: () => ({
@@ -273,6 +281,7 @@ export const {
   useVerifyResetOtpMutation,
   useVerifyUserCodeMutation,
   useApplyReferralCodeMutation,
+  useGetMyReferralsQuery,
   useGetMyProfileQuery,
   useUpgradeAccountMutation,
   useChangePasswordMutation

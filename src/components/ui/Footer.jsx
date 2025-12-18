@@ -88,8 +88,8 @@ const Footer = () => {
               </a>
             </li>
           </ul>
-           <p className="text-white text-sm mt-10">© 2023 Invitte.com
-        </p>
+           {/* <p className="text-white text-sm mt-10">© 2023 Invitte.com
+        </p> */}
           </div>
         </div>
 

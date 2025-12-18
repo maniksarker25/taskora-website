@@ -2,41 +2,32 @@
 import React, { useState } from "react";
 import { Copy, Share, Check, CloudCog } from "lucide-react";
 import { TbDiscount } from "react-icons/tb";
-import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";
+import { useGetMyProfileQuery, useGetMyReferralsQuery } from "@/lib/features/auth/authApi";
 import { toast } from "sonner";
+import { format } from "date-fns";
 
 const ReferDiscounts = ({ onBack }) => {
   const [activeTab, setActiveTab] = useState("my-discounts");
   const [copied, setCopied] = useState(false);
 
-  const { data, isLoading, error } = useGetMyProfileQuery();
+  const { data, isLoading } = useGetMyProfileQuery();
+  const { data: myReferrals, isLoading: isReferralsLoading } = useGetMyReferralsQuery();
+
+
+  console.log("myReferrals", myReferrals)
+   
 
   const refercode = data?.data?.referralCode;
-  console.log("asfasf===>",refercode)
-  // Sample referral data
-  const referralData = [
-    {
-      type: "Got a referral",
-      status: "Active",
-      value: "₦0.00",
-      appliedDate: "—",
-    },
-    {
-      type: "Got a referral",
-      status: "Used",
-      value: "₦0.00",
-      appliedDate: "Jul 15, 2025",
-    },
-    {
-      type: "Joined with a referral",
-      status: "Used",
-      value: "₦0.00",
-      appliedDate: "Jul 15, 2025",
-    },
-  ];
+
+  const referralData = myReferrals?.data?.result?.map(item => ({
+    type: item.isMeReferrer ? "Referral Reward" : "Joined Reward",
+    status: item.status,
+    value: `₦${item.value}`,
+    appliedDate: item.createdAt ? format(new Date(item.createdAt), "MMM d, yyyy") : "—"
+  })) || [];
 
   const referralCode = refercode;
-   console.log("asfasf++===>",referralCode)
+  console.log("asfasf++===>", referralCode)
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
