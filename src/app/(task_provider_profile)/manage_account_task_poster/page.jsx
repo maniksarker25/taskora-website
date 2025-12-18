@@ -5,6 +5,7 @@ import { ChevronLeft, Edit, Plus, Shield, X } from "lucide-react";
 import { CgProfile } from "react-icons/cg";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { MdManageAccounts } from "react-icons/md";
+import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";
 
 const LinkdedAccount = () => {
   const [accounts, setAccounts] = useState([
@@ -17,6 +18,9 @@ const LinkdedAccount = () => {
       isConnected: true,
     }
   ]);
+
+    const { data, isLoading } = useGetMyProfileQuery();
+    console.log(data?.data)
 
   const [showRejectModal, setShowRejectModal] = useState(false);
 
