@@ -4,7 +4,7 @@ import { Check, Calendar } from "lucide-react";
 import Image from "next/image";
 import { FaCalendar, FaMapPin, FaStar } from "react-icons/fa6";
 import { BsChatLeftText } from "react-icons/bs";
-import srvcporvider from "../../../public/women.svg";
+import srvcporvider from "../../../public/profile_image.jpg";
 import { useCreateFeedbackMutation, useGetMyFeedbackQuery } from "@/lib/features/feedback/feedbackApi";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";

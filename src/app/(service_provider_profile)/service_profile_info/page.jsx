@@ -2,7 +2,7 @@
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import React from "react";
-import client from "../../../../public/client.png";
+import client from "../../../../public/profile_image.jpg";
 import Link from "next/link";
 import { CgProfile } from "react-icons/cg";
 import { useSelector } from "react-redux";
@@ -106,13 +106,13 @@ const ServiceProfileInfo = () => {
             {/* Desktop Layout */}
             <div className="hidden lg:flex lg:items-start lg:gap-12">
               {/* Profile Image - Desktop */}
-              <div className="flex-shrink-0 w-36 h-36">
+              <div className="flex-shrink-0 w-30 h-30">
                 <Image
                   src={userData?.profile_image || client}
                   alt="profile"
                   width={200}
                   height={200}
-                  className="rounded-full h-full w-full object-cover border-4 border-gray-100 shadow-lg"
+                  className="rounded-full h-full w-full object-cover border-2 border-gray-100 "
                 />
               </div>
 
