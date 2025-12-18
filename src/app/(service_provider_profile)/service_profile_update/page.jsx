@@ -62,9 +62,9 @@ const ServiceProfileInfoUpdate = () => {
       reader.onload = (e) => {
         setProfileImage(e.target.result);
         setProfileImageFile(file);
-        toast.success(
-          'Profile image selected! Click "Save Changes" to upload.'
-        );
+        // toast.success(
+        //   'Profile image selected! Click "Save Changes" to upload.'
+        // );
       };
       reader.readAsDataURL(file);
     }
