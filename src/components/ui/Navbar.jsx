@@ -13,6 +13,7 @@ import { RiUserSettingsFill } from "react-icons/ri";
 import { PiSignOutBold } from "react-icons/pi";
 import { FaHandshake } from "react-icons/fa";
 import { logout } from "@/lib/features/auth/authSlice";
+import client from "../../../public/profile_image.jpg";
 import { toast } from "sonner";
 import { useGetMyProfileQuery, useUpgradeAccountMutation } from "@/lib/features/auth/authApi";
 
@@ -24,14 +25,14 @@ const Navbar = () => {
   const [mounted, setMounted] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [desktopProfileOpen, setDesktopProfileOpen] = useState(false);
-  
+
   const dispatch = useDispatch();
   const router = useRouter();
   const [upgradeAccount, { isLoading: isUpgrading }] = useUpgradeAccountMutation();
   const { data, isLoading, error } = useGetMyProfileQuery();
   const multiUserverify = data?.data.user.isMultiRole
- 
-  
+
+
   const userData = data?.data
 
   const handleLogout = () => {
@@ -40,44 +41,44 @@ const Navbar = () => {
     router.push("/login");
   };
 
-const handleUpgradeAccount = async () => {
+  const handleUpgradeAccount = async () => {
 
-  try {
-    const result = await upgradeAccount().unwrap();
-    const data = result?.data;
+    try {
+      const result = await upgradeAccount().unwrap();
+      const data = result?.data;
 
-  
 
-    if (data?.role === "provider") {
-      if (!data.isAddressProvided) {
-        router.push("/verify");
-        return;
+
+      if (data?.role === "provider") {
+        if (!data.isAddressProvided) {
+          router.push("/verify");
+          return;
+        }
+
+        if (!data.isBankNumberVerified) {
+          router.push("/bank_verification");
+          return;
+        }
+
+        if (!data.isIdentificationDocumentVerified) {
+          router.push("/id_card_verify");
+          return;
+        }
+
+        router.push("/");
       }
 
-      if (!data.isBankNumberVerified) {
-        router.push("/bank_verification");
-        return;
+      if (result?.success) {
+        toast.success(result.message || "Account upgraded successfully");
+        setDesktopProfileOpen(false);
+        setProfileOpen(false);
       }
 
-      if (!data.isIdentificationDocumentVerified) {
-        router.push("/id_card_verify");
-        return;
-      }
+    } catch (error) {
 
-      router.push("/"); 
+      toast.error(error?.data?.message || "Account upgrade failed");
     }
-
-    if (result?.success) {
-      toast.success(result.message || "Account upgraded successfully");
-      setDesktopProfileOpen(false);
-      setProfileOpen(false);
-    }
-
-  } catch (error) {
-   
-    toast.error(error?.data?.message || "Account upgrade failed");
-  }
-};
+  };
 
 
   useEffect(() => {
@@ -179,22 +180,20 @@ const handleUpgradeAccount = async () => {
     <div className="flex flex-col lg:items-center lg:flex-row gap-3">
       <Link
         href="/login"
-        className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${
-          pathname === "/login"
+        className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${pathname === "/login"
             ? "bg-[#115e59] text-white"
             : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
-        }`}
+          }`}
       >
         Log In
       </Link>
 
       <Link
         href="/role"
-        className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${
-          pathname !== "/login"
+        className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${pathname !== "/login"
             ? "bg-[#115e59] text-white"
             : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
-        }`}
+          }`}
       >
         Register
       </Link>
@@ -230,12 +229,12 @@ const handleUpgradeAccount = async () => {
         id="desktop-avatar-button"
         onClick={() => setDesktopProfileOpen(!desktopProfileOpen)}
         className="btn btn-ghost btn-circle avatar focus:outline-none cursor-pointer"
-       
+
       >
         <div className="w-12 rounded-full overflow-hidden">
           <img
             alt={userData?.name}
-            src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
+            src={userData?.profile_image || client.src}
             className="w-full h-full object-cover"
           />
         </div>
@@ -249,14 +248,14 @@ const handleUpgradeAccount = async () => {
             <div className="w-16 h-16 overflow-hidden rounded-xl">
               <img
                 alt="Profile"
-                src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
+                src={userData?.profile_image || client.src}
                 className="w-full h-full object-cover"
               />
             </div>
             <div>
-              <p className="text-xl font-bold">{userData?.name}</p>
-              <p className="text-gray-600">{user?.email}</p>
-              <p className="text-sm text-[#115e59] font-medium">{user?.role}</p>
+              <p className="text-base font-bold">{userData?.name}</p>
+              <p className="text-xs text-gray-600">{user?.email}</p>
+              <p className="text-xs text-[#115e59] font-medium">{user?.role}</p>
             </div>
           </div>
 
@@ -287,9 +286,8 @@ const handleUpgradeAccount = async () => {
           </Link>
 
           <button
-            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${
-              isUpgrading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
+            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${isUpgrading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             onClick={handleUpgradeAccount}
             disabled={isUpgrading}
           >
@@ -331,7 +329,7 @@ const handleUpgradeAccount = async () => {
         <div className="w-12 rounded-full overflow-hidden">
           <img
             alt="User Avatar"
-            src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
+            src={userData?.profile_image || client.src}
             className="w-full h-full object-cover"
           />
         </div>
@@ -345,12 +343,12 @@ const handleUpgradeAccount = async () => {
             <div className="w-16 h-16 overflow-hidden rounded-xl">
               <img
                 alt="Profile"
-                src={userData?.profile_image || "https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"}
+                src={userData?.profile_image || client.src}
                 className="w-full h-full object-cover"
               />
             </div>
             <div>
-              <p className="text-xl font-bold">{userData?.name}</p>
+              <p className="text-base font-bold">{userData?.name}</p>
               <p className="text-gray-600">{user?.email}</p>
               <p className="text-sm text-[#115e59] font-medium">{user?.role}</p>
             </div>
@@ -383,9 +381,8 @@ const handleUpgradeAccount = async () => {
           </Link>
 
           <button
-            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${
-              isUpgrading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
+            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${isUpgrading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             onClick={handleUpgradeAccount}
             disabled={isUpgrading}
           >
@@ -425,23 +422,21 @@ const handleUpgradeAccount = async () => {
         <div className="w-10 h-10 rounded-full overflow-hidden">
           <img
             alt="User Avatar"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+            src={userData?.profile_image || client.src}
             className="w-full h-full object-cover"
           />
         </div>
         <span className="font-medium">My Account (Customer)</span>
         <div
-          className={`ml-auto transform transition-transform ${
-            profileOpen ? "rotate-180" : ""
-          }`}
+          className={`ml-auto transform transition-transform ${profileOpen ? "rotate-180" : ""
+            }`}
         >
           ▼
         </div>
       </button>
       <div
-        className={`transition-all duration-500 overflow-hidden ${
-          profileOpen ? "max-h-[400px] mt-4" : "max-h-0"
-        }`}
+        className={`transition-all duration-500 overflow-hidden ${profileOpen ? "max-h-[400px] mt-4" : "max-h-0"
+          }`}
       >
         <div className="flex flex-col gap-2">
           <Link className={getProfileLinkClass("/my_task")} href="/my_task">
@@ -462,9 +457,8 @@ const handleUpgradeAccount = async () => {
           </Link>
 
           <button
-            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${
-              isUpgrading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
+            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${isUpgrading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             onClick={handleUpgradeAccount}
             disabled={isUpgrading}
           >
@@ -504,23 +498,21 @@ const handleUpgradeAccount = async () => {
         <div className="w-10 h-10 rounded-full overflow-hidden">
           <img
             alt="User Avatar"
-            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp"
+            src={userData?.profile_image || client.src}
             className="w-full h-full object-cover"
           />
         </div>
         <span className="font-medium">My Account (Provider)</span>
         <div
-          className={`ml-auto transform transition-transform ${
-            profileOpen ? "rotate-180" : ""
-          }`}
+          className={`ml-auto transform transition-transform ${profileOpen ? "rotate-180" : ""
+            }`}
         >
           ▼
         </div>
       </button>
       <div
-        className={`transition-all duration-500 overflow-hidden ${
-          profileOpen ? "max-h-[400px] mt-4" : "max-h-0"
-        }`}
+        className={`transition-all duration-500 overflow-hidden ${profileOpen ? "max-h-[400px] mt-4" : "max-h-0"
+          }`}
       >
         <div className="flex flex-col gap-2">
           <Link className={getProfileLinkClass("/my_bids")} href="/my_bids">
@@ -541,9 +533,8 @@ const handleUpgradeAccount = async () => {
           </Link>
 
           <button
-            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${
-              isUpgrading ? "opacity-70 cursor-not-allowed" : ""
-            }`}
+            className={`flex items-center gap-2 text-lg hover:bg-green-50 hover:text-[#115E59] px-3 py-2 rounded-md transition-colors ${isUpgrading ? "opacity-70 cursor-not-allowed" : ""
+              }`}
             onClick={handleUpgradeAccount}
             disabled={isUpgrading}
           >
@@ -553,7 +544,7 @@ const handleUpgradeAccount = async () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                   {multiUserverify ? "Switching..." : " Upgrading..."}
+                {multiUserverify ? "Switching..." : " Upgrading..."}
               </>
             ) : (
               <>
@@ -588,17 +579,15 @@ const handleUpgradeAccount = async () => {
 
   return (
     <nav
-      className={`w-full bg-white shadow-sm sticky top-0 z-50 py-2 transform transition-transform duration-500 ${
-        isVisible ? "translate-y-0" : "-translate-y-full"
-      }`}
+      className={`w-full bg-white shadow-sm sticky top-0 z-50 py-2 transform transition-transform duration-500 ${isVisible ? "translate-y-0" : "-translate-y-full"
+        }`}
     >
       <div className="max-w-[1240px] mx-auto px-6 py-3 flex items-center justify-between">
         {/* Logo */}
         <Link
           href="/"
-          className={`flex items-center gap-2 transition duration-300 hover:scale-105 ${
-            pathname === "/" ? "opacity-100" : "opacity-90 hover:opacity-100"
-          }`}
+          className={`flex items-center gap-2 transition duration-300 hover:scale-105 ${pathname === "/" ? "opacity-100" : "opacity-90 hover:opacity-100"
+            }`}
         >
           <Image
             className="h-10 lg:h-12"
@@ -631,9 +620,8 @@ const handleUpgradeAccount = async () => {
 
       {/*  Mobile Dropdown  */}
       <div
-        className={`lg:hidden bg-white shadow-md px-6 overflow-hidden transition-all duration-500 border-t border-gray-100 ${
-          isOpen ? "max-h-[700px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
-        }`}
+        className={`lg:hidden bg-white shadow-md px-6 overflow-hidden transition-all duration-500 border-t border-gray-100 ${isOpen ? "max-h-[700px] opacity-100 py-4" : "max-h-0 opacity-0 py-0"
+          }`}
       >
         {role === "guest" && (
           <>

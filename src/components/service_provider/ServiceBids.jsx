@@ -3,7 +3,7 @@ import { FaMapMarkerAlt } from "react-icons/fa";
 import { MdDateRange, MdMessage } from "react-icons/md";
 import { BsChatLeftText } from "react-icons/bs";
 import Link from "next/link";
-import srvcporvider from "../../../public/women.svg";
+import srvcporvider from "../../../public/profile_image.jpg";
 import Image from "next/image";
 
 const bids = [

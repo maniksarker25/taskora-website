@@ -2,7 +2,7 @@
 import { ArrowLeft, Camera, Upload, X, Check, User } from "lucide-react";
 import Image from "next/image";
 import React, { useState, useRef, useEffect } from "react";
-import client from "../../../../public/client.png";
+import client from "../../../../public/profile_image.jpg";
 import Link from "next/link";
 import {
   useGetMyProfileQuery,
