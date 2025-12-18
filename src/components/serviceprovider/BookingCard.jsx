@@ -1,8 +1,6 @@
 "use client";
 
 import React from "react";
-import { MapPin, Clock, Shield, MessageCircle, CloudCog } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";

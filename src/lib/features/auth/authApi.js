@@ -202,6 +202,14 @@ const authApi = createApi({
       }),
       invalidatesTags: ["Auth"],
     }),
+    applyReferralCode: builder.mutation({
+      query: (data) => ({
+        url: "/referralUse/apply-referral-code",
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
     // get single customer
     getMyProfile: builder.query({
       query: () => ({
@@ -211,7 +219,7 @@ const authApi = createApi({
       providesTags: ["Auth"],
     }),
 
-     // Account Upgrade API 
+    // Account Upgrade API 
     upgradeAccount: builder.mutation({
       query: () => ({
         url: "/user/upgrade-account",
@@ -221,27 +229,27 @@ const authApi = createApi({
         try {
           const { data } = await queryFulfilled;
           console.log("Account upgrade response:", data);
-          
+
           if (data.success && data.data) {
             const { accessToken, refreshToken, role, isAddressProvided } = data.data;
-            
+
             storeTokens(accessToken, refreshToken);
             dispatch(
-              setCredentials({ 
-                accessToken, 
-                refreshToken, 
+              setCredentials({
+                accessToken,
+                refreshToken,
                 isAddressProvided,
-                role 
+                role
               })
             );
-            
+
             if (typeof window !== "undefined") {
               localStorage.setItem(
                 "isAddressProvided",
                 isAddressProvided ? "true" : "false"
               );
             }
-            
+
             console.log("Account upgraded successfully. Role:", role);
           }
         } catch (error) {
@@ -250,7 +258,7 @@ const authApi = createApi({
       },
       invalidatesTags: ["Auth"],
     }),
-     // Change Password API
+    // Change Password API
     changePassword: builder.mutation({
       query: (passwordData) => ({
         url: "/auth/change-password",
@@ -260,7 +268,7 @@ const authApi = createApi({
       }),
       invalidatesTags: ["Auth"],
     }),
-    
+
   }),
 });
 
@@ -271,6 +279,7 @@ export const {
   useForgetPasswordMutation,
   useVerifyResetOtpMutation,
   useVerifyUserCodeMutation,
+  useApplyReferralCodeMutation,
   useGetMyProfileQuery,
   useUpgradeAccountMutation,
   useChangePasswordMutation
