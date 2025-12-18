@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import React, { useEffect } from "react";
-import client from "../../../../public/client.png";
+import client from "../../../../public/profile_image.jpg";
 import Link from "next/link";
 import { CgProfile } from "react-icons/cg";
 import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";

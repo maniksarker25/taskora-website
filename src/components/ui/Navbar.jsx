@@ -66,6 +66,8 @@ const Navbar = () => {
         }
 
         router.push("/");
+      } else if (data?.role === "customer") {
+        router.push("/");
       }
 
       if (result?.success) {
@@ -181,8 +183,8 @@ const Navbar = () => {
       <Link
         href="/login"
         className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${pathname === "/login"
-            ? "bg-[#115e59] text-white"
-            : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
+          ? "bg-[#115e59] text-white"
+          : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
           }`}
       >
         Log In
@@ -191,8 +193,8 @@ const Navbar = () => {
       <Link
         href="/role"
         className={`px-6 py-2 border-2 border-[#115e59] rounded-md transition ${pathname !== "/login"
-            ? "bg-[#115e59] text-white"
-            : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
+          ? "bg-[#115e59] text-white"
+          : "text-[#115e59] hover:bg-[#115e59] hover:text-white"
           }`}
       >
         Register

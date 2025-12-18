@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from "react";
 import Image from "next/image";
-import client from "../../../public/client.png";
+import client from "../../../public/profile_image.jpg";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import { useSocketContext } from "@/app/context/SocketProvider";

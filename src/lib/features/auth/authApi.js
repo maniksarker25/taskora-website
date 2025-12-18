@@ -243,13 +243,6 @@ const authApi = createApi({
               })
             );
 
-            if (typeof window !== "undefined") {
-              localStorage.setItem(
-                "isAddressProvided",
-                isAddressProvided ? "true" : "false"
-              );
-            }
-
             console.log("Account upgraded successfully. Role:", role);
           }
         } catch (error) {

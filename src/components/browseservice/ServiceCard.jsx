@@ -5,7 +5,7 @@ import { LuMapPin } from "react-icons/lu";
 import { SlCalender } from "react-icons/sl";
 import { IoTimerOutline } from "react-icons/io5";
 import Image from "next/image";
-import userImage from "../../../public/task_img.png";
+import userImage from "../../../public/profile_image.jpg";
 
 const ServiceCard = ({ task, isActive = false }) => {
   // console.log("taskkkskjfkasdjflksj===>>>>>>>",task)

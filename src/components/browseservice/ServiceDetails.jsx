@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { ChevronLeft, MapPin, Calendar, Star, Clock, Languages } from "lucide-react";
-import client from "../../../public/client.png";
+import client from "../../../public/profile_image.jpg";
 import Image from "next/image";
 import Link from "next/link";
 

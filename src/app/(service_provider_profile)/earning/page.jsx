@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight, Mail, DollarSign } from 'lucide-react';
 import { CgProfile } from 'react-icons/cg';
-import { FaMoneyBillTransfer } from 'react-icons/fa6';
+import { FaMoneyBillTransfer, FaNairaSign } from 'react-icons/fa6';
 import { TbCurrencyNaira } from 'react-icons/tb';
 
 const page = () => {
@@ -86,9 +86,7 @@ const page = () => {
               <p className="text-lg text-[#115e59] font-medium mb-2">Total Earnings</p>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900">₦ 1285.66</h2>
             </div>
-            <div className="bg-teal-100 p-3 rounded-lg">
-              <DollarSign className="w-6 h-6 text-[#c0d9d3]" />
-            </div>
+          
           </div>
         </div>
 
