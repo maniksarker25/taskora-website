@@ -240,9 +240,9 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
               key={bid._id}
               className="flex flex-col lg:flex-row gap-4 p-4 border rounded-lg"
             >
-              <div className="flex flex-col justify-between gap-10 bg-[#E6F4F1] rounded-xl px-4 py-4 ">
-                <div className="flex flex-wrap lg:justify-between items-center gap-4 md:gap-8">
-                  <div className="w-14 h-14 md:w-24 md:h-24 rounded-full overflow-clip">
+              <div className="flex flex-col justify-between gap-10 bg-[#E6F4F1] rounded-xl px-4 py-4 md:max-h-[200px] min-h-[150px]">
+                <div className="flex flex-wrap lg:justify-between items-center gap-4 md:gap-4">
+                  <div className="w-8 h-8 md:w-12 md:h-12 rounded-full overflow-clip">
                     <Image
                       src={bid?.provider?.profile_image || client}
                       alt={bid?.provider?.name || "Provider"}
@@ -251,32 +251,39 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="">
-                    <h4 className="font-semibold md:text-xl">{bid?.provider?.name || "Anonymous"}</h4>
-                    <p className="flex items-center text-gray-500 gap-1 text-sm md:text-base">
-                      <FaStar className="text-yellow-500 text-sm md:text-base" />
+                  <div className="flex flex-col gap-2">
+                    <h4 className="font-semibold md:text-base">{bid?.provider?.name || "Anonymous"}</h4>
+                    
+                   <div className='flex items-center gap-2 justify-between'>
+                         <div>
+                       <p className="flex items-center text-gray-500 gap-1 text-xs">
+                      <FaStar className="text-yellow-500 text-xs" />
                       {bid?.provider?.totalRatingCount || "0"} Reviews
                     </p>
-                  </div>
-                  <div>
-                    <p className="font-semibold text-xl md:text-3xl">
+                    </div>
+
+                     <div>
+                    <p className="font-semibold text-base text-gray-500">
                       ₦ {bid.price || "0"}
                     </p>
                   </div>
+                   </div>
+                  </div>
+                 
                 </div>
 
                 {(user?.profileId === bid?.provider?.profileId || user?.profileId === bid?.provider?._id) && (
                   <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={() => handleEditClick(bid)}
-                      className="px-4 py-2 rounded-lg font-medium transition-colors bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
+                      className="px-4 py-2 rounded-lg font-medium transition-colors bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer text-xs"
                     >
                       Update Bid
                     </button>
                     <button
                       onClick={() => handleDeleteBid(bid._id)}
                       disabled={isDeleting}
-                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isDeleting
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors text-xs ${!isDeleting
                         ? "bg-red-500 text-white hover:bg-red-700 cursor-pointer"
                         : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
@@ -287,7 +294,7 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
                 )}
               </div>
 
-              <div className="flex-1">
+              <div className="flex-1 max-h-[200px] md:max-h-[400px] overflow-y-auto">
                 <p className="text-gray-600 text-sm mt-2">{bid.details || "No details provided"}</p>
                 <div className="flex justify-between items-center mt-6">
                   <p className="text-sm text-gray-500">
