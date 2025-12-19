@@ -4,7 +4,7 @@ import { MdDateRange } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import Image from 'next/image';
 import { toast } from "sonner";
-import { useCreateBidMutation, useDeleteBidMutation } from '@/lib/features/bidApi/bidApi';
+import { useCreateBidMutation, useDeleteBidMutation, useUpdateBidMutation } from '@/lib/features/bidApi/bidApi';
 import { useAuth } from '@/components/auth/useAuth';
 import { User } from 'lucide-react';
 import { FaStar } from 'react-icons/fa6';
@@ -14,7 +14,9 @@ import client from "../../../public/profile_image.jpg";
 const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBids }) => {
   const info = bidsData?.data?.result || [];
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
+  const [editingBid, setEditingBid] = useState(null);
   const [createBid, { isLoading: isSubmittingBid }] = useCreateBidMutation();
+  const [updateBid, { isLoading: isUpdatingBid }] = useUpdateBidMutation();
   const [deleteBid, { isLoading: isDeleting }] = useDeleteBidMutation();
   const [activeTab, setActiveTab] = useState("bids");
   const [taskStatus, setTaskStatus] = useState(taskDetails?.status || "OPEN_FOR_BID");
@@ -51,7 +53,7 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
           },
           duration: 3000,
         });
-        
+
         if (refetchBids && typeof refetchBids === 'function') {
           refetchBids();
         } else {
@@ -71,7 +73,7 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
       }
     } catch (error) {
       console.error("Failed to delete bid:", error);
-      
+
       if (error?.status === 'FETCH_ERROR' || error?.status === 'PARSING_ERROR') {
         toast.error("Network error. Please check your connection.", {
           style: {
@@ -97,12 +99,22 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
     }
   };
 
+  const handleEditClick = (bid) => {
+    setEditingBid(bid);
+    setIsBidModalOpen(true);
+  };
+
   const handleBidSubmit = async (bidData) => {
     try {
-      const result = await createBid(bidData).unwrap();
+      let result;
+      if (editingBid) {
+        result = await updateBid({ id: editingBid._id, ...bidData }).unwrap();
+      } else {
+        result = await createBid(bidData).unwrap();
+      }
 
       if (result.success) {
-        toast.success("Bid sent successfully!", {
+        toast.success(editingBid ? "Bid updated successfully!" : "Bid sent successfully!", {
           style: {
             backgroundColor: "#d1fae5",
             color: "#065f46",
@@ -111,7 +123,8 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
           duration: 3000,
         });
         setIsBidModalOpen(false);
-        
+        setEditingBid(null);
+
         // Refetch bids after successful submission
         if (refetchBids && typeof refetchBids === 'function') {
           refetchBids();
@@ -252,18 +265,26 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
                   </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <button
-                    onClick={() => handleDeleteBid(bid._id)}
-                    disabled={isDeleting}
-                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isDeleting
-                      ? "bg-red-500 text-white hover:bg-red-700 cursor-pointer"
-                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      }`}
-                  >
-                    {isDeleting ? "Deleting..." : "Delete Bid"}
-                  </button>
-                </div>
+                {(user?.profileId === bid?.provider?.profileId || user?.profileId === bid?.provider?._id) && (
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <button
+                      onClick={() => handleEditClick(bid)}
+                      className="px-4 py-2 rounded-lg font-medium transition-colors bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
+                    >
+                      Update Bid
+                    </button>
+                    <button
+                      onClick={() => handleDeleteBid(bid._id)}
+                      disabled={isDeleting}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isDeleting
+                        ? "bg-red-500 text-white hover:bg-red-700 cursor-pointer"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        }`}
+                    >
+                      {isDeleting ? "Deleting..." : "Delete Bid"}
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="flex-1">
@@ -280,7 +301,10 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
           <div className="text-center py-8">
             <p className="text-gray-600 mb-4">No bids yet. Be the first to bid on this task!</p>
             <button
-              onClick={() => setIsBidModalOpen(true)}
+              onClick={() => {
+                setEditingBid(null);
+                setIsBidModalOpen(true);
+              }}
               className="bg-[#115E59] hover:bg-[#0a7c75] text-white px-6 py-3 rounded-lg font-medium transition-colors cursor-pointer"
             >
               Submit A Bid
@@ -358,10 +382,14 @@ const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBid
       {/* Bid Modal */}
       <BidModal
         isOpen={isBidModalOpen}
-        onClose={() => setIsBidModalOpen(false)}
+        onClose={() => {
+          setIsBidModalOpen(false);
+          setEditingBid(null);
+        }}
         task={bidModalTaskData}
         onSubmit={handleBidSubmit}
-        isLoading={isSubmittingBid}
+        isLoading={isSubmittingBid || isUpdatingBid}
+        initialData={editingBid}
       />
     </div>
   )
