@@ -9,7 +9,7 @@ import { useSocketContext } from "@/app/context/SocketProvider";
 const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
   const router = useRouter();
   const { user } = useAuth();
-    const { socket, isConnected ,sendMessageSoket, seenMessage} = useSocketContext();
+  const { socket, isConnected, sendMessageSoket, seenMessage } = useSocketContext();
 
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,32 +21,32 @@ const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
       return;
     }
 
-    setIsModalOpen(true); 
+    setIsModalOpen(true);
   };
 
   const handleSend = () => {
-     const userID =  user?.role !== "customer" ? taskDetails?.customer?._id : taskDetails?.provider?._id ;
-     if(!message.trim()){
+    const userID = user?.role !== "customer" ? taskDetails?.customer?._id : taskDetails?.provider?._id;
+    if (!message.trim()) {
       toast.error("Message cannot be empty");
       return;
-     }
-     if(!userID){
+    }
+    if (!userID) {
       toast.error("Unable to identify the recipient.");
       return;
-     }
+    }
 
-   const data =  {
-    text:message,
-    imageUrl:[""],
-    pdfUrl:[""],
-    receiver:userID
-  }
+    const data = {
+      text: message,
+      imageUrl: [""],
+      pdfUrl: [""],
+      receiver: userID
+    }
 
- const res = sendMessageSoket(data);
- 
-  setMessage(""); 
-  setIsModalOpen(false)
-  router.push("/chat")
+    const res = sendMessageSoket(data);
+
+    setMessage("");
+    setIsModalOpen(false)
+    router.push("/chat")
   };
 
   return (
@@ -95,11 +95,10 @@ const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
         <button
           onClick={handleChatClick}
           disabled={taskDetails?.status && taskDetails.status !== "IN_PROGRESS"}
-          className={`px-6 py-2.5 rounded-md transition transform duration-300 hover:scale-105 flex gap-2 items-center justify-center mt-12 ${
-            taskDetails?.status && taskDetails.status !== "IN_PROGRESS"
+          className={`px-6 py-2.5 rounded-md transition transform duration-300 hover:scale-105 flex gap-2 items-center justify-center mt-12 ${taskDetails?.status && taskDetails.status !== "IN_PROGRESS"
               ? "bg-gray-300 text-gray-700 cursor-not-allowed"
               : "bg-[#115e59] text-white hover:bg-teal-800 cursor-pointer"
-          }`}
+            }`}
         >
           <MessageCircle className="w-4 h-4" />
           Chat Now

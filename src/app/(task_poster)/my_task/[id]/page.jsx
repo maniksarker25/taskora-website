@@ -29,7 +29,7 @@ const TaskDetails = () => {
   } = useGetTaskByIdQuery(taskId);
   const taskDetails = taskData?.data;
 
-  console.log("taskDetails",taskDetails)
+  console.log("taskDetails", taskDetails)
 
   const {
     data: questionsData,
@@ -72,28 +72,28 @@ const TaskDetails = () => {
   // Status badge configuration
   const getStatusConfig = (status) => {
     const config = {
-      "OPEN_FOR_BID": { 
-        color: "bg-blue-50 text-blue-700 border-blue-200", 
+      "OPEN_FOR_BID": {
+        color: "bg-blue-50 text-blue-700 border-blue-200",
         text: "Open for bids",
         badgeColor: "bg-blue-500"
       },
-      "ASSIGNED": { 
-        color: "bg-purple-50 text-purple-700 border-purple-200", 
+      "ASSIGNED": {
+        color: "bg-purple-50 text-purple-700 border-purple-200",
         text: "Assigned",
         badgeColor: "bg-purple-500"
       },
-      "IN_PROGRESS": { 
-        color: "bg-orange-50 text-orange-700 border-orange-200", 
+      "IN_PROGRESS": {
+        color: "bg-orange-50 text-orange-700 border-orange-200",
         text: "In Progress",
         badgeColor: "bg-orange-500"
       },
-      "COMPLETED": { 
-        color: "bg-green-50 text-green-700 border-green-200", 
+      "COMPLETED": {
+        color: "bg-green-50 text-green-700 border-green-200",
         text: "Completed",
         badgeColor: "bg-green-500"
       },
-      "CANCELLED": { 
-        color: "bg-red-50 text-red-700 border-red-200", 
+      "CANCELLED": {
+        color: "bg-red-50 text-red-700 border-red-200",
         text: "Cancelled",
         badgeColor: "bg-red-500"
       }
@@ -106,7 +106,7 @@ const TaskDetails = () => {
   // Get available status tabs based on current backend status
   const getAvailableStatusTabs = () => {
     const backendStatus = taskDetails?.status;
-    
+
     switch (backendStatus) {
       case "OPEN_FOR_BID":
         return ["Bids"];
@@ -191,22 +191,22 @@ const TaskDetails = () => {
                 <p className="text-sm text-gray-500 font-mono bg-gray-50 px-3 py-1.5 rounded-lg inline-block">
                   {taskDetails?._id}
                 </p>
-                
+
                 {/* Status and Info Grid */}
                 <div className="flex flex-wrap items-center gap-4 mt-4">
                   <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-semibold ${statusConfig.color}`}>
                     <div className={`w-2 h-2 rounded-full ${statusConfig.badgeColor} animate-pulse`}></div>
                     {statusConfig.text}
                   </span>
-                  
+
                   {taskDetails?.budget && (
                     <div className="flex items-center gap-2 text-gray-700">
-                      
+
                       <span className="font-semibold text-xl">₦ {taskDetails?.customerPayingAmount}</span>
                     </div>
                   )}
-                  
-                 
+
+
                 </div>
               </div>
             </div>
@@ -216,7 +216,7 @@ const TaskDetails = () => {
           {taskDetails?.task_attachments?.length > 0 && (
             <div className="p-6 lg:p-8 border-b border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Task Attachments</h3>
-              
+
               {/* Main Image */}
               <div className="relative rounded-xl overflow-hidden bg-gray-100 mb-4">
                 <Image
@@ -236,11 +236,10 @@ const TaskDetails = () => {
                     <button
                       key={index}
                       onClick={() => setActiveImageIndex(index)}
-                      className={`flex-shrink-0 relative rounded-lg overflow-hidden border-2 transition-all duration-200 ${
-                        activeImageIndex === index 
-                          ? 'border-teal-500 ring-2 ring-teal-200' 
+                      className={`flex-shrink-0 relative rounded-lg overflow-hidden border-2 transition-all duration-200 ${activeImageIndex === index
+                          ? 'border-teal-500 ring-2 ring-teal-200'
                           : 'border-gray-200 hover:border-teal-300'
-                      }`}
+                        }`}
                     >
                       <Image
                         src={img || srvcporvider}
@@ -260,28 +259,28 @@ const TaskDetails = () => {
           <div className="p-6 lg:p-8">
             <div className="min-h-[400px]">
               {currentStatus === "Bids" && (
-                <Bids 
-                  taskDetails={taskDetails} 
-                  bidsData={bidsData} 
+                <Bids
+                  taskDetails={taskDetails}
+                  bidsData={bidsData}
                   questionsData={questionsData}
                 />
               )}
               {currentStatus === "Progress" && (
-                <Progress 
-                  taskId={taskId} 
-                  taskDetails={taskDetails} 
+                <Progress
+                  taskId={taskId}
+                  taskDetails={taskDetails}
                   bidsData={bidsData}
                 />
               )}
               {currentStatus === "Completed" && (
-                <Completed 
-                  taskDetails={taskDetails} 
-                  bidsData={bidsData} 
+                <Completed
+                  taskDetails={taskDetails}
+                  bidsData={bidsData}
                 />
               )}
               {currentStatus === "Cancelled" && (
-                <Cancelled 
-                  taskDetails={taskDetails} 
+                <Cancelled
+                  taskDetails={taskDetails}
                 />
               )}
             </div>
@@ -291,7 +290,7 @@ const TaskDetails = () => {
 
       {/* Resolution Modal */}
       {showResolutionModal && (
-        <ResolutionModal 
+        <ResolutionModal
           taskId={taskId}
           taskDetails={taskDetails}
           onClose={() => setShowResolutionModal(false)}
