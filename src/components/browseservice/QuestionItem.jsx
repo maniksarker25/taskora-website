@@ -9,14 +9,14 @@ import { MessageCircle } from "lucide-react";
 
 const QuestionItem = ({ question, task }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-   const [message, setMessage] = useState("");
+  const [message, setMessage] = useState("");
   const userID = useSelector((state) => state?.auth?.user?.profileId);
   const user = useSelector((state) => state?.auth?.user?.role);
   const users = useSelector((state) => state?.auth?.user);
   const customerId = task?.customer?._id;
   const { socket, isConnected, sendMessageSoket, seenMessage } = useSocketContext();
 
-  console.log("tasksksfksdjlfksadj",task)
+  console.log("tasksksfksdjlfksadj", task)
 
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
@@ -32,7 +32,7 @@ const QuestionItem = ({ question, task }) => {
     return `${diffInDays} days ago`;
   };
 
-//   modal
+  //   modal
   const handleChatClick = () => {
     // if (!user?.role) {
     //   toast.error("Please log in to access the chat feature.");
@@ -42,15 +42,17 @@ const QuestionItem = ({ question, task }) => {
     setIsModalOpen(true);
   };
 
-//   send sms
- const handleSend = () => {
-    const userIDrole = users?.role !== "customer" ? task?.customer?._id : task?.provider?._id;
-    
+  //   send sms
+  const handleSend = () => {
+    // logic: Only customer sees this button (userID === customerId check in render)
+    // So the receiver should be the provider who asked the question.
+    const receiverId = question?.provider?._id || question?.provider?.profileId;
+
     if (!message.trim()) {
       toast.error("Message cannot be empty");
       return;
     }
-    if (!userIDrole) {
+    if (!receiverId) {
       toast.error("Unable to identify the recipient.");
       return;
     }
@@ -59,7 +61,7 @@ const QuestionItem = ({ question, task }) => {
       text: message,
       imageUrl: [""],
       pdfUrl: [""],
-      receiver: userIDrole
+      receiver: receiverId
     }
 
 
@@ -108,9 +110,9 @@ const QuestionItem = ({ question, task }) => {
 
           {userID === customerId && (
             <div className="flex mt-10">
-              <button 
-              onClick={handleChatClick}
-              className="px-10 py-2 bg-[#115E59] text-white rounded-md hover:bg-[#0d726b] cursor-pointer">
+              <button
+                onClick={handleChatClick}
+                className="px-10 py-2 bg-[#115E59] text-white rounded-md hover:bg-[#0d726b] cursor-pointer">
                 Chat
               </button>
             </div>
@@ -118,7 +120,7 @@ const QuestionItem = ({ question, task }) => {
         </div>
       </div>
 
-        {/*  CHAT MODAL */}
+      {/*  CHAT MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/30 bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white w-11/12 max-w-md p-5 rounded-lg shadow-lg">
@@ -139,14 +141,14 @@ const QuestionItem = ({ question, task }) => {
             ></textarea>
 
             {/* Send Button */}
-          <button
-          onClick={() => handleSend()}
-          disabled={task?.status && task.status !== "IN_PROGRESS"}
-          className={`px-6 py-2.5 rounded-md transition transform duration-300 hover:scale-105 flex gap-2 items-center justify-center mt-12 ${task?.status && task.status !== "IN_PROGRESS" ? "bg-gray-300 text-gray-700 cursor-not-allowed" : "bg-[#115e59] text-white hover:bg-teal-800 cursor-pointer"}`}
-        >
-          <MessageCircle className="w-4 h-4" />
-          Chat Now
-        </button>
+            <button
+              onClick={() => handleSend()}
+              // disabled={task?.status === "COMPLETED" || task?.status === "CANCELLED"}
+              className={`px-6 py-2.5 rounded-md transition transform duration-300 hover:scale-105 flex gap-2 items-center justify-center mt-12 ${(task?.status === "COMPLETED" || task?.status === "CANCELLED") ? "bg-gray-300 text-gray-700 cursor-not-allowed" : "bg-[#115e59] text-white hover:bg-teal-800 cursor-pointer"}`}
+            >
+              <MessageCircle className="w-4 h-4" />
+              Chat Now
+            </button>
           </div>
         </div>
       )}

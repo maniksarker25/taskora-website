@@ -88,7 +88,7 @@ const ServiceProvideSideNav = ({ open, onClose }) => {
     >
       <div className="flex flex-col items-center py-6 gap-2">
         {/* Profile Image */}
-        <div className="relative w-24 h-24 group cursor-pointer" onClick={handleImageClick}>
+        <div className="relative w-20 h-20 group cursor-pointer" onClick={handleImageClick}>
           <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-md">
             <Image
               src={userData?.profile_image || client}
