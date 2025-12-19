@@ -3,15 +3,29 @@
 import React, { useState } from "react";
 import { X, DollarSign, MessageCircle } from "lucide-react";
 
-const BidModal = ({ isOpen, onClose, task, onSubmit, isLoading }) => {
+const BidModal = ({ isOpen, onClose, task, onSubmit, isLoading, initialData }) => {
   const [bidData, setBidData] = useState({
     price: "",
     details: "",
   });
 
+  React.useEffect(() => {
+    if (isOpen && initialData) {
+      setBidData({
+        price: initialData.price || "",
+        details: initialData.details || "",
+      });
+    } else if (isOpen) {
+      setBidData({
+        price: "",
+        details: "",
+      });
+    }
+  }, [isOpen, initialData]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!bidData.price || parseFloat(bidData.price) <= 0) {
       alert("Please enter a valid bid amount");
       return;
@@ -38,7 +52,9 @@ const BidModal = ({ isOpen, onClose, task, onSubmit, isLoading }) => {
       <div className="bg-white rounded-lg w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Submit Your Bid</h2>
+          <h2 className="text-xl font-semibold text-gray-900">
+            {initialData ? "Update Your Bid" : "Submit Your Bid"}
+          </h2>
           <button
             onClick={handleClose}
             className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
@@ -64,7 +80,7 @@ const BidModal = ({ isOpen, onClose, task, onSubmit, isLoading }) => {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-               ₦
+                ₦
               </div>
               <input
                 type="number"
@@ -116,13 +132,12 @@ const BidModal = ({ isOpen, onClose, task, onSubmit, isLoading }) => {
             <button
               type="submit"
               disabled={isLoading || !bidData.price}
-              className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${
-                isLoading || !bidData.price
+              className={`flex-1 px-4 py-3 rounded-lg font-medium transition-colors ${isLoading || !bidData.price
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
-              }`}
+                }`}
             >
-              {isLoading ? "Submitting..." : "Submit Bid"}
+              {isLoading ? (initialData ? "Updating..." : "Submitting...") : (initialData ? "Update Bid" : "Submit Bid")}
             </button>
           </div>
         </form>

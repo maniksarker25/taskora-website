@@ -3,7 +3,7 @@ import BidItem from "./BidItem";
 import { toast } from "sonner";
 import { useGetBidsByTaskIdQuery } from "@/lib/features/bidApi/bidApi";
 
-const BidsList = ({ task }) => {
+const BidsList = ({ task, onEdit }) => {
   const {
     data: bidsData,
     isLoading: isLoadingBids,
@@ -46,9 +46,9 @@ const BidsList = ({ task }) => {
   return (
     <div>
       {bids.map((bid) => (
-        <BidItem 
-          key={bid._id} 
-          bid={bid} 
+        <BidItem
+          key={bid._id}
+          bid={bid}
           task={task}
           refetchBids={refetchBids}
         />

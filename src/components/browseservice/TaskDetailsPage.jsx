@@ -23,7 +23,7 @@ const TaskDetailsPage = ({ task }) => {
       const result = await createBid(bidData).unwrap();
 
       if (result.success) {
-        toast.success("Bid send successfull!", {
+        toast.success("Bid sent successfully!", {
           style: {
             backgroundColor: "#d1fae5",
             color: "#065f46",
@@ -58,7 +58,9 @@ const TaskDetailsPage = ({ task }) => {
       <TaskBudgetSection
         task={task}
         role={role}
-        onBidClick={() => setIsBidModalOpen(true)}
+        onBidClick={() => {
+          setIsBidModalOpen(true);
+        }}
       />
 
       <TabNavigation
@@ -75,7 +77,9 @@ const TaskDetailsPage = ({ task }) => {
 
       <BidModal
         isOpen={isBidModalOpen}
-        onClose={() => setIsBidModalOpen(false)}
+        onClose={() => {
+          setIsBidModalOpen(false);
+        }}
         task={task}
         onSubmit={handleBidSubmit}
         isLoading={isSubmittingBid}

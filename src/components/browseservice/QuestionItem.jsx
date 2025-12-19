@@ -45,6 +45,7 @@ const QuestionItem = ({ question, task }) => {
 //   send sms
  const handleSend = () => {
     const userIDrole = users?.role !== "customer" ? task?.customer?._id : task?.provider?._id;
+    
     if (!message.trim()) {
       toast.error("Message cannot be empty");
       return;

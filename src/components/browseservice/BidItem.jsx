@@ -1,11 +1,11 @@
-"use client"
 import React, { useState } from "react";
 import Image from "next/image";
 import { Star } from "lucide-react";
 import client from "../../../public/profile_image.jpg";
-import { useAcceptBidMutation, useDeleteBidMutation } from "@/lib/features/bidApi/bidApi";
+import { useAcceptBidMutation, useDeleteBidMutation, useUpdateBidMutation } from "@/lib/features/bidApi/bidApi";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
+import BidModal from "./BidModal";
 
 import ConfirmBookingModal from "../my_tasks/ConfirmBookingModal";
 
@@ -19,8 +19,10 @@ const BidItem = ({ bid, task, refetchBids }) => {
 
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
   const [deleteBid, { isLoading: isDeleting }] = useDeleteBidMutation();
+  const [updateBid, { isLoading: isUpdatingBid }] = useUpdateBidMutation();
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const formatTimeAgo = (dateString) => {
     const date = new Date(dateString);
@@ -55,20 +57,6 @@ const BidItem = ({ bid, task, refetchBids }) => {
         const paymentLink = result?.data?.paymentLink;
         const reference = result?.data?.reference;
 
-        // toast.success(
-        //   paymentLink
-        //     ? "Bid accepted! Redirecting to payment..."
-        //     : "Bid accepted successfully!",
-        //   {
-        //     style: {
-        //       backgroundColor: "#d1fae5",
-        //       color: "#065f46",
-        //       borderLeft: "6px solid #10b981",
-        //     },
-        //     duration: 3500,
-        //   }
-        // );
-
         if (paymentLink && typeof window !== "undefined") {
           window.open(paymentLink, "_blank");
         }
@@ -84,6 +72,38 @@ const BidItem = ({ bid, task, refetchBids }) => {
       console.error("Failed to accept bid:", error);
       toast.error(
         error?.data?.message || "Failed to accept bid. Please try again.",
+        {
+          style: {
+            backgroundColor: "#fee2e2",
+            color: "#991b1b",
+            borderLeft: "6px solid #ef4444",
+          },
+          duration: 3000,
+        }
+      );
+    }
+  };
+
+  const handleUpdateBid = async (bidData) => {
+    try {
+      const result = await updateBid({ id: bid._id, ...bidData }).unwrap();
+
+      if (result.success) {
+        toast.success("Bid updated successfully!", {
+          style: {
+            backgroundColor: "#d1fae5",
+            color: "#065f46",
+            borderLeft: "6px solid #10b981",
+          },
+          duration: 3000,
+        });
+        setIsEditModalOpen(false);
+        refetchBids && refetchBids();
+      }
+    } catch (error) {
+      console.error("Failed to update bid:", error);
+      toast.error(
+        error?.data?.message || "Failed to update bid. Please try again.",
         {
           style: {
             backgroundColor: "#fee2e2",
@@ -129,6 +149,15 @@ const BidItem = ({ bid, task, refetchBids }) => {
     }
   };
 
+  // BidModal task data structure
+  const bidModalTaskData = {
+    _id: task?._id,
+    title: task?.title,
+    budget: task?.budget,
+    category: task?.category,
+    customer: task?.customer
+  };
+
   return (
     <>
       <ConfirmBookingModal
@@ -138,6 +167,16 @@ const BidItem = ({ bid, task, refetchBids }) => {
         bidAmount={bid.price}
         isLoading={isAcceptingBid}
       />
+
+      <BidModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        task={bidModalTaskData}
+        onSubmit={handleUpdateBid}
+        isLoading={isUpdatingBid}
+        initialData={bid}
+      />
+
       <div className="flex gap-4 p-4 bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors">
         <Image
           src={bid?.provider?.profile_image || client}
@@ -184,16 +223,28 @@ const BidItem = ({ bid, task, refetchBids }) => {
               </button>
             )}
             {role === "provider" && taskStatus === "OPEN_FOR_BID" && (
-              <button
-                onClick={() => handleDeleteBid(bid._id)}
-                disabled={isDeleting}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isDeleting
-                  ? "bg-red-400 text-white hover:bg-red-700 cursor-pointer hover:text-white"
-                  : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  }`}
-              >
-                {isDeleting ? "Deleting..." : "Delete Bid"}
-              </button>
+              <>
+                {(userID === bid?.provider?.profileId || userID === bid?.provider?._id) && (
+                  <>
+                    <button
+                      onClick={() => setIsEditModalOpen(true)}
+                      className="px-4 py-2 rounded-lg font-medium transition-colors bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
+                    >
+                      Update Bid
+                    </button>
+                    <button
+                      onClick={() => handleDeleteBid(bid._id)}
+                      disabled={isDeleting}
+                      className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isDeleting
+                        ? "bg-red-400 text-white hover:bg-red-700 cursor-pointer hover:text-white"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        }`}
+                    >
+                      {isDeleting ? "Deleting..." : "Delete Bid"}
+                    </button>
+                  </>
+                )}
+              </>
             )}
           </div>
         </div>
