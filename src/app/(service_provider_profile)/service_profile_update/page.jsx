@@ -245,7 +245,7 @@ const ServiceProfileInfoUpdate = () => {
                   alt="profile"
                   width={140}
                   height={140}
-                  className="rounded-full w-32 h-32 border-4 border-white shadow-lg mx-auto"
+                  className="rounded-full w-32 h-32 border-4 border-white shadow-lg mx-auto object-cover"
                 />
                 <button
                   onClick={triggerProfileImageInput}
