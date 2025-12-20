@@ -200,6 +200,39 @@ const authApi = createApi({
         headers: { "Content-Type": "application/json" },
         body: verificationData,
       }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data.success && data.data) {
+            const { accessToken, refreshToken, isAddressProvided } = data.data;
+
+            dispatch(
+              setCredentials({ accessToken, refreshToken, isAddressProvided })
+            );
+
+            storeTokens(accessToken, refreshToken);
+            if (typeof window !== "undefined") {
+              localStorage.setItem(
+                "isAddressProvided",
+                isAddressProvided ? "true" : "false"
+              );
+            }
+
+            const cookieOptions = [
+              `refreshToken=${refreshToken}`,
+              "path=/",
+              "max-age=2592000",
+              "SameSite=Lax",
+              process.env.NODE_ENV === "production" ? "Secure" : "",
+            ]
+              .filter(Boolean)
+              .join("; ");
+            document.cookie = cookieOptions;
+          }
+        } catch (error) {
+          console.error("Verification auto-login error:", error);
+        }
+      },
       invalidatesTags: ["Auth"],
     }),
     applyReferralCode: builder.mutation({

@@ -115,7 +115,7 @@ const ProfileInfo = () => {
                   alt="profile"
                   width={200}
                   height={200}
-                  className="rounded-full h-44 w-44 border-4 border-gray-100 shadow-lg"
+                  className="rounded-full h-44 w-44 border-4 border-gray-100 shadow-lg object-cover"
                 />
               </div>
 
