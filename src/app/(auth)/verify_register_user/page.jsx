@@ -7,12 +7,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const VerifyUserCode = () => {
-  const [otp, setOtp] = useState(Array(6).fill("")); 
+  const [otp, setOtp] = useState(Array(6).fill(""));
   const [email, setEmail] = useState("");
   const [isResending, setIsResending] = useState(false);
   const inputRefs = useRef([]);
   const router = useRouter();
-  
+
   const [verifyUserCode, { isLoading, isError, error, isSuccess }] = useVerifyUserCodeMutation();
 
   useEffect(() => {
@@ -77,23 +77,29 @@ const VerifyUserCode = () => {
 
   const handleVerify = async (e) => {
     e.preventDefault();
-    
+
     if (!email) {
       toast.error("Email not found. Please sign up again.");
       return;
     }
 
     const verifyCode = otp.join("");
-    
+
     try {
       const result = await verifyUserCode({
-        email: email, 
+        email: email,
         verifyCode: parseInt(verifyCode)
       }).unwrap();
-      
+
       toast.success("Account verified successfully!");
       localStorage.removeItem('email');
-      router.push("/login");
+
+      const isAddressProvided = result.data?.isAddressProvided || result.isAddressProvided;
+      if (isAddressProvided) {
+        router.push("/");
+      } else {
+        router.push("/verify");
+      }
     } catch (err) {
       console.error("Failed to verify user code:", err);
       toast.error(err?.data?.message || "Invalid verification code. Please try again.");
@@ -131,14 +137,14 @@ const VerifyUserCode = () => {
           <div className="lg:w-1/2 w-full p-6 sm:p-8 lg:p-12">
             <div className="max-w-md mx-auto w-full">
               <div className="text-center mb-8">
-                
+
                 <h1 className="text-3xl lg:text-4xl font-bold text-gray-800 mb-3">
                   Verify Your Account
                 </h1>
                 <p className="text-gray-600 mb-2">
                   Enter the 6-digit verification code sent to your provided phone number
                 </p>
-               
+
               </div>
 
               {/* OTP Input Section */}
@@ -190,7 +196,7 @@ const VerifyUserCode = () => {
                 <p className="text-gray-600 mb-4">
                   Didn't receive the code?
                 </p>
-                <button 
+                <button
                   type="button"
                   onClick={handleResendCode}
                   disabled={isResending}
