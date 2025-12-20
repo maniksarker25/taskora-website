@@ -1,38 +1,41 @@
 "use client"
 import registration_img from "../../../../public/login_page_image.png";
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import Image from "next/image";
 import { useVerifyBVNMutation } from "@/lib/features/bankVerificationApi/bankVerificationApi";
 import { toast } from "sonner";
 import { useAuth } from "@/components/auth/useAuth";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 
-const BankVerification = () => {
+const BankVerificationContent = () => {
 
   const [bvn, setBvn] = useState("");
   const [verifyBVN, { isLoading, error, data }] = useVerifyBVNMutation();
   const { user, accessToken } = useAuth();
-   const router = useRouter();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting BVN:", bvn);
-    
+
     try {
       const result = await verifyBVN({ bvn: bvn }).unwrap();
       console.log("API Response Success:", result);
-      
+
       if (result.isBankVerificationNumberApproved) {
         toast.success("Bank Verification Number verified successfully")
-          setTimeout(() => {
-          if (user?.role === 'provider') {
+        setTimeout(() => {
+          if (from === "linked_account") {
+            router.push("/linked_account");
+          } else if (user?.role === 'provider') {
             router.push('/id_card_verify');
           } else {
             router.push('/');
           }
         }, 1000);
-       
+
       }
     } catch (err) {
       console.error("Error Details:", {
@@ -44,7 +47,7 @@ const BankVerification = () => {
     }
   };
 
-  
+
   React.useEffect(() => {
     if (error) {
       console.log("Error state updated:", error);
@@ -81,7 +84,7 @@ const BankVerification = () => {
                     <p className="text-[#1F2937]">
                       Enter your 11-digit Bank Verification Number (BVN) for identity confirmation.
                     </p>
-                    
+
                     {/* -------------------form------------------------------ */}
                     <form onSubmit={handleSubmit} className="mt-12 space-y-6">
                       <div>
@@ -102,21 +105,20 @@ const BankVerification = () => {
                             required
                           />
                         </div>
-                       
+
                       </div>
 
-                     
+
 
                       {/* Submit Button */}
                       <div className="mt-4 rounded-sm overflow-clip transition transform duration-300 hover:scale-101">
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className={`bg-[#115E59] w-full py-3 text-white cursor-pointer rounded-md ${
-                            (isLoading ) 
-                            ? "opacity-50 cursor-not-allowed" 
+                          className={`bg-[#115E59] w-full py-3 text-white cursor-pointer rounded-md ${(isLoading)
+                            ? "opacity-50 cursor-not-allowed"
                             : "hover:bg-[#0e4d49]"
-                          }`}
+                            }`}
                         >
                           {isLoading ? (
                             <span className="flex items-center justify-center">
@@ -133,7 +135,7 @@ const BankVerification = () => {
                       </div>
                     </form>
 
-                    
+
                   </div>
                 </div>
               </div>
@@ -142,6 +144,18 @@ const BankVerification = () => {
         </div>
       </div>
     </section>
+  );
+};
+
+const BankVerification = () => {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#115E59]"></div>
+      </div>
+    }>
+      <BankVerificationContent />
+    </Suspense>
   );
 };
 

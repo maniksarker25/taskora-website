@@ -46,9 +46,7 @@ const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsDa
     sendMessageSoket(data);
     setMessage("");
     setIsModalOpen(false)
-    if (window !== undefined) {
-      window.location.href = "/chat";
-    }
+    router.push(`/chat/${userID}`)
   };
   // const handleChatClick = () => {
 

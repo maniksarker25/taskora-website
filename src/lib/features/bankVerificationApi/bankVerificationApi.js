@@ -71,9 +71,8 @@ const baseQuery = async (args, api, extraOptions) => {
 const bankVerificationApi = createApi({
   reducerPath: "bankVerificationApi",
   baseQuery,
-  tagTypes: ["BankVerification", "IdentityVerification"], // দুইটা tag যোগ করুন
+  tagTypes: ["BankVerification", "IdentityVerification"], 
   endpoints: (builder) => ({
-    // BVN Verification Endpoint
     verifyBVN: builder.mutation({
       query: (bvnData) => ({
         url: "/provider/verify-bvn",
@@ -106,7 +105,6 @@ const bankVerificationApi = createApi({
       query: (formData) => {
         console.log("Sending FormData to API...");
         
-        // FormData এর জন্য headers সেট করব না
         return {
           url: "/provider/complete-identity-verification",
           method: "POST",

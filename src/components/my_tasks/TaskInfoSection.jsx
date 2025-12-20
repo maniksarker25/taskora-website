@@ -46,7 +46,7 @@ const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
 
     setMessage("");
     setIsModalOpen(false)
-    router.push("/chat")
+    router.push(`/chat/${userID}`)
   };
 
   return (
@@ -96,8 +96,8 @@ const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
           onClick={handleChatClick}
           disabled={taskDetails?.status && taskDetails.status !== "IN_PROGRESS"}
           className={`px-6 py-2.5 rounded-md transition transform duration-300 hover:scale-105 flex gap-2 items-center justify-center mt-12 ${taskDetails?.status && taskDetails.status !== "IN_PROGRESS"
-              ? "bg-gray-300 text-gray-700 cursor-not-allowed"
-              : "bg-[#115e59] text-white hover:bg-teal-800 cursor-pointer"
+            ? "bg-gray-300 text-gray-700 cursor-not-allowed"
+            : "bg-[#115e59] text-white hover:bg-teal-800 cursor-pointer"
             }`}
         >
           <MessageCircle className="w-4 h-4" />
