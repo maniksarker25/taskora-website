@@ -152,7 +152,6 @@ const TransactionHistory = () => {
       status: transaction.type === 'DEBIT' ? 'Completed' : 'Pending',
       // providerName: transaction.reason || "Service Provider",
       service: transaction.userType ,
-      // avatar: "https://i.pravatar.cc/150?img=" + Math.floor(Math.random() * 70)
     }));
   };
 

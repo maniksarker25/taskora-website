@@ -184,11 +184,11 @@ const ServiceListing = () => {
 
             {/* Services Count and Sort Info */}
             <div className="mb-4 flex justify-between items-center">
-              <div className="text-sm text-gray-600">
+              {/* <div className="text-sm text-gray-600">
                 Showing {services.length} of {meta.total || 0} services
                 {selectedCategory !== "all" && ` in ${serviceCategories.find(cat => cat.id === selectedCategory)?.label}`}
                 {debouncedSearch && ` for "${debouncedSearch}"`}
-              </div>
+              </div> */}
               {/* <div className="text-sm text-gray-500">
                 Sorted by: {sortOptions.find(opt => opt.id === selectedSortBy)?.label || "Relevance"}
               </div> */}

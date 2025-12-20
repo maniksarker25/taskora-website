@@ -22,7 +22,7 @@ const sidebarLinks = [
     icon: <IoIosNotifications />,
   },
   { name: "My Transactions", href: "/transaction", icon: <FaMoneyBillTransfer /> },
-  { name: "Manage Account", href: "/manage_account_task_poster", icon: <MdManageAccounts /> },
+  // { name: "Manage Account", href: "/manage_account_task_poster", icon: <MdManageAccounts /> },
   {
     name: "Security Settings",
     href: "/security_settings",
