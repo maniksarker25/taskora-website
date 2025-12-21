@@ -10,11 +10,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/auth/useAuth";
 import { X } from "lucide-react";
 import { toast } from "sonner";
+import LocationSearch from "@/components/task_post/LocationSearch";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const VerifyReg = () => {
-  const { register, handleSubmit, formState: { errors } } = useForm();
+  const { register, handleSubmit, setValue, watch, trigger, formState: { errors } } = useForm();
   const [updateProfile, { isLoading, isError, error }] = useUpdateProfileMutation();
   const dispatch = useDispatch();
   const router = useRouter();
@@ -22,6 +23,20 @@ const VerifyReg = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [fileType, setFileType] = useState(null);
+
+  const streetValue = watch("street") || "";
+
+  const handleLocationSelect = (locationData) => {
+    if (locationData) {
+      setValue("street", locationData.address);
+      setValue("city", locationData.city || "");
+      // Trigger validation for both fields
+      trigger(["street", "city"]);
+    } else {
+      setValue("street", "");
+      setValue("city", "");
+    }
+  };
 
   useEffect(() => {
     if (selectedFile) {
@@ -162,6 +177,26 @@ const VerifyReg = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="mt-12 space-y-6">
                       <div>
                         <label className="text-[#1F2937] text-sm font-medium mb-2 block">
+                          Street Address
+                        </label>
+                        <LocationSearch
+                          value={streetValue}
+                          onChange={(val) => {
+                            setValue("street", val);
+                            if (!val) setValue("city", "");
+                          }}
+                          onSelect={handleLocationSelect}
+                          placeholder="Search for your street address..."
+                          required
+                        />
+                        {errors.street && (
+                          <p className="text-red-500 text-sm mt-1">{errors.street.message}</p>
+                        )}
+                        <input type="hidden" {...register("street", { required: "Street address is required" })} />
+                      </div>
+
+                      <div>
+                        <label className="text-[#1F2937] text-sm font-medium mb-2 block">
                           City / LGA
                         </label>
                         <div className="relative flex items-center">
@@ -170,30 +205,13 @@ const VerifyReg = () => {
                             name="city"
                             type="text"
                             required
-                            className="w-full text-[#6B7280] text-sm border border-slate-300 px-4 py-3 pr-8 rounded-md outline-blue-600"
+                            className="w-full text-[#6B7280] text-sm border border-slate-300 px-4 py-3 pr-8 rounded-md outline-blue-600 bg-gray-50"
                             placeholder="Ikeja, Surulere"
+                            readOnly
                           />
                         </div>
                         {errors.city && (
                           <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
-                        )}
-                      </div>
-                      <div>
-                        <label className="text-[#1F2937] text-sm font-medium mb-2 block">
-                          Street Address
-                        </label>
-                        <div className="relative flex items-center">
-                          <input
-                            {...register("street", { required: "Street address is required" })}
-                            name="street"
-                            type="text"
-                            required
-                            className="w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 pr-8 rounded-md outline-blue-600"
-                            placeholder="Enter Street Address"
-                          />
-                        </div>
-                        {errors.address && (
-                          <p className="text-red-500 text-sm mt-1">{errors.address.message}</p>
                         )}
                       </div>
 
