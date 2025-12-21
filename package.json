@@ -24,6 +24,7 @@
     "daisyui": "^5.1.7",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.18",
+    "firebase": "^12.7.0",
     "jodit-react": "^5.2.38",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.542.0",
