@@ -6,7 +6,7 @@ import srvcporvider from "../../../../public/women.svg";
 import MyTaskCard from "@/components/my_tasks/MyTaskCard";
 import popularcateIcon from "../../../../public/popularcate.svg";
 import Link from "next/link";
-import { useGetMyTasksQuery } from "@/lib/features/task/taskApi"; 
+import { useGetMyTasksQuery } from "@/lib/features/task/taskApi";
 
 const statusCategories = [
   {
@@ -40,14 +40,14 @@ const MyTasks = () => {
 
   const activeStatus = statusCategories.find((cat) => cat.name === activeTab)?.status || "";
 
-  const { 
-    data: tasksData, 
-    isLoading, 
+  const {
+    data: tasksData,
+    isLoading,
     error,
-    refetch 
+    refetch
   } = useGetMyTasksQuery({
     status: activeStatus,
-    limit: 20 
+    limit: 20
   });
 
   const tasks = tasksData?.data?.result || tasksData?.data || [];
@@ -105,7 +105,7 @@ const MyTasks = () => {
           <div className="text-center py-8">
             <h2 className="text-xl font-bold text-gray-900 mb-2">Failed to Load Tasks</h2>
             <p className="text-gray-600 mb-4">There was an error loading your tasks.</p>
-            <button 
+            <button
               onClick={refetch}
               className="px-6 py-2 bg-[#115e59] text-white rounded-lg hover:bg-teal-700 transition-colors"
             >
@@ -144,11 +144,10 @@ const MyTasks = () => {
               <button
                 key={cat.name}
                 onClick={() => handleTabChange(cat.name)}
-                className={`px-4 md:px-6 py-2 rounded-md text-sm font-medium transition cursor-pointer ${
-                  activeTab === cat.name
+                className={`px-4 md:px-6 py-2 rounded-md text-sm font-medium transition cursor-pointer ${activeTab === cat.name
                     ? "bg-[#115e59] text-white"
                     : "bg-[#e6f4f1] hover:bg-[#115e59] hover:text-white"
-                }`}
+                  }`}
               >
                 {cat.name}
               </button>
@@ -170,13 +169,13 @@ const MyTasks = () => {
                   No Tasks Found
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  {activeTab === "All Tasks" 
-                    ? "You haven't created any tasks yet." 
+                  {activeTab === "All Tasks"
+                    ? "You haven't created any tasks yet."
                     : `You don't have any ${activeTab.toLowerCase()} tasks.`
                   }
                 </p>
-                <Link 
-                  href="/post_task" 
+                <Link
+                  href="/post_task"
                   className="inline-block px-6 py-2 bg-[#115e59] text-white rounded-lg hover:bg-teal-700 transition-colors"
                 >
                   Create Your First Task
@@ -188,24 +187,27 @@ const MyTasks = () => {
               {tasks?.map((task) => (
                 <div key={task._id}>
                   <Link href={`/my_task/${task._id}`}>
-                    <MyTaskCard 
+                    <MyTaskCard
                       service={{
                         id: task._id,
                         title: task.title,
                         price: `₦${parseInt(task.budget || 0).toLocaleString()}`,
                         locations: [task.address, task.city].filter(Boolean),
-                        date: task.preferredDate 
-                          ? new Date(task.preferredDate).toLocaleDateString("en-US", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            }) + (task.preferredTime ? ` ${task.preferredTime}` : "")
+                        date: task.preferredDeliveryDateTime
+                          ? new Date(task.preferredDeliveryDateTime).toLocaleString("en-US", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: true,
+                          })
                           : "Schedule not set",
                         category: task.category?.name || "General",
                         status: task.status || "OPEN_FOR_BID",
                         offers: task.totalOffer || 0,
                         image: task.customer?.profile_image || srvcporvider
-                      }} 
+                      }}
                       activeTab={activeTab}
                     />
                   </Link>

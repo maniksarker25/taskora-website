@@ -10,6 +10,7 @@ import {
 } from "@/lib/features/auth/authApi";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
+import LocationSearch from "@/components/task_post/LocationSearch";
 
 const UpdateInformation = () => {
   const [profileImage, setProfileImage] = useState(client);
@@ -115,6 +116,22 @@ const UpdateInformation = () => {
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleLocationSelect = (locationData) => {
+    if (locationData) {
+      setFormData((prev) => ({
+        ...prev,
+        street: locationData.address,
+        city: locationData.city || "",
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        street: "",
+        city: "",
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -344,6 +361,23 @@ const UpdateInformation = () => {
                   />
                 </div>
 
+                {/* Street Field */}
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Street Address <span className="text-red-500">*</span>
+                  </label>
+                  <LocationSearch
+                    value={formData.street}
+                    onChange={(val) => {
+                      setFormData(prev => ({ ...prev, street: val }));
+                      if (!val) setFormData(prev => ({ ...prev, city: "" }));
+                    }}
+                    onSelect={handleLocationSelect}
+                    placeholder="Search for your street address..."
+                    required
+                  />
+                </div>
+
                 {/* City Field */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">
@@ -356,23 +390,8 @@ const UpdateInformation = () => {
                     onChange={handleInputChange}
                     placeholder="Enter your city"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#115e59] focus:border-[#115e59] transition-all placeholder-gray-400 text-gray-900"
-                  />
-                </div>
-
-                {/* Street Field */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Street Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    name="street"
-                    value={formData.street}
-                    onChange={handleInputChange}
-                    placeholder="Enter your street address"
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#115e59] focus:border-[#115e59] transition-all placeholder-gray-400 text-gray-900"
+                    readOnly
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#115e59] focus:border-[#115e59] transition-all placeholder-gray-400 text-gray-900 bg-gray-50 cursor-not-allowed"
                   />
                 </div>
 
