@@ -78,7 +78,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
         // );
 
         if (paymentLink && typeof window !== "undefined") {
-          window.open(paymentLink, "_blank");
+          window.location.href = paymentLink;
         }
 
         if (reference) {

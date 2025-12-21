@@ -264,7 +264,7 @@ const Cancelled = ({ taskDetails }) => {
       </div>
 
       {/* Additional Information */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="font-semibold mb-2">Task Information</h3>
           <div className="space-y-2 text-sm">
@@ -308,7 +308,7 @@ const Cancelled = ({ taskDetails }) => {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
