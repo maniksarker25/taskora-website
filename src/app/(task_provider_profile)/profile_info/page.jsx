@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useEffect } from "react";
+import React from "react";
 import client from "../../../../public/profile_image.jpg";
 import Link from "next/link";
 import { CgProfile } from "react-icons/cg";

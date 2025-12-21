@@ -78,6 +78,13 @@ const bidApi = createApi({
       }),
       invalidatesTags: ["Bid"],
     }),
+    rejectOffer: builder.mutation({
+      query: (taskId) => ({
+        url: `/task/reject-offer/${taskId}`,
+        method: "PATCH",
+      }),
+      invalidatesTags: ["Bid"],
+    }),
   }),
 });
 
@@ -87,7 +94,8 @@ export const {
   useAcceptBidMutation,
   useGetMyBidsQuery,
   useDeleteBidMutation,
-  useUpdateBidMutation
+  useUpdateBidMutation,
+  useRejectOfferMutation
 } = bidApi;
 
 export default bidApi;
