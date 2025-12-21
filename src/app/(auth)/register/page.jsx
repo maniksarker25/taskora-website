@@ -391,7 +391,7 @@ const RegisterContent = () => {
                       </div>
                     </form>
                     {/* social login */}
-                    <p className="text-[#6B7280] font-semibold mt-2">
+                    {/* <p className="text-[#6B7280] font-semibold mt-2">
                       Or continue with
                     </p>
                     <div className="mt-4 flex gap-6">
@@ -407,7 +407,7 @@ const RegisterContent = () => {
                       >
                         <FaApple className="text-2xl text-[#115e59]" />
                       </button>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
