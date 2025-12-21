@@ -1,8 +1,40 @@
-// components/BidCard.jsx
 import Image from "next/image";
 import Link from "next/link";
+import { useRejectOfferMutation } from "@/lib/features/bidApi/bidApi";
+import { toast } from "sonner";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 
 const BidCard = ({ task }) => {
+  const [rejectOffer, { isLoading: isRejecting }] = useRejectOfferMutation();
+  const user = useSelector((state) => state.auth?.user);
+
+  const isDirectOffer = task.provider === user?.profileId || (typeof task.provider === 'object' && task.provider?._id === user?.profileId);
+
+  const handleReject = async (e) => {
+    e.preventDefault();
+
+    toast("Reject Offer", {
+      description: "Are you sure you want to reject this offer?",
+      action: {
+        label: "Reject",
+        onClick: async () => {
+          try {
+            const result = await rejectOffer(task._id).unwrap();
+            if (result.success) {
+              toast.success("Offer rejected successfully");
+            }
+          } catch (error) {
+            toast.error(error?.data?.message || "Failed to reject offer");
+          }
+        },
+      },
+      cancel: {
+        label: "Cancel",
+      },
+    });
+  };
+
   const getStatusColor = (status) => {
     const statusColors = {
       OPEN_FOR_BID: "bg-blue-100 text-blue-800",
@@ -97,12 +129,23 @@ const BidCard = ({ task }) => {
         <div className="flex items-center gap-2 text-sm text-gray-500">
           <span>Total Offers: {task.totalOffer || 0}</span>
         </div>
-        <Link
-          href={`/my_bids/${task._id}`}
-          className="px-4 py-2 bg-[#115e59] text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium"
-        >
-          View Details
-        </Link>
+        <div className="flex items-center gap-2">
+          {isDirectOffer && task.status === "OPEN_FOR_BID" && (
+            <button
+              onClick={handleReject}
+              disabled={isRejecting}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium disabled:bg-gray-400"
+            >
+              {isRejecting ? "Rejecting..." : "Reject Offer"}
+            </button>
+          )}
+          <Link
+            href={`/my_bids/${task._id}`}
+            className="px-4 py-2 bg-[#115e59] text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium"
+          >
+            View Details
+          </Link>
+        </div>
       </div>
     </div>
   );
