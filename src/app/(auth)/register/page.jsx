@@ -19,14 +19,14 @@ const RegisterContent = () => {
   const role = searchParams.get('role') || 'customer';
   const router = useRouter();
   const [phoneValue, setPhoneValue] = useState("");
-  const { 
-    register, 
-    handleSubmit, 
+  const {
+    register,
+    handleSubmit,
     formState: { errors },
     setError,
     clearErrors,
   } = useForm();
-  
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [registerUser, { isLoading }] = useRegisterMutation();
@@ -51,7 +51,7 @@ const RegisterContent = () => {
 
   const onSubmit = async (formData) => {
     try {
-     
+
       const phoneValidation = validatePhoneNumber(phoneValue);
       if (phoneValidation !== true) {
         setError("phone", {
@@ -82,10 +82,10 @@ const RegisterContent = () => {
 
       // Call register API
       const result = await registerUser(registrationData).unwrap();
-      
+
       if (result.success) {
-        localStorage.setItem('email', formData.email); 
-        
+        localStorage.setItem('email', formData.email);
+
         toast.success("Registration successful! Please check your phone to verify your account.", {
           style: {
             backgroundColor: "#d1fae5",
@@ -93,7 +93,7 @@ const RegisterContent = () => {
             borderLeft: "6px solid #10b981",
           }
         });
-        
+
         router.push("/verify_register_user");
       }
     } catch (err) {
@@ -110,7 +110,7 @@ const RegisterContent = () => {
 
   const handlePhoneChange = (value) => {
     setPhoneValue(value);
-  
+
     if (value) {
       clearErrors("phone");
     }
@@ -161,7 +161,7 @@ const RegisterContent = () => {
                         </label>
                         <div className="relative flex items-center">
                           <input
-                            {...register("name", { 
+                            {...register("name", {
                               required: "Full name is required",
                               minLength: {
                                 value: 2,
@@ -186,7 +186,7 @@ const RegisterContent = () => {
                         </label>
                         <div className="relative flex items-center">
                           <input
-                            {...register("email", { 
+                            {...register("email", {
                               required: "Email is required",
                               pattern: {
                                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
@@ -213,11 +213,11 @@ const RegisterContent = () => {
                         <div className="relative flex items-center">
                           <PhoneInput
                             international
-                            defaultCountry="NG" 
+                            defaultCountry="NG"
+                            countries={['NG', 'CA', 'GB', 'US']}
                             value={phoneValue}
                             onChange={handlePhoneChange}
                             className="w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 pr-10 rounded-md outline-blue-600 focus:border-blue-500 outline-none"
-
                           />
                         </div>
                         {errors.phone && (
@@ -234,7 +234,7 @@ const RegisterContent = () => {
                         </label>
                         <div className="relative flex items-center">
                           <input
-                            {...register("password", { 
+                            {...register("password", {
                               required: "Password is required",
                               minLength: {
                                 value: 6,
@@ -293,7 +293,7 @@ const RegisterContent = () => {
                           <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
                         )}
                       </div>
-                      
+
                       {/* confirm pass */}
                       <div>
                         <label className="text-[#1F2937] text-sm font-medium block">
@@ -301,7 +301,7 @@ const RegisterContent = () => {
                         </label>
                         <div className="relative flex items-center">
                           <input
-                            {...register("confirmPassword", { 
+                            {...register("confirmPassword", {
                               required: "Please confirm your password"
                             })}
                             name="confirmPassword"
@@ -375,9 +375,8 @@ const RegisterContent = () => {
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className={`${
-                            isLoading ? "bg-gray-400 cursor-not-allowed" : "hover:bg-[#0e4d49]"
-                          } bg-[#115E59] py-3 text-white cursor-pointer w-full text-center font-medium text-base transition-colors duration-300`}
+                          className={`${isLoading ? "bg-gray-400 cursor-not-allowed" : "hover:bg-[#0e4d49]"
+                            } bg-[#115E59] py-3 text-white cursor-pointer w-full text-center font-medium text-base transition-colors duration-300`}
                         >
                           {isLoading ? (
                             <span className="flex items-center justify-center">
@@ -396,13 +395,13 @@ const RegisterContent = () => {
                       Or continue with
                     </p>
                     <div className="mt-4 flex gap-6">
-                      <button 
+                      <button
                         type="button"
                         className="border-1 border-[#115E59] p-3.5 rounded-sm transition transform duration-300 hover:scale-101 cursor-pointer hover:bg-gray-50"
                       >
                         <FcGoogle className="text-2xl " />
                       </button>
-                      <button 
+                      <button
                         type="button"
                         className="border-1 border-[#115E59] p-3.5 rounded-sm transition transform duration-300 hover:scale-101 cursor-pointer hover:bg-gray-50"
                       >
