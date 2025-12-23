@@ -82,12 +82,12 @@ const HeroSection = () => {
         {/* Right Side */}
         <div className="relative w-full lg:w-1/2 flex items-center justify-center">
           {/* Background Pattern */}
-          <div className="absolute inset-0 flex items-center justify-center -left-6 md:-left-10 lg:-left-28">
+          <div className="absolute inset-0 flex items-center justify-center mt-20 md:mt-20 lg:mt-0 -left-6 md:-left-10 lg:-left-28">
             <Image
               src={bg_image}
               width={600}
               alt="Pattern"
-              className="opacity-50 max-w-full h-auto"
+              className="opacity-50 w-[350px] md:w-full h-auto"
             />
           </div>
 
