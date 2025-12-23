@@ -7,23 +7,26 @@ import srvcporvider from "../../../public/profile_image.jpg";
 import Image from 'next/image';
 import { toast } from "sonner";
 import { useAcceptBidMutation } from '@/lib/features/bidApi/bidApi';
+import { useDeleteTaskMutation } from '@/lib/features/task/taskApi';
 import { useAuth } from '@/components/auth/useAuth';
 import { useSelector } from 'react-redux';
 import ConfirmBookingModal from './ConfirmBookingModal';
 import client from "../../../public/profile_image.jpg";
 import { useSocketContext } from "@/app/context/SocketProvider";
-import { useStartConversationMutation } from "@/lib/features/chatApi/chatApi";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, User } from "lucide-react";
 
 
 
 const Bids = ({ taskDetails, bidsData, questionsData }) => {
+
+  console.log("taskDetails", taskDetails);
 
   const info = bidsData?.data.result
   const role = useSelector((state) => state?.auth?.user?.role);
 
   const [activeTab, setActiveTab] = useState("bids");
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
+  const [deleteTask, { isLoading: isDeletingTask }] = useDeleteTaskMutation();
 
   const [taskStatus, setTaskStatus] = useState(taskDetails?.status || "OPEN_FOR_BID");
   const { user } = useAuth();
@@ -57,20 +60,6 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
         const paymentLink = result?.data?.paymentLink;
         const reference = result?.data?.reference;
 
-        // toast.success(
-        //   paymentLink
-        //     ? "Bid accepted! Redirecting to payment..."
-        //     : "Bid accepted successfully!",
-        //   {
-        //     style: {
-        //       backgroundColor: "#d1fae5",
-        //       color: "#065f46",
-        //       borderLeft: "6px solid #10b981",
-        //     },
-        //     duration: 3500,
-        //   }
-        // );
-
         if (paymentLink && typeof window !== "undefined") {
           window.location.href = paymentLink;
         }
@@ -80,7 +69,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
         }
 
         setTaskStatus(result?.data?.status || "IN_PROGRESS");
-        // refetchBids(); // refetchBids is not defined in the scope, kept original logic flow
+
       }
     } catch (error) {
       console.error("Failed to accept bid:", error);
@@ -238,6 +227,22 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
     }
   };
 
+  const handleDeleteTask = async () => {
+    if (!taskDetails?._id) return;
+
+  
+    try {
+      const result = await deleteTask(taskDetails._id).unwrap();
+      if (result.success) {
+        toast.success("Task removed successfully!");
+        router.push("/my_task");
+      }
+    } catch (error) {
+      console.error("Failed to delete task:", error);
+      toast.error(error?.data?.message || "Failed to remove task. Please try again.");
+    }
+  };
+
   return (
     <div>
       <ConfirmBookingModal
@@ -251,6 +256,16 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
       <div className="flex flex-col lg:flex-row lg:justify-between gap-8 border rounded-2xl p-4 sm:p-6 bg-white shadow mt-8 items-stretch lg:items-start">
         {/* Left side */}
         <div className="flex-1 space-y-6">
+          {/* user */}
+          <div className="flex items-start gap-4">
+            <div className="p-3 rounded-full bg-[#E6F4F1] text-[#115E59] flex items-center justify-center">
+              <User size={20} />
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-black">Posted By</p>
+              <p className="text-sm text-gray-600">{taskDetails?.customer?.name || "N/A"}</p>
+            </div>
+          </div>
           {/* Location */}
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-full bg-[#E6F4F1] text-[#115E59] flex-shrink-0 flex items-center justify-center">
@@ -258,7 +273,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
             </div>
             <div className=''>
               <p className="text-base sm:text-lg font-semibold text-black">Location</p>
-              <p className="text-xs sm:text-sm text-gray-600">{taskDetails?.address}</p>
+              <p className="text-xs sm:text-sm text-gray-600">{taskDetails?.address || "Online"}</p>
             </div>
           </div>
 
@@ -276,9 +291,13 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                   <div className="flex items-center gap-2 text-gray-700">
                     <span>{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
                   </div>
-                )}
+                ) || "Flexible"}
               </div>
             </div>
+          </div>
+          <div>
+            <p className='text-xl font-bold pb-4'>Details</p>
+            <p>{taskDetails?.description || "No description available"}</p>
           </div>
         </div>
 
@@ -290,13 +309,18 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
               <p className="text-xl sm:text-2xl font-bold text-black">₦ {taskDetails?.budget}</p>
             </div>
             <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3 w-full">
-              <button className="flex-1 px-4 py-2 border-2 border-[#115e59] rounded-md hover:bg-[#115e59] hover:text-white transition transform duration-300 cursor-pointer text-sm">
+              <button
+                onClick={() => router.push(`/post_task?editId=${taskDetails?._id}`)}
+                className="px-4 py-2 border-2 border-[#115e59] rounded-md hover:bg-[#115e59] hover:text-white transition transform duration-300 cursor-pointer text-sm"
+              >
                 Edit Task
               </button>
               <button
-                className=" px-4 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer text-sm"
+                onClick={handleDeleteTask}
+                disabled={isDeletingTask}
+                className=" px-4 py-2.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition transform duration-300 hover:scale-105 cursor-pointer text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                Remove Task
+                {isDeletingTask ? "Removing..." : "Remove Task"}
               </button>
             </div>
           </div>
@@ -327,152 +351,174 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
       {/* Bids / Questions */}
       <div className="mt-4 space-y-4">
-        {activeTab === "bids" &&
-          info?.map((bid) => (
-            <div
-              key={bid._id || bid.id}
-              className="flex flex-col lg:flex-row gap-4 p-4 border rounded-lg bg-white"
-            >
-              {/* left side */}
-              <div className="flex flex-col justify-between gap-6 sm:gap-10 bg-[#E6F4F1] rounded-xl p-4 lg:w-1/3 xl:w-1/4">
-                <div className="flex flex-col sm:flex-row lg:flex-col items-center sm:items-start lg:items-center xl:flex-row xl:items-center gap-4">
-                  <div className="w-16 h-16 sm:w-20 sm:h-20  rounded-full overflow-clip border-2 border-white shadow-sm flex-shrink-0">
-                    <Image
-                      src={srvcporvider}
-                      alt={bid?.provider?.name || "Provider"}
-                      width={500}
-                      height={500}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <div className="text-center sm:text-left lg:text-center xl:text-left">
-                    <h4 className="font-semibold text-lg">{bid?.provider?.name}</h4>
-                    <p className="flex items-center justify-center sm:justify-start lg:justify-center xl:justify-start text-gray-500 gap-1 text-xs sm:text-sm">
-                      <FaStar className="text-yellow-500" />
-                      (0 Reviews)
-                    </p>
-                    <p className="font-bold text-lg sm:text-xl text-[#115E59] mt-1 sm:hidden lg:block xl:hidden">
-                      ₦ {bid.price}
-                    </p>
-                  </div>
-                  <div className="hidden sm:block lg:hidden xl:block ml-auto sm:ml-0 lg:ml-auto xl:ml-auto">
-                    <p className="font-bold text-xl">
-                      ₦ {bid.price}
-                    </p>
-                  </div>
-                </div>
-
-                {/* accept button */}
-                <div className="flex flex-col gap-3">
-                  {role === "customer" && (taskStatus || taskDetails?.status) === "OPEN_FOR_BID" && (
-                    <button
-                      onClick={() => openConfirmModal(bid)}
-                      disabled={isAcceptingBid}
-                      className={`w-full px-4 py-2.5 rounded-lg font-medium transition-colors text-sm ${!isAcceptingBid
-                        ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
-                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                        }`}
-                    >
-                      {isAcceptingBid ? "Accepting..." : "Accept Bid"}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* right side */}
-              <div className="flex-1 flex flex-col justify-between">
-                <div>
-                  <p className="text-gray-600 text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
-                    {bid?.details || "No details provided"}
-                  </p>
-                </div>
-                <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
-                  <p className="text-xs sm:text-sm text-gray-400">
-                    {bid.date || formatTimeAgo(bid.createdAt)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-
-        {activeTab === "questions" &&
-          questionsData?.data?.map((q) => (
-            <div
-              key={q._id}
-              className="flex flex-col sm:flex-row gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors bg-white rounded-lg"
-            >
-              <div className="flex md:justify-center sm:justify-start">
-                <Image
-                  src={q?.provider?.profile_image || q?.user?.profileImage || client}
-                  alt={q?.user?.name || "User"}
-                  width={64}
-                  height={64}
-                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-gray-100"
-                />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-gray-900 text-sm sm:text-base">
-                    {q?.provider?.name || "Anonymous"}
-                  </h3>
-                  <span className="text-[10px] sm:text-xs text-gray-400">
-                    {formatTimeAgo(q.createdAt)}
-                  </span>
-                </div>
-
-                {/* Question */}
-                <div className="mb-3">
-                  <p className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-tighter mb-1">Question</p>
-                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                    {q.details}
-                  </p>
-
-                  {/* Question Image */}
-                  {q.question_image && (
-                    <div className="mt-3 flex justify-center sm:justify-start">
-                      <img
-                        src={q.question_image}
-                        alt="Question attachment"
-                        className="max-w-full sm:max-w-xs rounded-lg border border-gray-200 shadow-sm"
+        {activeTab === "bids" && (
+          info && info.length > 0 ? (
+            info.map((bid) => (
+              <div
+                key={bid._id || bid.id}
+                className="flex flex-col lg:flex-row gap-4 p-4 border rounded-lg bg-white"
+              >
+                {/* left side */}
+                <div className="flex flex-col justify-between gap-6 sm:gap-10 bg-[#E6F4F1] rounded-xl p-4 lg:w-1/3 xl:w-1/4">
+                  <div className="flex flex-col sm:flex-row lg:flex-col items-center sm:items-start lg:items-center xl:flex-row xl:items-center gap-4">
+                    <div className="w-16 h-16 sm:w-20 sm:h-20  rounded-full overflow-clip border-2 border-white shadow-sm flex-shrink-0">
+                      <Image
+                        src={srvcporvider}
+                        alt={bid?.provider?.name || "Provider"}
+                        width={500}
+                        height={500}
+                        className="w-full h-full object-cover"
                       />
                     </div>
-                  )}
+                    <div className="text-center sm:text-left lg:text-center xl:text-left">
+                      <h4 className="font-semibold text-lg">{bid?.provider?.name}</h4>
+                      <p className="flex items-center justify-center sm:justify-start lg:justify-center xl:justify-start text-gray-500 gap-1 text-xs sm:text-sm">
+                        <FaStar className="text-yellow-500" />
+                        (0 Reviews)
+                      </p>
+                      <p className="font-bold text-lg sm:text-xl text-[#115E59] mt-1 sm:hidden lg:block xl:hidden">
+                        ₦ {bid.price}
+                      </p>
+                    </div>
+                    <div className="hidden sm:block lg:hidden xl:block ml-auto sm:ml-0 lg:ml-auto xl:ml-auto">
+                      <p className="font-bold text-xl">
+                        ₦ {bid.price}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* accept button */}
+                  <div className="flex flex-col gap-3">
+                    {role === "customer" && (taskStatus || taskDetails?.status) === "OPEN_FOR_BID" && (
+                      <button
+                        onClick={() => openConfirmModal(bid)}
+                        disabled={isAcceptingBid}
+                        className={`w-full px-4 py-2.5 rounded-lg font-medium transition-colors text-sm ${!isAcceptingBid
+                          ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          }`}
+                      >
+                        {isAcceptingBid ? "Accepting..." : "Accept Bid"}
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {/* Answer */}
-                {q.answer && (
-                  <div className="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-100 mt-2">
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className="text-[10px] sm:text-xs font-bold text-green-700 uppercase tracking-wider">
-                        Response from Poster
-                      </span>
-                      {q.answeredAt && (
-                        <span className="text-[10px] text-gray-400">
-                          {formatTimeAgo(q.answeredAt)}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-                      {q.answer}
+                {/* right side */}
+                <div className="flex-1 flex flex-col justify-between">
+                  <div>
+                    <p className="text-gray-600 text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                      {bid?.details || "No details provided"}
                     </p>
                   </div>
-                )}
-
-                {/* Chat button for customer */}
-                {role === "customer" && (
-                  <div className="flex justify-end mt-4">
-                    <button
-                      onClick={() => handleOpenChatModal(q)}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#115E59] text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium cursor-pointer"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      Chat Now
-                    </button>
+                  <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
+                    <p className="text-xs sm:text-sm text-gray-400">
+                      {bid.date || formatTimeAgo(bid.createdAt)}
+                    </p>
                   </div>
-                )}
+                </div>
               </div>
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl border border-dashed border-gray-300">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                <FaStar className="w-8 h-8 text-gray-300" />
+              </div>
+              <p className="text-gray-500 font-medium text-center">No bids have been placed on this task yet.</p>
+              <p className="text-gray-400 text-sm mt-1 text-center">Once providers start bidding, they will appear here.</p>
             </div>
-          ))}
+          )
+        )}
+
+        {activeTab === "questions" && (
+          questionsData?.data && questionsData?.data.length > 0 ? (
+            questionsData?.data?.map((q) => (
+              <div
+                key={q._id}
+                className="flex flex-col sm:flex-row gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors bg-white rounded-lg"
+              >
+                <div className="flex md:justify-center sm:justify-start">
+                  <Image
+                    src={q?.provider?.profile_image || q?.user?.profileImage || client}
+                    alt={q?.user?.name || "User"}
+                    width={64}
+                    height={64}
+                    className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-gray-100"
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium text-gray-900 text-sm sm:text-base">
+                      {q?.provider?.name || "Anonymous"}
+                    </h3>
+                    <span className="text-[10px] sm:text-xs text-gray-400">
+                      {formatTimeAgo(q.createdAt)}
+                    </span>
+                  </div>
+
+                  {/* Question */}
+                  <div className="mb-3">
+                    <p className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-tighter mb-1">Question</p>
+                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {q.details}
+                    </p>
+
+                    {/* Question Image */}
+                    {q.question_image && (
+                      <div className="mt-3 flex justify-center sm:justify-start">
+                        <img
+                          src={q.question_image}
+                          alt="Question attachment"
+                          className="max-w-full sm:max-w-xs rounded-lg border border-gray-200 shadow-sm"
+                        />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Answer */}
+                  {q.answer && (
+                    <div className="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-100 mt-2">
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="text-[10px] sm:text-xs font-bold text-green-700 uppercase tracking-wider">
+                          Response from Poster
+                        </span>
+                        {q.answeredAt && (
+                          <span className="text-[10px] text-gray-400">
+                            {formatTimeAgo(q.answeredAt)}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {q.answer}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Chat button for customer */}
+                  {role === "customer" && (
+                    <div className="flex justify-end mt-4">
+                      <button
+                        onClick={() => handleOpenChatModal(q)}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#115E59] text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium cursor-pointer"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        Chat Now
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="flex flex-col items-center justify-center p-12 bg-white rounded-xl border border-dashed border-gray-300">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
+                <MessageCircle className="w-8 h-8 text-gray-300" />
+              </div>
+              <p className="text-gray-500 font-medium text-center">No questions have been asked yet.</p>
+              <p className="text-gray-400 text-sm mt-1 text-center">Providers can ask questions to clarify task details.</p>
+            </div>
+          )
+        )}
       </div>
 
       {/* QUESTION CHAT MODAL */}

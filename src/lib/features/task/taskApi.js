@@ -94,9 +94,24 @@ const taskApi = createApi({
       }),
       invalidatesTags: ["Task"],
     }),
+
+    updateTask: builder.mutation({
+      query: (formData) => ({
+        url: "/task/update-task",
+        method: "PATCH",
+        body: formData,
+      }),
+      invalidatesTags: ["Task"],
+    }),
+
+    deleteTask: builder.mutation({
+      query: (taskId) => ({
+        url: `/task/delete-task/${taskId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Task"],
+    }),
   }),
-
-
 });
 
 export const {
@@ -104,7 +119,9 @@ export const {
   useGetAllTasksQuery,
   useGetTaskByIdQuery,
   useGetMyTasksQuery,
-  useCompleteTaskMutation
+  useCompleteTaskMutation,
+  useUpdateTaskMutation,
+  useDeleteTaskMutation,
 } = taskApi;
 
 export default taskApi;

@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRejectOfferMutation } from "@/lib/features/bidApi/bidApi";
 import { toast } from "sonner";
-import { useState } from "react";
 import { useSelector } from "react-redux";
 
 const BidCard = ({ task }) => {
@@ -10,7 +9,7 @@ const BidCard = ({ task }) => {
   const user = useSelector((state) => state.auth?.user);
 
   const isDirectOffer = task.provider === user?.profileId || (typeof task.provider === 'object' && task.provider?._id === user?.profileId);
-
+ console.log("task",task)
   const handleReject = async (e) => {
     e.preventDefault();
 
@@ -110,25 +109,23 @@ const BidCard = ({ task }) => {
         <div>
           <p className="text-gray-500">Date</p>
           <p className="font-semibold text-gray-900">
-            {formatDate(task.preferredDate)}
+           {
+            task.preferredDeliveryDateTime ? formatDate(task.preferredDeliveryDateTime) : "Flexible"
+           } 
           </p>
         </div>
-        <div>
+        {/* <div>
           <p className="text-gray-500">Time</p>
           <p className="font-semibold text-gray-900">
-            {formatTime(task.preferredTime)}
+            {formatTime(task.preferredDeliveryDateTime)}
           </p>
-        </div>
+        </div> */}
       </div>
 
-      <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-        {task.description}
-      </p>
+     
 
       <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <span>Total Offers: {task.totalOffer || 0}</span>
-        </div>
+        
         <div className="flex items-center gap-2">
           {isDirectOffer && task.status === "OPEN_FOR_BID" && (
             <button

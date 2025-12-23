@@ -7,6 +7,7 @@ import { useAuth } from "@/components/auth/useAuth";
 import { useSocketContext } from "@/app/context/SocketProvider";
 
 const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsData }) => {
+  console.log("location", location)
   const { socket, isConnected, sendMessageSoket, seenMessage } = useSocketContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -110,7 +111,7 @@ const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsDa
           </div>
           <div>
             <p className="text-base md:text-xl font-semibold"> Location</p>
-            <p className="text-[#6B7280] text-sm">{location || "Location not specified"}</p>
+            <p className="text-[#6B7280] text-sm">{location === "Location not specified" ? "Online" : location}</p>
           </div>
         </div>
         <div className="flex mt-8 items-center gap-3">
@@ -120,12 +121,16 @@ const ProviderTaskInfo = ({ assignedTo, location, dateLabel, taskDetails, bidsDa
           <div>
             <p className="text-base md:text-xl font-semibold">To Be Done On</p>
             <p className="text-sm text-gray-600">
-              {taskDetails?.preferredDeliveryDateTime && (
-                <div className="flex items-center gap-2 text-gray-700">
+               {
+                taskDetails?.preferredDeliveryDateTime ? (
+                  <div className="flex items-center gap-2 text-gray-700">
 
                   <span className="text-sm">{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
                 </div>
-              )}
+                ) : (
+                  "Flexible"
+                )
+               }
             </p>
           </div>
         </div>
