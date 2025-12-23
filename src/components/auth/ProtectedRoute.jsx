@@ -18,10 +18,11 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
     }
 
     // If requiredRole is specified and user role doesn't match, logout and redirect to login
-    if (!isLoading && isAuthenticated && requiredRole && user?.role !== requiredRole) {
+    // Added 'user' check to prevent logout if user object is temporarily missing during re-hydration
+    if (!isLoading && isAuthenticated && user && requiredRole && user?.role !== requiredRole) {
       // Logout the user
       dispatch(logout());
-      
+
       // Clear refreshToken cookie
       if (typeof document !== 'undefined') {
         document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax';
@@ -29,7 +30,7 @@ const ProtectedRoute = ({ children, requiredRole = null }) => {
           document.cookie = 'refreshToken=; path=/; max-age=0; SameSite=Lax; Secure';
         }
       }
-      
+
       // Redirect to login
       router.push("/login");
       return;

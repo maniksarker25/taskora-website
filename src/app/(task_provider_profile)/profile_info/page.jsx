@@ -92,7 +92,7 @@ const ProfileInfo = () => {
               alt="profile"
               width={120}
               height={120}
-              className="rounded-full mx-auto border-4 border-white shadow-lg mb-4"
+              className="rounded-full mx-auto border-4 border-white shadow-lg mb-4 w-24 h-24 object-cover"
             />
             <h3 className="text-white text-xl font-semibold mb-1">
               {userData?.firstName && userData?.lastName
@@ -190,16 +190,7 @@ const ProfileInfo = () => {
                         )}
                       </p>
                     </div>
-                    {/* {userData?.dateOfBirth && (
-                      <div className="group">
-                        <h3 className="font-semibold text-gray-800 text-xl mb-2 group-hover:text-[#115e59] transition-colors">
-                          Date of Birth
-                        </h3>
-                        <p className="text-gray-600 text-lg bg-gray-50 p-3 rounded-lg">
-                          {new Date(userData.dateOfBirth).toLocaleDateString()}
-                        </p>
-                      </div>
-                    )} */}
+                   
                   </div>
                 </div>
 
@@ -284,7 +275,7 @@ const ProfileInfo = () => {
                     Role
                   </h3>
                   <p className="text-gray-600 text-base ml-5 capitalize">
-                    {userData?.role || "Not specified"}
+                    {role || "Not specified"}
                   </p>
                 </div>
 
@@ -294,34 +285,30 @@ const ProfileInfo = () => {
                     Location
                   </h3>
                   <p className="text-gray-600 text-base ml-5 leading-relaxed">
-                    {userData?.address ? (
-                      <>
-                        {userData.address.street && <>{userData.address.street}<br /></>}
-                        {userData.address.city && <>{userData.address.city}, </>}
-                        {userData.address.state && <>{userData.address.state}, </>}
-                        {userData.address.zipCode && <>{userData.address.zipCode}<br /></>}
-                        {userData.address.country && <>{userData.address.country}</>}
-                        {!userData.address.street && !userData.address.city && "Not provided"}
-                      </>
-                    ) : userData?.location ? (
-                      userData.location
-                    ) : (
-                      "Not provided"
-                    )}
+                   {userData?.address ? (
+                          <>
+                            {userData.address.street && <>{userData.address.street}<br /></>}
+                            {userData.address.city && <>{userData.address.city}, </>}
+                            {userData.address.state && <>{userData.address.state}, </>}
+                            {userData.address.zipCode && <>{userData.address.zipCode}<br /></>}
+                            {userData.address.country && <>{userData.address.country}</>}
+                            {!userData.address.street && !userData.address.city && "Not provided"}
+                          </>
+                        ) : userData?.location ? (
+                          userData.location
+                        ) : (
+                          userData?.city && userData?.street ? (
+                            <>
+                              {userData.city}, {userData.street}
+                            </>
+                          ) : (
+                            "Not provided"
+                          )
+                        )}
                   </p>
                 </div>
 
-                {userData?.dateOfBirth && (
-                  <div className="bg-gray-50 rounded-xl p-4 hover:shadow-md transition-shadow">
-                    <h3 className="font-semibold text-gray-800 text-lg mb-2 flex items-center">
-                      <span className="w-2 h-2 bg-[#115e59] rounded-full mr-3"></span>
-                      Date of Birth
-                    </h3>
-                    <p className="text-gray-600 text-base ml-5">
-                      {new Date(userData.dateOfBirth).toLocaleDateString()}
-                    </p>
-                  </div>
-                )}
+              
               </div>
 
               {/* Update Button - Mobile */}

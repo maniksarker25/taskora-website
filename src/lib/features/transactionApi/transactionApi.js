@@ -32,7 +32,21 @@ export const transactionApi = createApi({
       }),
       providesTags: ["Transaction"],
     }),
+    getProviderTransactions: builder.query({
+      query: ({ type = "daily", date, week, year, month }) => ({
+        url: "/payment/provider-earnings",
+        method: "GET",
+        params: {
+          type,
+          ...(date && { date }),
+          ...(week && { week }),
+          ...(year && { year }),
+          ...(month && { month }),
+        },
+      }),
+      providesTags: ["Transaction"],
+    }),
   }),
 });
 
-export const { useGetMyTransactionsQuery } = transactionApi;
+export const { useGetMyTransactionsQuery, useGetProviderTransactionsQuery } = transactionApi;
