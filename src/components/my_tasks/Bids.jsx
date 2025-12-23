@@ -509,8 +509,8 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                 onClick={handleSendQuestionChat}
                 disabled={!chatMessage.trim()}
                 className={`px-6 py-2 rounded-lg font-bold text-white transition-all transform hover:scale-105 flex items-center gap-2 ${!chatMessage.trim()
-                    ? "bg-gray-300 cursor-not-allowed"
-                    : "bg-[#115E59] hover:bg-teal-800 shadow-md"
+                  ? "bg-gray-300 cursor-not-allowed"
+                  : "bg-[#115E59] hover:bg-teal-800 shadow-md"
                   }`}
               >
                 <MessageCircle className="w-4 h-4" />
