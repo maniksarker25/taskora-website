@@ -11,23 +11,11 @@ import { useAuth } from '@/components/auth/useAuth';
 import { useSelector } from 'react-redux';
 import ConfirmBookingModal from './ConfirmBookingModal';
 import client from "../../../public/profile_image.jpg";
+import { useSocketContext } from "@/app/context/SocketProvider";
+import { useStartConversationMutation } from "@/lib/features/chatApi/chatApi";
+import { MessageCircle } from "lucide-react";
 
-const questions = [
-  {
-    id: 1,
-    name: "Ronald Richards",
-    date: "24 January, 2023",
-    message:
-      "I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!I was a bit nervous to be buying a secondhand phone from Amazon, but I couldn't be happier with my purchase!",
-  },
-  {
-    id: 2,
-    name: "Ronald Richards",
-    date: "24 January, 2023",
-    message:
-      "Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?Does this task include moving the couch upstairs too, or just ground floor?",
-  },
-];
+
 
 const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
@@ -43,6 +31,12 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [selectedBid, setSelectedBid] = useState(null);
+
+  // Chat from Question State
+  const [isChatModalOpen, setIsChatModalOpen] = useState(false);
+  const [chatMessage, setChatMessage] = useState("");
+  const [selectedQuestion, setSelectedQuestion] = useState(null);
+  const { sendMessageSoket } = useSocketContext();
 
   const executeAcceptBid = async (bidId, couponCode) => {
     if ((taskStatus || taskDetails?.status) !== "OPEN_FOR_BID") {
@@ -200,6 +194,50 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
     return `${diffInDays} days ago`;
   };
 
+  const handleOpenChatModal = (q) => {
+    setSelectedQuestion(q);
+    setChatMessage("");
+    setIsChatModalOpen(true);
+  };
+
+  const handleSendQuestionChat = async () => {
+    const receiverId = selectedQuestion?.provider?._id || selectedQuestion?.provider?.profileId || selectedQuestion?.user?._id;
+
+    if (!chatMessage.trim()) {
+      toast.error("Message cannot be empty");
+      return;
+    }
+    if (!receiverId) {
+      toast.error("Unable to identify the recipient.");
+      return;
+    }
+
+    try {
+      const data = {
+        text: chatMessage,
+        imageUrl: [""],
+        pdfUrl: [""],
+        receiver: receiverId
+      }
+
+      sendMessageSoket(data);
+      setChatMessage("");
+      setIsChatModalOpen(false);
+
+      toast.success("Message sent! Redirecting to chat...");
+
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          router.push(`/chat/${receiverId}`);
+        }
+      }, 1000);
+
+    } catch (error) {
+      console.error("Failed to start chat:", error);
+      toast.error("Failed to send message via socket.");
+    }
+  };
+
   return (
     <div>
       <ConfirmBookingModal
@@ -209,57 +247,54 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
         bidAmount={selectedBid?.price}
         isLoading={isAcceptingBid}
       />
-      <div className="flex flex-col lg:flex-row lg:justify-between gap-8 border rounded-2xl p-6 bg-white shadow mt-8 items-center">
+
+      <div className="flex flex-col lg:flex-row lg:justify-between gap-8 border rounded-2xl p-4 sm:p-6 bg-white shadow mt-8 items-stretch lg:items-start">
         {/* Left side */}
         <div className="flex-1 space-y-6">
           {/* Location */}
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-full bg-[#E6F4F1] text-[#115E59] flex items-center justify-center">
+            <div className="p-3 rounded-full bg-[#E6F4F1] text-[#115E59] flex-shrink-0 flex items-center justify-center">
               <FaMapMarkerAlt size={20} />
             </div>
-            <div>
-              <p className="text-lg font-semibold text-black">Location</p>
-              <p className="text-sm text-gray-600">{taskDetails?.address}</p>
+            <div className=''>
+              <p className="text-base sm:text-lg font-semibold text-black">Location</p>
+              <p className="text-xs sm:text-sm text-gray-600">{taskDetails?.address}</p>
             </div>
           </div>
 
           {/* Date */}
           <div className="flex items-start gap-4">
-            <div className="p-3 rounded-full bg-[#E6F4F1] text-[#115E59] flex items-center justify-center">
+            <div className="p-3 rounded-full bg-[#E6F4F1] text-[#115E59] flex-shrink-0 flex items-center justify-center">
               <MdDateRange size={20} />
             </div>
             <div>
-              <p className="text-lg font-semibold text-black">
+              <p className="text-base sm:text-lg font-semibold text-black">
                 To Be Done On
               </p>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs sm:text-sm text-gray-600">
                 {taskDetails?.preferredDeliveryDateTime && (
                   <div className="flex items-center gap-2 text-gray-700">
-
-                    <span className="text-sm">{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
+                    <span>{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
                   </div>
                 )}
               </div>
             </div>
           </div>
-
-
         </div>
 
         {/* Right side */}
-        <div className="w-full md:w-auto">
-          <div className="bg-[#E6F4F1] rounded-xl p-6 flex flex-col items-center text-center shadow-sm">
+        <div className="w-full lg:w-auto">
+          <div className="bg-[#E6F4F1] rounded-xl p-4 sm:p-6 flex flex-col items-center text-center shadow-sm">
             <div className="mb-4">
-              <p className="text-gray-500">Task budget</p>
-              <p className="text-2xl font-bold text-black">₦ {taskDetails?.budget}</p>
+              <p className="text-sm sm:text-base text-gray-500">Task budget</p>
+              <p className="text-xl sm:text-2xl font-bold text-black">₦ {taskDetails?.budget}</p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-3 w-full">
-              <button className="px-6 py-2 border-2 border-[#115e59] rounded-md hover:bg-[#115e59] hover:text-white transition transform duration-300 cursor-pointer">
+            <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3 w-full">
+              <button className="flex-1 px-4 py-2 border-2 border-[#115e59] rounded-md hover:bg-[#115e59] hover:text-white transition transform duration-300 cursor-pointer text-sm">
                 Edit Task
               </button>
               <button
-                href="/construction"
-                className="px-6 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer"
+                className=" px-4 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer text-sm"
               >
                 Remove Task
               </button>
@@ -269,21 +304,21 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
       </div>
 
       {/* Tabs */}
-      <div className="mt-6 flex gap-3 ">
+      <div className="mt-6 flex flex-wrap gap-2 sm:gap-3">
         <button
           onClick={() => setActiveTab("bids")}
-          className={`pb-2 ${activeTab === "bids"
-            ? "border-b-2 bg-[#115E59] px-6 rounded-md py-2 text-white cursor-pointer"
-            : "text-black bg-[#E6F4F1] px-6 rounded-md py-2 cursor-pointer"
+          className={`px-4 sm:px-6 py-2 rounded-md transition-colors cursor-pointer text-sm sm:text-base ${activeTab === "bids"
+            ? "bg-[#115E59] text-white"
+            : "text-black bg-[#E6F4F1] hover:bg-gray-200"
             }`}
         >
           Bids
         </button>
         <button
           onClick={() => setActiveTab("questions")}
-          className={`pb-2 ${activeTab === "questions"
-            ? "border-b-2 bg-[#115E59] px-6 rounded-md py-2 text-white cursor-pointer"
-            : "text-black bg-[#E6F4F1] px-6 rounded-md py-2 cursor-pointer"
+          className={`px-4 sm:px-6 py-2 rounded-md transition-colors cursor-pointer text-sm sm:text-base ${activeTab === "questions"
+            ? "bg-[#115E59] text-white"
+            : "text-black bg-[#E6F4F1] hover:bg-gray-200"
             }`}
         >
           Questions
@@ -296,81 +331,66 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
           info?.map((bid) => (
             <div
               key={bid._id || bid.id}
-              className="flex flex-col lg:flex-row gap-4 p-4 border rounded-lg"
+              className="flex flex-col lg:flex-row gap-4 p-4 border rounded-lg bg-white"
             >
               {/* left side */}
-              <div className="flex flex-col justify-between gap-10 bg-[#E6F4F1] rounded-xl px-4 py-4 ">
-                <div className="flex flex-wrap lg:justify-between items-center gap-4 md:gap-8">
-                  <div className="w-14 h-14 md:w-24 md:h-24  rounded-full overflow-clip">
+              <div className="flex flex-col justify-between gap-6 sm:gap-10 bg-[#E6F4F1] rounded-xl p-4 lg:w-1/3 xl:w-1/4">
+                <div className="flex flex-col sm:flex-row lg:flex-col items-center sm:items-start lg:items-center xl:flex-row xl:items-center gap-4">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20  rounded-full overflow-clip border-2 border-white shadow-sm flex-shrink-0">
                     <Image
                       src={srvcporvider}
-                      alt={bid.name}
+                      alt={bid?.provider?.name || "Provider"}
                       width={500}
                       height={500}
                       className="w-full h-full object-cover"
                     />
                   </div>
-                  <div className="">
-                    <h4 className="font-semibold md:text-xl">{bid?.provider.name}</h4>
-                    <p className="flex items-center text-gray-500 gap-1 text-sm md:text-base">
-                      <FaStar className="text-yellow-500 text-sm md:text-base" />{" "}
+                  <div className="text-center sm:text-left lg:text-center xl:text-left">
+                    <h4 className="font-semibold text-lg">{bid?.provider?.name}</h4>
+                    <p className="flex items-center justify-center sm:justify-start lg:justify-center xl:justify-start text-gray-500 gap-1 text-xs sm:text-sm">
+                      <FaStar className="text-yellow-500" />
                       (0 Reviews)
                     </p>
+                    <p className="font-bold text-lg sm:text-xl text-[#115E59] mt-1 sm:hidden lg:block xl:hidden">
+                      ₦ {bid.price}
+                    </p>
                   </div>
-                  <div>
-                    {" "}
-                    <p className="font-semibold text-xl md:text-xl">
+                  <div className="hidden sm:block lg:hidden xl:block ml-auto sm:ml-0 lg:ml-auto xl:ml-auto">
+                    <p className="font-bold text-xl">
                       ₦ {bid.price}
                     </p>
                   </div>
                 </div>
-                {/* accept and chat button */}
-                <div className="flex flex-col sm:flex-row gap-3  ">
 
+                {/* accept button */}
+                <div className="flex flex-col gap-3">
                   {role === "customer" && (taskStatus || taskDetails?.status) === "OPEN_FOR_BID" && (
-                    <div className="mt-2">
-                      <button
-                        onClick={() => openConfirmModal(bid)}
-                        disabled={isAcceptingBid}
-                        className={`px-4 py-2 rounded-lg font-medium transition-colors ${!isAcceptingBid
-                          ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                          }`}
-                      >
-                        Accept Bid
-                      </button>
-                    </div>
-                  )}
-
-                  {/* {taskStatus === "OPEN_FOR_BID" && (
                     <button
-                      onClick={() => handleAcceptBid(bid._id)}
+                      onClick={() => openConfirmModal(bid)}
                       disabled={isAcceptingBid}
-                      className={`px-6 py-2 border-2 rounded-md transition transform duration-300 ${!isAcceptingBid
-                        ? "border-[#115e59] text-[#115e59] hover:bg-[#115e59] hover:text-white cursor-pointer"
-                        : "border-gray-300 text-gray-400 cursor-not-allowed"
+                      className={`w-full px-4 py-2.5 rounded-lg font-medium transition-colors text-sm ${!isAcceptingBid
+                        ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
                         }`}
                     >
-                      {isAcceptingBid ? "Accepting..." : "Accept the Bid"}
+                      {isAcceptingBid ? "Accepting..." : "Accept Bid"}
                     </button>
-                  )} */}
-                  {/* <button
-                    onClick={() => handleChatClick(bid)}
-                    className="px-6 py-2.5 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 cursor-pointer flex gap-2 items-center justify-center"
-                  >
-                    <BsChatLeftText />
-                    Chat Now
-                  </button> */}
+                  )}
                 </div>
               </div>
-              {/* right side */}
 
-              <div className="flex-1">
-                <p className="text-gray-600 text-sm mt-2">{bid?.details}</p>
-                <div className="flex justify-between items-center mt-6">
-                  <p className="text-sm text-gray-500">{bid.date}</p>
+              {/* right side */}
+              <div className="flex-1 flex flex-col justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
+                    {bid?.details || "No details provided"}
+                  </p>
                 </div>
-                <div className="flex flex-col md:flex-row  justify-between md:items-center mt-16 gap-5"></div>
+                <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
+                  <p className="text-xs sm:text-sm text-gray-400">
+                    {bid.date || formatTimeAgo(bid.createdAt)}
+                  </p>
+                </div>
               </div>
             </div>
           ))}
@@ -379,39 +399,41 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
           questionsData?.data?.map((q) => (
             <div
               key={q._id}
-              className="flex gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              className="flex flex-col sm:flex-row gap-4 p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors bg-white rounded-lg"
             >
-              <Image
-                src={q?.provider?.profile_image || q?.user?.profileImage || client}
-                alt={q?.user?.name || "User"}
-                width={64}
-                height={64}
-                className="w-16 h-16 rounded-full object-cover"
-              />
+              <div className="flex md:justify-center sm:justify-start">
+                <Image
+                  src={q?.provider?.profile_image || q?.user?.profileImage || client}
+                  alt={q?.user?.name || "User"}
+                  width={64}
+                  height={64}
+                  className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-gray-100"
+                />
+              </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-medium text-gray-900">
+                  <h3 className="font-medium text-gray-900 text-sm sm:text-base">
                     {q?.provider?.name || "Anonymous"}
                   </h3>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-[10px] sm:text-xs text-gray-400">
                     {formatTimeAgo(q.createdAt)}
                   </span>
                 </div>
 
                 {/* Question */}
                 <div className="mb-3">
-                  <p className="text-sm font-medium text-gray-800 mb-1">Q:</p>
-                  <p className="text-sm text-gray-700 leading-relaxed">
+                  <p className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-tighter mb-1">Question</p>
+                  <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
                     {q.details}
                   </p>
 
                   {/* Question Image */}
                   {q.question_image && (
-                    <div className="mt-2">
+                    <div className="mt-3 flex justify-center sm:justify-start">
                       <img
                         src={q.question_image}
                         alt="Question attachment"
-                        className="max-w-xs rounded-lg border border-gray-200"
+                        className="max-w-full sm:max-w-xs rounded-lg border border-gray-200 shadow-sm"
                       />
                     </div>
                   )}
@@ -419,26 +441,85 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
                 {/* Answer */}
                 {q.answer && (
-                  <div className="bg-green-50 p-3 rounded-lg border border-green-100">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-medium text-green-700">
-                        Task Poster Response:
+                  <div className="bg-green-50 p-3 sm:p-4 rounded-lg border border-green-100 mt-2">
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className="text-[10px] sm:text-xs font-bold text-green-700 uppercase tracking-wider">
+                        Response from Poster
                       </span>
                       {q.answeredAt && (
-                        <span className="text-xs text-gray-500">
+                        <span className="text-[10px] text-gray-400">
                           {formatTimeAgo(q.answeredAt)}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
                       {q.answer}
                     </p>
+                  </div>
+                )}
+
+                {/* Chat button for customer */}
+                {role === "customer" && (
+                  <div className="flex justify-end mt-4">
+                    <button
+                      onClick={() => handleOpenChatModal(q)}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#115E59] text-white rounded-lg hover:bg-teal-700 transition-colors text-sm font-medium cursor-pointer"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      Chat Now
+                    </button>
                   </div>
                 )}
               </div>
             </div>
           ))}
       </div>
+
+      {/* QUESTION CHAT MODAL */}
+      {isChatModalOpen && (
+        <div className="fixed inset-0 bg-black/30 bg-opacity-40 flex items-center justify-center z-[100] p-4">
+          <div className="bg-white w-full max-w-md p-5 rounded-xl shadow-xl animate-in fade-in zoom-in duration-200">
+            {/* Header */}
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-bold text-gray-900">Message {selectedQuestion?.provider?.name || "Provider"}</h2>
+              <button onClick={() => setIsChatModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors text-2xl">
+                ✕
+              </button>
+            </div>
+
+            {/* Message Input */}
+            <div className="relative">
+              <textarea
+                className="w-full border border-gray-200 rounded-lg p-3 h-32 outline-none focus:ring-2 focus:ring-[#115E59] focus:border-transparent transition-all text-sm resize-none"
+                placeholder="Hi, I saw your question about my task..."
+                value={chatMessage}
+                onChange={(e) => setChatMessage(e.target.value)}
+              ></textarea>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setIsChatModalOpen(false)}
+                className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendQuestionChat}
+                disabled={!chatMessage.trim()}
+                className={`px-6 py-2 rounded-lg font-bold text-white transition-all transform hover:scale-105 flex items-center gap-2 ${!chatMessage.trim()
+                    ? "bg-gray-300 cursor-not-allowed"
+                    : "bg-[#115E59] hover:bg-teal-800 shadow-md"
+                  }`}
+              >
+                <MessageCircle className="w-4 h-4" />
+                Send Message
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -89,7 +89,7 @@ const ServiceProfileInfo = () => {
               alt="profile"
               width={120}
               height={120}
-              className="rounded-full mx-auto border-4 border-white shadow-lg mb-4"
+              className="rounded-full mx-auto border-4 border-white shadow-lg mb-4 w-24 h-24 object-cover"
             />
             <h3 className="text-white text-xl font-semibold mb-1">
               {userData?.firstName && userData?.lastName
