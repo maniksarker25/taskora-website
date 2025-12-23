@@ -96,25 +96,12 @@ const VerfiyOtp = () => {
   const handleVerify = async (e) => {
     e.preventDefault();
 
-    // Check if user is authenticated and has email
-    if (!isAuthenticated || !userEmail) {
-      toast.error("User not authenticated. Please login again.", {
-        style: {
-          backgroundColor: "#fee2e2",
-          color: "#991b1b",
-          borderLeft: "6px solid #dc2626",
-        },
-      });
-      return;
-    }
-
-    const resetCode = otp.join("");
-
-
+    const resetCode = Number(otp.join(""));
+    const forgetPasswordEmail = typeof window !== "undefined" ? localStorage.getItem("forgetPasswordEmail") : null;
 
     try {
       const result = await verifyResetOtp({
-        email: userEmail,
+        email: forgetPasswordEmail || userEmail,
         resetCode: resetCode
       }).unwrap();
 
@@ -161,17 +148,17 @@ const VerfiyOtp = () => {
               <div className="flex flex-col items-center justify-center py-6">
                 <div className="w-full">
                   <div className="p-6 sm:p-8">
-                    <h1 className="text-[#394352] text-3xl font-semibold my-4">
+                    <h1 className="text-[#394352] text-3xl font-semibold my-4 text-center">
                       Verify your OTP
                     </h1>
-                    <p className="text-[#1F2937]">
+                    {/* <p className="text-[#1F2937]">
                       Please enter the code we've sent to your phone number
                       {userEmail && (
                         <span className="block text-sm text-gray-600 mt-1">
                           (Verifying for: {userEmail})
                         </span>
                       )}
-                    </p>
+                    </p> */}
 
 
 
@@ -206,7 +193,7 @@ const VerfiyOtp = () => {
                     <div className="mt-4 flex w-full text-center rounded-sm overflow-clip transition transform duration-300 hover:scale-101">
                       <button
                         onClick={handleVerify}
-                        disabled={isLoading || otp.some(digit => digit === "") || !isAuthenticated}
+                        disabled={isLoading || otp.some(digit => digit === "")}
                         className="bg-[#115E59] w-full py-2 text-white cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
                       >
                         {isLoading ? "Verifying..." : "Verify"}

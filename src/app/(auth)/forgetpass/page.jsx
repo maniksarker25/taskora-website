@@ -6,6 +6,9 @@ import { useForgetPasswordMutation } from "@/lib/features/auth/authApi";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import 'react-phone-number-input/style.css'
+import PhoneInput from 'react-phone-number-input'
+
 const ForgetPassword = () => {
   const [phone, setPhone] = useState("");
   const router = useRouter();
@@ -17,6 +20,11 @@ const ForgetPassword = () => {
     try {
       const result = await forgetPassword({ phone }).unwrap();
       if (result.success) {
+        localStorage.setItem("forgetPasswordPhone", phone);
+        // Store email if returned by backend
+        if (result.data?.email) {
+          localStorage.setItem("forgetPasswordEmail", result.data.email);
+        }
         toast.success("OTP sent successfully", {
           style: {
             backgroundColor: "#d1fae5",
@@ -27,7 +35,7 @@ const ForgetPassword = () => {
         router.push("/verifyotp");
       }
     } catch (err) {
-      toast.error("Failed to send OTP. Please try again.", {
+      toast.error(err?.data?.message || "Failed to send OTP. Please try again.", {
         style: {
           backgroundColor: "#fee2e2",
           color: "#991b1b",
@@ -58,10 +66,10 @@ const ForgetPassword = () => {
               <div className="flex flex-col items-center justify-center py-6">
                 <div className="w-full">
                   <div className="p-6 sm:p-8">
-                    <h1 className="text-[#394352] text-3xl font-semibold my-4">
+                    <h1 className="text-[#394352] text-3xl text-center font-semibold my-4">
                       Forget Password?
                     </h1>
-                    <p className="text-[#1F2937]">
+                    <p className="text-[#1F2937] text-center">
                       Please enter your Phone Number to get verification code
                     </p>
 
@@ -72,14 +80,15 @@ const ForgetPassword = () => {
                           Phone Number
                         </label>
                         <div className="relative flex items-center">
-                          <input
-                            name="phone_number"
-                            type="text"
+                          <PhoneInput
+                            international
+                            defaultCountry="NG"
+                            countries={['NG', 'CA', 'GB', 'US', 'BD']}
                             value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            onChange={setPhone}
+                            className="w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 pr-10 rounded-md outline-blue-600 focus:border-blue-500 outline-none"
+                            placeholder="Enter phone number"
                             required
-                            className="w-full text-[#6B7280] text-sm border border-slate-300 px-4 py-3 pr-8 rounded-md outline-blue-600"
-                            placeholder="+8801872970928"
                           />
                         </div>
                       </div>
@@ -88,7 +97,7 @@ const ForgetPassword = () => {
                         <button
                           type="submit"
                           disabled={isLoading}
-                          className="bg-[#115E59] w-full py-2 text-white cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+                          className="bg-[#115E59] w-full py-3 text-white cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
                         >
                           {isLoading ? "Sending..." : "Continue"}
                         </button>
