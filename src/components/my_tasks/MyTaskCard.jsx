@@ -3,6 +3,7 @@ import React from "react";
 import { Clock, Home, MapPin } from "lucide-react";
 
 const MyTaskCard = ({ service }) => {
+  console.log("service", service);
   return (
     <div className="bg-white shadow rounded-lg p-4 sm:p-6 mb-4 border border-gray-200">
       {/* Top row */}
@@ -18,17 +19,29 @@ const MyTaskCard = ({ service }) => {
       <div className="flex flex-col md:flex-row justify-between border-b mb-4 border-gray-200">
         {/* Details */}
         <div className="space-y-2 mb-4">
-          <div className="flex items-center gap-2 text-gray-600 text-sm">
-            <MapPin className="w-4 h-4 text-teal-600" />
-            <span> {service.locations[0]}</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-600 text-sm">
-            <Home className="w-4 h-4 text-teal-600" />
-            <span>{service.locations[1]}</span>
-          </div>
+            
+            {
+              service.locations && service.locations.length ? <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2 text-gray-600 text-sm">
+              <MapPin className="w-4 h-4 text-teal-600" />
+              <span> {service.locations[0]}</span>
+            </div>
+            <div className="flex items-center gap-2 text-gray-600 text-sm">
+              <Home className="w-4 h-4 text-teal-600" />
+              <span>{service.locations[1]}</span>
+            </div>
+          </div> : (
+                <div className="flex items-center gap-2 text-gray-600 text-sm">
+                  <MapPin className="w-4 h-4 text-teal-600" />
+                  <span>  Online</span>
+                </div>
+              )
+            }
+
+         
           <div className="flex items-center gap-2 text-gray-600 text-sm">
             <Clock className="w-4 h-4 text-teal-600" />
-            <span>{service.date}</span>
+            <span>{service?.date === "Schedule not set" ? "Flexible" : service?.date}</span>
           </div>
         </div>
         {/* Category + Image */}

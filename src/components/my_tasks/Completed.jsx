@@ -206,7 +206,7 @@ const Completed = ({ bidsData, taskDetails }) => {
             <div>
               <p className="text-base md:text-xl font-semibold">Location</p>
               <p className="text-[#6B7280] text-sm">
-                {taskDetails?.address || taskDetails?.city || "Location not specified"}
+                {taskDetails?.address || taskDetails?.city || "Online"}
               </p>
             </div>
           </div>
@@ -220,7 +220,9 @@ const Completed = ({ bidsData, taskDetails }) => {
                 To Be Done On
               </p>
               <p className="text-[#6B7280] text-sm">
-                {formatDateTime(taskDetails?.preferredDate, taskDetails?.preferredTime)}
+                {
+                  taskDetails?.preferredDeliveryDateTime ? formatDate(taskDetails.preferredDeliveryDateTime) : "Flexible"
+                }
               </p>
             </div>
           </div>

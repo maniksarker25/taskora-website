@@ -13,6 +13,7 @@ import client from "../../../public/profile_image.jpg";
 import { useCreateQuestionMutation } from '@/lib/features/question/questionApi';
 
 const ProviderBids = ({ taskDetails, bidsData, questionsData, taskId, refetchBids }) => {
+  console.log("taskDetails", taskDetails)
   const info = bidsData?.data?.result || [];
   const [isBidModalOpen, setIsBidModalOpen] = useState(false);
   const [editingBid, setEditingBid] = useState(null);
