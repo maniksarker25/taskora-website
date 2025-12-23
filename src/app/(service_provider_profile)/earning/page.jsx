@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Mail, DollarSign, Loader2 } from 'lucide-rea
 import { CgProfile } from 'react-icons/cg';
 import { FaMoneyBillTransfer, FaNairaSign } from 'react-icons/fa6';
 import { TbCurrencyNaira } from 'react-icons/tb';
-import { useGetMyTransactionsQuery } from '@/lib/features/transactionApi/transactionApi';
+import { useGetProviderTransactionsQuery } from '@/lib/features/transactionApi/transactionApi';
 
 const Earningpage = () => {
   const [activeTab, setActiveTab] = useState('Daily');
@@ -16,12 +16,14 @@ const Earningpage = () => {
     isLoading,
     isError,
     refetch
-  } = useGetMyTransactionsQuery(filterParams);
+  } = useGetProviderTransactionsQuery(filterParams);
+
+  console.log("transactionsData",transactionsData);
 
   useEffect(() => {
     const updateFilterParams = () => {
       const tab = activeTab.toLowerCase();
-      const params = { filterType: tab };
+      const params = { type: tab };
 
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth() + 1;
@@ -111,9 +113,8 @@ const Earningpage = () => {
     }
   };
 
-  const transactions = transactionsData?.data || [];
+  const transactions = transactionsData?.data?.data || [];
   const totalEarnings = transactions
-    .filter(t => t.type === 'CREDIT')
     .reduce((sum, t) => sum + (t.amount || 0), 0);
 
   return (
@@ -222,27 +223,31 @@ const Earningpage = () => {
                 {transactions.map((transaction) => (
                   <div key={transaction._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-teal-200 transition-all">
                     <div className="flex items-center gap-4">
-                      <div className={`p-3 rounded-full ${transaction.type === 'CREDIT' ? 'bg-green-100' : 'bg-red-100'}`}>
-                        <TbCurrencyNaira className={`w-6 h-6 ${transaction.type === 'CREDIT' ? 'text-green-600' : 'text-red-600'}`} />
+                      <div className="p-3 rounded-full bg-[#E6F4F1]">
+                        <TbCurrencyNaira className="w-6 h-6 text-[#115E59]" />
                       </div>
                       <div>
                         <p className="font-bold text-gray-900 leading-tight">
-                          {transaction.reason || (transaction.type === 'CREDIT' ? 'Payment Received' : 'Withdrawal')}
+                          {transaction.taskTitle || 'Project Payment'}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <p className="text-xs text-gray-500">{new Date(transaction.createdAt).toLocaleDateString()}</p>
-                          <span className="text-gray-300">•</span>
-                          <p className="text-[10px] text-gray-400 font-mono">{transaction.transactionId}</p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(transaction.updatedAt).toLocaleDateString('en-GB', {
+                              day: '2-digit',
+                              month: 'short',
+                              year: 'numeric'
+                            })}
+                          </p>
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className={`text-lg font-bold ${transaction.type === 'CREDIT' ? 'text-green-600' : 'text-red-600'}`}>
-                        {transaction.type === 'CREDIT' ? '+' : '-'} ₦ {transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                      <p className="text-lg font-bold text-[#115E59] ">
+                        + ₦ {transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </p>
-                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${transaction.type === 'CREDIT' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-                        {transaction.type}
-                      </span>
+                      {/* <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-green-50 text-green-700">
+                        CREDIT
+                      </span> */}
                     </div>
                   </div>
                 ))}

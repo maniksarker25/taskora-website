@@ -14,7 +14,11 @@ const rawBaseQuery = fetchBaseQuery({
     const state = getState();
     const accessToken = state?.auth?.accessToken || getTokens().accessToken;
     if (accessToken) {
-      headers.set("Authorization", `${accessToken}`);
+      // Add Bearer prefix for backend compatibility
+      const authHeader = accessToken.startsWith('Bearer ')
+        ? accessToken
+        : `Bearer ${accessToken}`;
+      headers.set("Authorization", authHeader);
     }
     return headers;
   },
@@ -23,10 +27,10 @@ const baseQuery = async (args, api, extraOptions) => {
   let result = await rawBaseQuery(args, api, extraOptions);
 
   if (result.error && result.error.status === 401) {
-    const cookieRefreshToken = document.cookie
+    const cookieRefreshToken = typeof document !== 'undefined' ? document.cookie
       .split("; ")
       .find((row) => row.startsWith("refreshToken="))
-      ?.split("=")[1];
+      ?.split("=")[1] : null;
 
     const { refreshToken: storedRefreshToken } = getTokens();
     const refreshToken = cookieRefreshToken || storedRefreshToken;
@@ -51,40 +55,26 @@ const baseQuery = async (args, api, extraOptions) => {
         extraOptions
       );
 
-      if (
-        refreshResult.data?.success &&
-        refreshResult.data?.data?.accessToken
-      ) {
+      if (refreshResult.data?.success && refreshResult.data?.data?.accessToken) {
         const newAccessToken = refreshResult.data.data.accessToken;
-
         storeTokens(newAccessToken, refreshToken);
-        api.dispatch(
-          setCredentials({
-            accessToken: newAccessToken,
-            refreshToken,
-          })
-        );
+        api.dispatch(setCredentials({
+          accessToken: newAccessToken,
+          refreshToken,
+        }));
 
+        // Retry the original query with the new token
         result = await rawBaseQuery(args, api, extraOptions);
-        return result;
-      }
-
-      if (refreshResult.error) {
-        console.error("Token refresh response error:", refreshResult.error);
-        return result;
+      } else {
+        // Refresh failed, logout
+        api.dispatch(logout());
+        if (typeof window !== "undefined" && !window.location.pathname.includes('/login')) {
+          window.location.href = "/login";
+        }
       }
     } catch (error) {
-      console.error("Token refresh failed:", error);
-      return result;
-    }
-
-    if (!refreshToken) {
-      removeTokens();
+      console.error("Token refresh process failed:", error);
       api.dispatch(logout());
-
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
-      }
     }
   }
 
