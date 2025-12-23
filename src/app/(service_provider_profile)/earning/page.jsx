@@ -134,10 +134,10 @@ const Earningpage = () => {
         <div className="bg-[#e6f4f1] border border-[#c0d9d3] rounded-lg p-6 mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-lg text-[#115e59] font-medium mb-2">
+              <p className="text-base text-[#115e59] font-semibold mb-2">
                 {activeTab === 'Lifetime' ? 'Total Earnings' : `${activeTab} Earnings`}
               </p>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900">
+              <h2 className="text-base md:text-base font-bold text-gray-900">
                 ₦ {totalEarnings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </h2>
             </div>
@@ -147,19 +147,19 @@ const Earningpage = () => {
         {/* Earnings Breakdown Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center gap-2 mb-6">
-            <div className="bg-teal-100 p-2 rounded-lg">
-              <TbCurrencyNaira className="w-4 h-4 text-[#115e59]" />
+            <div className="bg-[#E6F4F1] p-2 rounded-lg">
+              <TbCurrencyNaira className="w-4 h-4 text-[#115e59] font-bold" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900">Earnings Breakdown</h3>
           </div>
 
           {/* Time Period Tabs */}
-          <div className="flex flex-wrap gap-2 mb-6">
+          <div className="flex flex-wrap gap-2 mb-6  items-center justify-center mb-10">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 text-lg font-medium rounded-lg transition-colors ${activeTab === tab
+                className={`px-4 py-2 text-xs md:text-base font-medium rounded-lg transition-colors ${activeTab === tab
                   ? 'bg-[#115e59] text-white'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
@@ -223,15 +223,15 @@ const Earningpage = () => {
                 {transactions.map((transaction) => (
                   <div key={transaction._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-100 hover:border-teal-200 transition-all">
                     <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-full bg-[#E6F4F1]">
-                        <TbCurrencyNaira className="w-6 h-6 text-[#115E59]" />
+                      <div className="p-2 md:p-3 rounded-full bg-[#E6F4F1]">
+                        <TbCurrencyNaira className="w-4 h-4 md:w-6 md:h-6 text-[#115E59]" />
                       </div>
                       <div>
-                        <p className="font-bold text-gray-900 leading-tight">
+                        <p className="font-bold text-gray-900 leading-tight text-xs md:text-base">
                           {transaction.taskTitle || 'Project Payment'}
                         </p>
                         <div className="flex items-center gap-2 mt-1">
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 text-xs md:text-base">
                             {new Date(transaction.updatedAt).toLocaleDateString('en-GB', {
                               day: '2-digit',
                               month: 'short',
@@ -242,7 +242,7 @@ const Earningpage = () => {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-lg font-bold text-[#115E59] ">
+                      <p className="text-sm md:text-lg font-bold text-[#115E59] ">
                         + ₦ {transaction.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                       </p>
                       {/* <span className="text-[10px] px-2 py-0.5 rounded-full font-medium bg-green-50 text-green-700">
