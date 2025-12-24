@@ -41,6 +41,8 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const { sendMessageSoket } = useSocketContext();
 
+  const [loadingBidId, setLoadingBidId] = useState(null);
+
   const executeAcceptBid = async (bidId, couponCode) => {
     if ((taskStatus || taskDetails?.status) !== "OPEN_FOR_BID") {
       toast.error("Task is no longer open for bids.");
@@ -48,6 +50,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
     }
 
     try {
+      setLoadingBidId(bidId);
       const payload = { bidID: bidId };
       if (couponCode && couponCode.trim()) {
         payload.promoCode = couponCode.trim();
@@ -84,6 +87,8 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
           duration: 3000,
         }
       );
+    } finally {
+      setLoadingBidId(null);
     }
   };
 
@@ -230,7 +235,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   const handleDeleteTask = async () => {
     if (!taskDetails?._id) return;
 
-  
+
     try {
       const result = await deleteTask(taskDetails._id).unwrap();
       if (result.success) {
@@ -393,12 +398,21 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                       <button
                         onClick={() => openConfirmModal(bid)}
                         disabled={isAcceptingBid}
-                        className={`w-full px-4 py-2.5 rounded-lg font-medium transition-colors text-sm ${!isAcceptingBid
-                          ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        className={`w-full px-4 py-2.5 rounded-lg font-medium transition-colors text-sm ${isAcceptingBid && loadingBidId === (bid._id || bid.id)
+                            ? "bg-[#115E59] text-white opacity-80 cursor-wait" // Processing state
+                            : !isAcceptingBid
+                              ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer" // Normal state
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed" // Disabled state (other buttons)
                           }`}
                       >
-                        {isAcceptingBid ? "Accepting..." : "Accept Bid"}
+                        {isAcceptingBid && loadingBidId === (bid._id || bid.id) ? (
+                          <div className="flex items-center justify-center gap-2">
+                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            <span>Accepting...</span>
+                          </div>
+                        ) : (
+                          "Accept Bid"
+                        )}
                       </button>
                     )}
                   </div>

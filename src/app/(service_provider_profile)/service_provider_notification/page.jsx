@@ -11,17 +11,18 @@ const ServiceProviderNotification = () => {
   const limit = 10;
   const { user } = useSelector((state) => state.auth);
   const userRole = user?.role;
-  
-  const { 
-    data: notificationsData, 
-    isLoading, 
-    error, 
-    refetch 
+
+  const {
+    data: notificationsData,
+    isLoading,
+    error,
+    refetch,
+    isFetching
   } = useGetNotificationsQuery({ page, limit });
-  
+
   const notifications = notificationsData?.data?.result || [];
   const meta = notificationsData?.data?.meta;
-  
+
   // Calculate unread count
   const unreadCount = notifications.filter(n => n.seenBy?.length === 0).length;
 
@@ -64,13 +65,14 @@ const ServiceProviderNotification = () => {
             )}
           </div>
         </div>
-        
+
         <button
           onClick={refetch}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          disabled={isFetching}
+          className={`inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors ${isFetching ? 'opacity-70 cursor-not-allowed' : ''}`}
         >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
+          <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+          {isFetching ? 'Refreshing...' : 'Refresh'}
         </button>
       </div>
 
@@ -84,7 +86,7 @@ const ServiceProviderNotification = () => {
         <div className="grid grid-cols-1 items-center gap-3 mb-6 py-6">
           {notifications.map((notification) => (
             <NotificationCard
-             userRole={userRole}
+              userRole={userRole}
               key={notification._id}
               notification={notification}
             />
