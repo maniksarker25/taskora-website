@@ -29,7 +29,9 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const [upgradeAccount, { isLoading: isUpgrading }] = useUpgradeAccountMutation();
-  const { data, isLoading, error } = useGetMyProfileQuery();
+  const { data, isLoading, error } = useGetMyProfileQuery(undefined, {
+    skip: !isAuthenticated,
+  });
   const multiUserverify = data?.data.user.isMultiRole
 
 

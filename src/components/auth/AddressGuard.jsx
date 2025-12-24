@@ -21,7 +21,7 @@ const AddressGuard = ({ children }) => {
                 // Actually, we generally want to force them to /verify if they are logged in and unverified.
                 // But we must allow them to be ON /verify.
 
-                if (pathname !== "/verify" && pathname !== "/logout") {
+                if (pathname !== "/verify" && pathname !== "/logout" && pathname !== "/verify_register_user") {
                     router.push("/verify");
                 }
             }
