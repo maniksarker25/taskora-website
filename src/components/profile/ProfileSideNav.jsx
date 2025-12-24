@@ -118,7 +118,7 @@ const ProfileSideNav = ({ open, onClose }) => {
         </div>
 
         <h2 className="font-semibold text-gray-800">{userData?.name}</h2>
-        <p className="text-xs text-gray-600">{user?.role}</p>
+        <p className="text-xs text-gray-600">{user?.role === "customer" ? "Tasker" : "Freelancer"}</p>
       </div>
 
       {/* Navigation */}
