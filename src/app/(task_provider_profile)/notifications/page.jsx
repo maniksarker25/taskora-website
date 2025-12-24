@@ -10,37 +10,38 @@ import { toast } from "sonner";
 const Notifications = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
-  
+
   const { user } = useSelector((state) => state.auth);
   const userRole = user?.role;
-  
+
   // Fetch notifications
-  const { 
-    data: notificationsData, 
-    isLoading, 
-    error, 
-    refetch 
+  const {
+    data: notificationsData,
+    isLoading,
+    error,
+    refetch,
+    isFetching
   } = useGetNotificationsQuery({ page, limit });
-  
+
   const [markNotificationAsSeen] = useMarkNotificationAsSeenMutation();
-  
+
   const notifications = notificationsData?.data?.result || [];
-  console.log("notifications====>",notifications)
+  console.log("notifications====>", notifications)
   const meta = notificationsData?.data?.meta;
-  
+
   // Calculate unread count
   const unreadCount = notifications.filter(n => n.seenBy?.length === 0).length;
-  
+
   // Handle mark all as seen
   const handleMarkAllAsSeen = async () => {
     if (unreadCount === 0) return;
-    
+
     try {
       const unreadNotifications = notifications.filter(n => n.seenBy?.length === 0);
-      const promises = unreadNotifications.map(notification => 
+      const promises = unreadNotifications.map(notification =>
         markNotificationAsSeen(notification._id)
       );
-      
+
       await Promise.all(promises);
       toast.success(`Marked ${unreadCount} notifications as read`);
       refetch();
@@ -49,7 +50,7 @@ const Notifications = () => {
       toast.error(error.message || "Error marking all as seen");
     }
   };
-  
+
   // Handle individual notification marked as seen
   const handleNotificationMarkedAsSeen = (notificationId) => {
     // This callback can be used to update local state if needed
@@ -115,7 +116,7 @@ const Notifications = () => {
             )}
           </div>
         </div>
-        
+
         <div className="flex gap-2">
           {unreadCount > 0 && (
             <button
@@ -128,10 +129,11 @@ const Notifications = () => {
           )}
           <button
             onClick={refetch}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            disabled={isFetching}
+            className={`inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors ${isFetching ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            <RefreshCw className="w-4 h-4" />
-            Refresh
+            <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+            {isFetching ? 'Refreshing...' : 'Refresh'}
           </button>
         </div>
       </div>
@@ -165,11 +167,11 @@ const Notifications = () => {
               >
                 Previous
               </button>
-              
+
               <span className="text-gray-600">
                 Page {page} of {meta.totalPage}
               </span>
-              
+
               <button
                 onClick={() => setPage(prev => Math.min(meta.totalPage, prev + 1))}
                 disabled={page === meta.totalPage}
