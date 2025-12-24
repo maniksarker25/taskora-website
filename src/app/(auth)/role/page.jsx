@@ -30,7 +30,7 @@ const page = () => {
               {/* Logo */}
               <div className="flex items-center justify-center mb-6 w-full">
                 <span className="text-xl font-bold text-[#115e59]">
-                  <Image src={main_logo} alt="main logo "className="w-44"/>
+                  <Image src={main_logo} alt="main logo " className="w-44" />
                 </span>
               </div>
 
@@ -47,25 +47,25 @@ const page = () => {
               <div className="space-y-4 space-x-2">
                 <Link
                   href={{ pathname: 'register', query: { role: 'customer' } }}
-                  className="w-full flex items-center gap-4 border rounded-lg py-3 px-4 text-xl md:text-2xl transition border-[#878b92] bg-white font-semibold" 
-              
+                  className="w-full flex items-center gap-4 border rounded-lg py-3 px-4 text-xl md:text-2xl transition border-[#878b92] bg-white font-semibold"
+
                 >
-                 <Image src={customer} alt="customer" className="w-20"/>
-                  Customer
+                  <Image src={customer} alt="customer" className="w-20" />
+                  Tasker
                 </Link>
                 <Link
-                 href={{ pathname: 'register', query: { role: 'provider' } }}
+                  href={{ pathname: 'register', query: { role: 'provider' } }}
                   className="w-full flex items-center gap-4 border rounded-lg py-3 px-4 transition border-[#878b92] bg-white text-xl md:text-2xl font-semibold">
-                 <Image src={service_provider} alt="customer"  className="w-20"/>
-                  Service Provider
+                  <Image src={service_provider} alt="customer" className="w-20" />
+                  Freelancer
                 </Link>
               </div>
 
-             <div className="mt-4 rounded-sm overflow-clip transition transform duration-300 hover:scale-101" >
-                 <button className="bg-[#115E59] w-full py-2 text-white cursor-pointer ">Continue</button>
-            </div>
+              <div className="mt-4 rounded-sm overflow-clip transition transform duration-300 hover:scale-101" >
+                <button className="bg-[#115E59] w-full py-2 text-white cursor-pointer ">Continue</button>
+              </div>
 
-              
+
             </div>
           </div>
         </div>

@@ -259,7 +259,7 @@ const Navbar = () => {
             <div>
               <p className="text-base font-bold">{userData?.name}</p>
               <p className="text-xs text-gray-600">{user?.email}</p>
-              <p className="text-xs text-[#115e59] font-medium">{user?.role}</p>
+              <p className="text-sm text-[#115e59] font-medium">Tasker</p>
             </div>
           </div>
 
@@ -354,7 +354,7 @@ const Navbar = () => {
             <div>
               <p className="text-base font-bold">{userData?.name}</p>
               <p className="text-gray-600">{user?.email}</p>
-              <p className="text-sm text-[#115e59] font-medium">{user?.role}</p>
+              <p className="text-sm text-[#115e59] font-medium">{user?.role === 'provider' ? "Freelancer" : "Tasker"}</p>
             </div>
           </div>
 
@@ -430,7 +430,7 @@ const Navbar = () => {
             className="w-full h-full object-cover"
           />
         </div>
-        <span className="font-medium">My Account (Customer)</span>
+        <span className="font-medium">My Account (Tasker)</span>
         <div
           className={`ml-auto transform transition-transform ${profileOpen ? "rotate-180" : ""
             }`}
@@ -506,7 +506,7 @@ const Navbar = () => {
             className="w-full h-full object-cover"
           />
         </div>
-        <span className="font-medium">My Account (Provider)</span>
+        <span className="font-medium">My Account (Freelancer)</span>
         <div
           className={`ml-auto transform transition-transform ${profileOpen ? "rotate-180" : ""
             }`}

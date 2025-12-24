@@ -276,9 +276,7 @@ const ServiceProfileInfoUpdate = () => {
                   {userData?.name || "User Name"}
                 </h3>
                 <p className="text-gray-600 mb-4 capitalize">
-                  {role === "provider"
-                    ? "Provider"
-                    : "Customer"}
+                  Freelancer
                 </p>
                 <button
                   onClick={triggerProfileImageInput}

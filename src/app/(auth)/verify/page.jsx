@@ -195,7 +195,7 @@ const VerifyReg = () => {
                         <input type="hidden" {...register("street", { required: "Street address is required" })} />
                       </div>
 
-                      <div>
+                      {/* <div>
                         <label className="text-[#1F2937] text-sm font-medium mb-2 block">
                           City / LGA
                         </label>
@@ -213,7 +213,7 @@ const VerifyReg = () => {
                         {errors.city && (
                           <p className="text-red-500 text-sm mt-1">{errors.city.message}</p>
                         )}
-                      </div>
+                      </div> */}
 
                       <div className="flex flex-col gap-2">
                         {!selectedFile ? (

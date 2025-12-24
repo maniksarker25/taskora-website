@@ -14,7 +14,7 @@ const ServiceProfileInfo = () => {
 
   // User data from API
   const userData = data?.data;
-  console.log("userDatatata",userData?.profile_image)
+  console.log("userDatatata", userData?.profile_image)
 
   if (isLoading) {
     return (
@@ -98,7 +98,7 @@ const ServiceProfileInfo = () => {
               }
             </h3>
             <p className="text-green-100 text-sm">
-              {userData?.role === "provider" ? "Service Provider" : "Customer"}
+              Freelancer
             </p>
           </div>
 
@@ -145,7 +145,7 @@ const ServiceProfileInfo = () => {
                         Role
                       </h3>
                       <p className="text-gray-600 text-lg bg-gray-50 p-3 rounded-lg capitalize">
-                        {role || "Not specified"}
+                        {role === "provider" ? "Freelancer" : "Tasker"}
                       </p>
                     </div>
                   </div>
@@ -187,7 +187,7 @@ const ServiceProfileInfo = () => {
                         )}
                       </p>
                     </div>
-                    
+
                   </div>
                 </div>
 
@@ -272,7 +272,7 @@ const ServiceProfileInfo = () => {
                     Role
                   </h3>
                   <p className="text-gray-600 text-base ml-5 capitalize">
-                    {role|| "Not specified"}
+                    {role === "provider" ? "Freelancer" : "Tasker"}
                   </p>
                 </div>
 
@@ -283,29 +283,29 @@ const ServiceProfileInfo = () => {
                   </h3>
                   <p className="text-gray-600 text-base ml-5 leading-relaxed">
                     {userData?.address ? (
-                          <>
-                            {userData.address.street && <>{userData.address.street}<br /></>}
-                            {userData.address.city && <>{userData.address.city}, </>}
-                            {userData.address.state && <>{userData.address.state}, </>}
-                            {userData.address.zipCode && <>{userData.address.zipCode}<br /></>}
-                            {userData.address.country && <>{userData.address.country}</>}
-                            {!userData.address.street && !userData.address.city && "Not provided"}
-                          </>
-                        ) : userData?.location ? (
-                          userData.location
-                        ) : (
-                          userData?.city && userData?.street ? (
-                            <>
-                              {userData.city}, {userData.street}
-                            </>
-                          ) : (
-                            "Not provided"
-                          )
-                        )}
+                      <>
+                        {userData.address.street && <>{userData.address.street}<br /></>}
+                        {userData.address.city && <>{userData.address.city}, </>}
+                        {userData.address.state && <>{userData.address.state}, </>}
+                        {userData.address.zipCode && <>{userData.address.zipCode}<br /></>}
+                        {userData.address.country && <>{userData.address.country}</>}
+                        {!userData.address.street && !userData.address.city && "Not provided"}
+                      </>
+                    ) : userData?.location ? (
+                      userData.location
+                    ) : (
+                      userData?.city && userData?.street ? (
+                        <>
+                          {userData.city}, {userData.street}
+                        </>
+                      ) : (
+                        "Not provided"
+                      )
+                    )}
                   </p>
                 </div>
 
-               
+
               </div>
 
               {/* Update Button - Mobile */}
