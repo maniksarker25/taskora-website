@@ -9,11 +9,14 @@ import { useRouter } from "next/navigation";
 
 const IdCardVerification = () => {
   const [selectedDoc, setSelectedDoc] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [dob, setDob] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [documentFile, setDocumentFile] = useState(null);
   const [completeIdentityVerification, { isLoading }] = useCompleteIdentityVerificationMutation();
   const { user, accessToken } = useAuth();
-   const router = useRouter();
+  const router = useRouter();
 
   const documentTypeMap = {
     "National Identification Number (NIN)": "NATIONAL_ID",
@@ -25,7 +28,7 @@ const IdCardVerification = () => {
   const getPlaceholder = () => {
     switch (selectedDoc) {
       case "National Identification Number (NIN)":
-        return "Enter your NIN number";
+        return "Enter your 11-digit NIN";
       case "Voter's Card":
         return "Enter your Voter's Card number";
       case "International Passport":
@@ -47,46 +50,51 @@ const IdCardVerification = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     console.log("=== Form submission started ===");
     console.log("Selected doc:", selectedDoc);
     console.log("Mapped type:", documentTypeMap[selectedDoc]);
     console.log("ID Number:", idNumber);
     console.log("Document file:", documentFile);
-    
+
     if (!selectedDoc) {
       toast.error("Please select a document type");
       return;
     }
-    
+
     if (!idNumber.trim()) {
       toast.error("Please enter your ID number");
       return;
     }
-    
+
+
+
     if (!documentFile) {
       toast.error("Please upload a document");
       return;
     }
-    
+
     try {
       console.log("=== Creating FormData ===");
-      
+
       const formData = new FormData();
-      
+
       // 1. File append
       formData.append("identification_document", documentFile);
       console.log("File appended to FormData");
-      
+
       const jsonData = {
+        first_name: firstName,
+        last_name: lastName,
+        dob: dob,
+        id_number: idNumber,
         identificationDocumentType: documentTypeMap[selectedDoc],
-        identificationDocumentNumber: idNumber
       };
-      
+
       const jsonString = JSON.stringify(jsonData);
       formData.append("data", jsonString);
-      
-      console.log("JSON Data:", jsonString);
+
+      console.log("JSON Data:===>", jsonString);
       console.log("FormData keys:");
       for (let [key, value] of formData.entries()) {
         if (value instanceof File) {
@@ -97,21 +105,21 @@ const IdCardVerification = () => {
       }
 
       const result = await completeIdentityVerification(formData).unwrap();
-      
       console.log("=== API Response Success ===", result);
+
       toast.success("Identity verification completed successfully");
-        setTimeout(() => {
-          if (user?.role === 'provider') {
-             router.push('/');
-            
-          } 
-          // else {
-          //  router.push('/service_provider_profile');
-          // }
-        }, 1000);
+      setTimeout(() => {
+        if (user?.role === 'provider') {
+          router.push('/');
+
+        }
+        // else {
+        //  router.push('/service_provider_profile');
+        // }
+      }, 1000);
       setIdNumber("");
       setDocumentFile(null);
-      
+
     } catch (err) {
       if (err.data?.message) {
         toast.error(err.data.message);
@@ -130,9 +138,9 @@ const IdCardVerification = () => {
   }, [selectedDoc]);
 
   return (
-    <section>
-      <div className="max-w-[1100px] mx-auto h-[1200px] flex items-center justify-center max-h-screen">
-        <div className="flex items-center justify-center gap-8 bg-[#F8FAFC] rounded-sm overflow-clip shadow-2xl">
+    <section className="min-h-screen flex items-center justify-center py-10 bg-white">
+      <div className="max-w-[1100px] w-full mx-auto px-4">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 bg-[#F8FAFC] rounded-sm overflow-hidden shadow-2xl">
           {/* Left Side - Images */}
           <div className="hidden md:block overflow-hidden w-full h-full">
             <div className="w-auto">
@@ -157,9 +165,53 @@ const IdCardVerification = () => {
                       Verify your identity with NIN or other accepted documents
                       using Smile ID's secure process.
                     </p>
-                    
+
                     {/* -------------------form------------------------------ */}
-                    <form onSubmit={handleSubmit} className="mt-12 space-y-6">
+                    <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[#1F2937] text-sm font-medium mb-2 block">
+                            First Name
+                          </label>
+                          <input
+                            name="firstName"
+                            type="text"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            required
+                            className="w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 rounded-md outline-blue-600 bg-white"
+                            placeholder="Enter First Name"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-[#1F2937] text-sm font-medium mb-2 block">
+                            Last Name
+                          </label>
+                          <input
+                            name="lastName"
+                            type="text"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            required
+                            className="w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 rounded-md outline-blue-600 bg-white"
+                            placeholder="Enter Last Name"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-[#1F2937] text-sm font-medium mb-2 block">
+                          Date of Birth
+                        </label>
+                        <input
+                          name="dob"
+                          type="date"
+                          value={dob}
+                          onChange={(e) => setDob(e.target.value)}
+                          required
+                          className="w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 rounded-md outline-blue-600 bg-white"
+                        />
+                      </div>
                       <div>
                         <label className="text-[#1F2937] text-sm font-medium mb-2 block">
                           Select Identification Document
@@ -177,7 +229,7 @@ const IdCardVerification = () => {
                             <option>Driver's License</option>
                           </select>
                         </div>
-                        
+
                       </div>
 
                       <div>
@@ -195,11 +247,10 @@ const IdCardVerification = () => {
                             }}
                             required
                             disabled={!selectedDoc}
-                            className={`w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 pr-8 rounded-md outline-blue-600 transition ${
-                              !selectedDoc
-                                ? "bg-gray-100 cursor-not-allowed"
-                                : "bg-white"
-                            }`}
+                            className={`w-full text-slate-900 text-sm border border-slate-300 px-4 py-3 pr-8 rounded-md outline-blue-600 transition ${!selectedDoc
+                              ? "bg-gray-100 cursor-not-allowed"
+                              : "bg-white"
+                              }`}
                             placeholder={getPlaceholder()}
                           />
                         </div>
@@ -210,7 +261,7 @@ const IdCardVerification = () => {
                           {documentFile ? (
                             <div className="text-center p-4">
                               <svg xmlns="http://www.w3.org/2000/svg" className="w-11 mb-3 fill-green-500" viewBox="0 0 32 32">
-                                <path d="M16 0C7.164 0 0 7.164 0 16s7.164 16 16 16 16-7.164 16-16S24.836 0 16 0zm-2 24.414l-5.707-5.707 1.414-1.414L14 21.586l8.293-8.293 1.414 1.414L14 24.414z"/>
+                                <path d="M16 0C7.164 0 0 7.164 0 16s7.164 16 16 16 16-7.164 16-16S24.836 0 16 0zm-2 24.414l-5.707-5.707 1.414-1.414L14 21.586l8.293-8.293 1.414 1.414L14 24.414z" />
                               </svg>
                               <p className="text-green-600 font-medium truncate max-w-xs">{documentFile.name}</p>
                               <p className="text-xs text-gray-400 mt-1">
@@ -238,7 +289,7 @@ const IdCardVerification = () => {
                               </svg>
                               <p className="font-medium">Upload Document</p>
                               <p className="text-xs font-medium text-slate-400 mt-2">
-                                PNG, JPG, SVG, WEBP, and GIF are allowed.
+                                PNG, JPG, and JPEG are allowed.
                               </p>
                             </div>
                           )}
@@ -247,7 +298,7 @@ const IdCardVerification = () => {
                             id="uploadFile1"
                             className="hidden"
                             onChange={handleFileChange}
-                            accept=".jpg,.jpeg,.png,.webp,.gif,.svg"
+                            accept=".jpg,.jpeg,.png"
                           />
                         </label>
                       </div>
@@ -256,12 +307,11 @@ const IdCardVerification = () => {
                       <div className="mt-4 flex rounded-sm overflow-clip transition transform duration-300 hover:scale-101">
                         <button
                           type="submit"
-                          disabled={isLoading || !selectedDoc || !idNumber || !documentFile}
-                          className={`bg-[#115E59] text-center w-full py-3 text-white cursor-pointer ${
-                            isLoading || !selectedDoc || !idNumber || !documentFile
-                              ? "opacity-70 cursor-not-allowed"
-                              : ""
-                          }`}
+                          disabled={isLoading || !selectedDoc || !idNumber || !documentFile || !firstName || !lastName || !dob}
+                          className={`bg-[#115E59] text-center w-full py-3 text-white cursor-pointer ${isLoading || !selectedDoc || !idNumber || !documentFile || !firstName || !lastName || !dob
+                            ? "opacity-70 cursor-not-allowed"
+                            : ""
+                            }`}
                         >
                           {isLoading ? (
                             <span className="flex items-center justify-center">
