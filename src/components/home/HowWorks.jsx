@@ -12,13 +12,13 @@ const data = [
     id: 1,
     cateName: "Create Your Account",
     providers:
-      "Sign up as a customer or service provider directly on our website.",
+      "Sign up as a tasker or freelancer directly on our website.",
     icon: cateimg1,
   },
   {
     id: 2,
     cateName: "Find or List a Service",
-    providers: "Customers can browse services by category, location, or price.",
+    providers: "Tasker can browse services by category, location, or price.",
     icon: cateimg2,
   },
   {

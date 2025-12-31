@@ -92,7 +92,6 @@ const Footer = () => {
         </p> */}
           </div>
         </div>
-
       </div>
       <div className='absolute top-8 right-20'>
         <Image src={FooterBg} alt="Footer Background" />

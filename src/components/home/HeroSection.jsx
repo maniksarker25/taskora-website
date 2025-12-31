@@ -73,21 +73,21 @@ const HeroSection = () => {
             <Link
               href="/post_task"
               onClick={handlePostTaskClick}
-              className="px-5 py-3 border-2 text-color border-teal-800 rounded-md hover:bg-teal-800 hover-white transition transform duration-300 text-base md:text-lg"
+              className="px-5 py-3 border-2 text-color border-teal-800 rounded-md  transition transform duration-300 text-base md:text-lg hover:scale-105"
             >
               Post a task
             </Link>
           </div>
         </div>
         {/* Right Side */}
-        <div className="relative w-full lg:w-1/2 flex items-center justify-center">
+        <div className="relative w-full lg:w-1/2 flex items-center justify-center  md:mt-20 lg:mt-0">
           {/* Background Pattern */}
           <div className="absolute inset-0 flex items-center justify-center mt-20 md:mt-20 lg:mt-0 -left-6 md:-left-10 lg:-left-10">
             <Image
               src={bg_image}
               width={600}
               alt="Pattern"
-              className="opacity-50 w-[350px] md:w-full h-auto"
+              className="opacity-50 w-[350px] md:w-[600px] lg:w-full h-auto"
             />
           </div>
 

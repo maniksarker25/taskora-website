@@ -247,6 +247,20 @@ const authApi = createApi({
         url: "/user/get-my-profile",
         method: "GET",
       }),
+      async onQueryStarted(args, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data?.success && data?.data) {
+            const isAddressProvided = !!(data.data.address?.street || data.data.street);
+            dispatch(updateAddressStatus(isAddressProvided));
+            if (typeof window !== "undefined") {
+              localStorage.setItem("isAddressProvided", isAddressProvided ? "true" : "false");
+            }
+          }
+        } catch (error) {
+          console.error("Error syncing profile address status:", error);
+        }
+      },
       providesTags: ["Auth"],
     }),
 
