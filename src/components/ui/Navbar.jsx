@@ -164,7 +164,14 @@ const Navbar = () => {
 
   const serviceProviderLinks = (
     <div className="flex flex-col lg:flex-row lg:items-center gap-3 lg:gap-6">
-      <Link href="/post_task" className={getLinkClass("/post_task")}>
+      <Link
+        href="/post_task"
+        className={getLinkClass("/post_task")}
+        onClick={(e) => {
+          e.preventDefault();
+          toast.error("Please switch or upgrade your account to Tasker to post a task");
+        }}
+      >
         Post A Task
       </Link>
       <Link href="/browseservice" className={getLinkClass("/browseservice")}>
