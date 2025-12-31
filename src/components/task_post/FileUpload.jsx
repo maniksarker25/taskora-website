@@ -1,10 +1,66 @@
 // components/task_post/FileUpload.jsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, X, Eye, Image as ImageIcon } from 'lucide-react';
 
-const FileUpload = ({ 
-  files = [], 
-  onChange, 
+const FilePreview = ({ file, isUrl, onRemove }) => {
+  const [previewUrl, setPreviewUrl] = useState(isUrl ? file : '');
+
+  useEffect(() => {
+    let url = '';
+    if (!isUrl && file instanceof File) {
+      url = URL.createObjectURL(file);
+      setPreviewUrl(url);
+    }
+    return () => {
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [file, isUrl]);
+
+  const fileName = isUrl ? file.split('/').pop() : (file?.name || 'File');
+  const fileSize = isUrl ? null : (file?.size ? (file.size / (1024 * 1024)).toFixed(2) : '0.00');
+
+  return (
+    <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border">
+      {isUrl || previewUrl ? (
+        <img
+          src={previewUrl || file}
+          alt="preview"
+          className="w-10 h-10 object-cover rounded shadow-sm"
+        />
+      ) : (
+        <ImageIcon className="w-8 h-8 text-gray-400 flex-shrink-0" />
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-900 truncate" title={fileName}>
+          {fileName}
+        </p>
+        <p className="text-xs text-gray-500">
+          {isUrl ? 'Existing Attachment' : `${fileSize} MB`}
+        </p>
+      </div>
+      <div className="flex gap-1">
+        <button
+          type="button"
+          onClick={() => window.open(previewUrl || file, '_blank')}
+          className="p-1 text-gray-400 hover:text-teal-600 transition-colors"
+        >
+          <Eye className="w-4 h-4" />
+        </button>
+        <button
+          type="button"
+          onClick={onRemove}
+          className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+        >
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const FileUpload = ({
+  files = [],
+  onChange,
   multiple = true,
   maxFiles = 5,
   maxSizeMB = 5
@@ -19,14 +75,14 @@ const FileUpload = ({
         alert(`File ${file.name} is too large. Maximum size is ${maxSizeMB}MB.`);
         return false;
       }
-      
+
       // Check file type
       const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       if (!validTypes.includes(file.type)) {
         alert(`File ${file.name} is not a supported image format.`);
         return false;
       }
-      
+
       return true;
     });
 
@@ -66,11 +122,6 @@ const FileUpload = ({
     fileInputRef.current?.click();
   };
 
-  const handlePreview = (file) => {
-    const url = URL.createObjectURL(file);
-    window.open(url, '_blank');
-  };
-
   return (
     <div className="space-y-4">
       {/* File Input (hidden) */}
@@ -87,8 +138,8 @@ const FileUpload = ({
       <div
         className={`
           border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
-          ${dragOver 
-            ? 'border-teal-500 bg-teal-50' 
+          ${dragOver
+            ? 'border-teal-500 bg-teal-50'
             : 'border-gray-300 hover:border-teal-400'
           }
         `}
@@ -114,36 +165,12 @@ const FileUpload = ({
           </h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {files.map((file, index) => (
-              <div
+              <FilePreview
                 key={index}
-                className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border"
-              >
-                <ImageIcon className="w-8 h-8 text-gray-400 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {file.name}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {(file.size / (1024 * 1024)).toFixed(2)} MB
-                  </p>
-                </div>
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => handlePreview(file)}
-                    className="p-1 text-gray-400 hover:text-teal-600 transition-colors"
-                  >
-                    <Eye className="w-4 h-4" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeFile(index)}
-                    className="p-1 text-gray-400 hover:text-red-600 transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                file={file}
+                isUrl={typeof file === 'string'}
+                onRemove={() => removeFile(index)}
+              />
             ))}
           </div>
         </div>
