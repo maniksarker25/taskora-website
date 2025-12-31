@@ -18,18 +18,29 @@ import { DatePicker, TimePicker } from "antd";
 import { CalendarOutlined, ClockCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { useGetAllCategoriesQuery } from "@/lib/features/category/categoryApi";
-import { useCreateTaskMutation } from "@/lib/features/task/taskApi";
+import {
+  useCreateTaskMutation,
+  useGetTaskByIdQuery,
+  useUpdateTaskMutation
+} from "@/lib/features/task/taskApi";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const TaskCreationApp = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formErrors, setFormErrors] = useState({});
   const [providerId, setProviderId] = useState(null);
-  const { data, isLoading, error } = useGetAllCategoriesQuery();
+  const [taskId, setTaskId] = useState(null);
+  const { data, isLoading: categoriesLoading, error } = useGetAllCategoriesQuery();
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [createTask, { isLoading: isCreating }] = useCreateTaskMutation();
+  const [updateTask, { isLoading: isUpdating }] = useUpdateTaskMutation();
+
+  const { data: taskData, isLoading: taskLoading } = useGetTaskByIdQuery(taskId, {
+    skip: !taskId,
+  });
 
   const categories = data?.data?.result?.map(category => ({
     value: category?._id || category?.id,
@@ -221,19 +232,22 @@ const TaskCreationApp = () => {
     try {
       const formDataToSend = new FormData();
 
-      // Append files
-      formData.taskAttachments.forEach((file) => {
-        formDataToSend.append('task_attachments', file);
-      });
+      // Append files if any new ones are selected
+      if (formData.taskAttachments && formData.taskAttachments.length > 0) {
+        formData.taskAttachments.forEach((file) => {
+          if (file instanceof File) {
+            formDataToSend.append('task_attachments', file);
+          }
+        });
+      }
 
       const mappedData = mapToBackendValues(formData);
-
       const coordinates = mappedData.locationCoordinates || [90.4125, 23.8103];
 
       // Create the task payload according to backend expectations
       const taskPayload = {
         title: mappedData.taskTitle,
-        category: mappedData.taskCategory,
+        category: typeof mappedData.taskCategory === 'object' ? (mappedData.taskCategory?._id || mappedData.taskCategory?.id) : mappedData.taskCategory,
         description: mappedData.taskDescription,
         budget: parseInt(mappedData.budget),
         address: mappedData.location || "",
@@ -244,7 +258,8 @@ const TaskCreationApp = () => {
         },
         scheduleType: mappedData.taskTiming,
         payOn: "completion",
-        doneBy: mappedData.taskType
+        doneBy: mappedData.taskType,
+        task_attachments: formData.taskAttachments.filter(item => typeof item === 'string')
       };
 
       // Add preferredDeliveryDateTime for fixed date tasks
@@ -255,66 +270,70 @@ const TaskCreationApp = () => {
       // Add provider if available
       if (providerId && providerId !== "null" && providerId !== "undefined") {
         taskPayload.provider = providerId;
-
-      } else {
-        console.log("Creating general task (no specific provider)");
       }
-
 
       formDataToSend.append('data', JSON.stringify(taskPayload));
 
-      const result = await createTask(formDataToSend).unwrap();
+      let result;
+      if (taskId) {
+        result = await updateTask({ id: taskId, formData: formDataToSend }).unwrap();
+      } else {
+        result = await createTask(formDataToSend).unwrap();
+      }
 
       if (result.success) {
-        if (result.data?.provider) {
-          toast.success(`Task created successfully for the provider!`);
-        } else {
-          toast.success("Task created successfully!");
+        const successMessage = taskId ? "Task updated successfully!" : (result.data?.provider ? "Task created successfully for the provider!" : "Task created successfully!");
+        toast.success(successMessage);
+
+        // Reset form and cleanup
+        if (!taskId) {
+          setFormData({
+            taskTitle: "",
+            taskCategory: "",
+            taskDescription: "",
+            taskType: "in-person",
+            location: "",
+            locationCoordinates: null,
+            city: "",
+            taskTiming: "fixed-date",
+            preferredDate: "",
+            preferredTime: "",
+            budget: "",
+            agreedToTerms: false,
+            taskAttachments: [],
+          });
         }
 
-        // Reset form
-        setFormData({
-          taskTitle: "",
-          taskCategory: "",
-          taskDescription: "",
-          taskType: "in-person",
-          location: "",
-          locationCoordinates: null,
-          city: "",
-          taskTiming: "fixed-date",
-          preferredDate: "",
-          preferredTime: "",
-          budget: "",
-          agreedToTerms: false,
-          taskAttachments: [],
-        });
-
-        const storageKey = providerId ? `task_draft_${providerId}` : "task_draft_general";
+        const storageKey = providerId ? `task_draft_${providerId}` : (taskId ? `task_edit_${taskId}` : "task_draft_general");
         localStorage.removeItem(storageKey);
         localStorage.removeItem(`${storageKey}_step`);
         setCurrentStep(0);
 
         setTimeout(() => {
-          router.push("/browseservice");
+          router.push(taskId ? "/my_task" : "/browseservice");
         }, 1500);
       }
 
     } catch (error) {
-      toast.error(error?.data?.message || "Failed to create task. Please try again.");
+      toast.error(error?.data?.message || `Failed to ${taskId ? "update" : "create"} task. Please try again.`);
     }
   };
 
   useEffect(() => {
     // Initialize from URL Params and LocalStorage
-    const urlParams = new URLSearchParams(window.location.search);
-    const providerIdFromUrl = urlParams.get('providerId');
-    const categoryIdFromUrl = urlParams.get('categoryId');
+    const providerIdFromUrl = searchParams.get('providerId');
+    const categoryIdFromUrl = searchParams.get('categoryId');
+    const editIdFromUrl = searchParams.get('editId') || searchParams.get('taskId');
 
     if (providerIdFromUrl) {
       setProviderId(providerIdFromUrl);
     }
 
-    const storageKey = providerIdFromUrl ? `task_draft_${providerIdFromUrl}` : "task_draft_general";
+    if (editIdFromUrl) {
+      setTaskId(editIdFromUrl);
+    }
+
+    const storageKey = providerIdFromUrl ? `task_draft_${providerIdFromUrl}` : (editIdFromUrl ? `task_edit_${editIdFromUrl}` : "task_draft_general");
     const savedStep = localStorage.getItem(`${storageKey}_step`);
     const savedForm = localStorage.getItem(storageKey);
 
@@ -323,24 +342,66 @@ const TaskCreationApp = () => {
     if (savedForm) {
       try {
         const parsedForm = JSON.parse(savedForm);
+        const categoryId = typeof parsedForm.taskCategory === 'object' ? (parsedForm.taskCategory?._id || parsedForm.taskCategory?.id) : parsedForm.taskCategory;
+
         setFormData(prev => ({
           ...prev,
           ...parsedForm,
           taskAttachments: [],
-          // URL category overrides saved category
-          taskCategory: categoryIdFromUrl || parsedForm.taskCategory || prev.taskCategory
+          // URL category/task overrides saved data
+          taskCategory: categoryIdFromUrl || categoryId || prev.taskCategory
         }));
       } catch (error) {
         console.error("Error parsing saved form", error);
       }
     } else if (categoryIdFromUrl) {
-      // No saved form, but URL has category
       setFormData(prev => ({
         ...prev,
         taskCategory: categoryIdFromUrl
       }));
     }
-  }, []);
+  }, [searchParams]);
+
+  // Handle task pre-filling during edit
+  useEffect(() => {
+    if (taskData?.data && taskId) {
+      const task = taskData.data;
+
+      const scheduleTypeMap = {
+        "FIXED_DATE_AND_TIME": "fixed-date",
+        "FLEXIBLE": "flexible"
+      };
+
+      const taskTypeMap = {
+        "IN_PERSON": "in-person",
+        "ONLINE": "online"
+      };
+
+      let preferredDate = "";
+      let preferredTime = "";
+      if (task.preferredDeliveryDateTime) {
+        const dt = dayjs(task.preferredDeliveryDateTime);
+        preferredDate = dt.format("YYYY-MM-DD");
+        preferredTime = dt.format("HH:mm");
+      }
+
+      setFormData({
+        taskTitle: task.title || "",
+        taskCategory: typeof task.category === 'object' ? (task.category?._id || task.category?.id) : (task.category || ""),
+        taskDescription: task.description || "",
+        taskType: taskTypeMap[task.doneBy] || "in-person",
+        location: task.address || "",
+        locationCoordinates: task.location?.coordinates || null,
+        city: task.city || "",
+        taskTiming: scheduleTypeMap[task.scheduleType] || "flexible",
+        preferredDate: preferredDate,
+        preferredTime: preferredTime,
+        budget: task.budget?.toString() || "",
+        agreedToTerms: true,
+        taskAttachments: task.task_attachments || [],
+      });
+    }
+  }, [taskData, taskId]);
 
   useEffect(() => {
     const storageKey = providerId ? `task_draft_${providerId}` : "task_draft_general";
@@ -349,9 +410,9 @@ const TaskCreationApp = () => {
 
   useEffect(() => {
     const { taskAttachments, ...formDataWithoutFiles } = formData;
-    const storageKey = providerId ? `task_draft_${providerId}` : "task_draft_general";
+    const storageKey = providerId ? `task_draft_${providerId}` : (taskId ? `task_edit_${taskId}` : "task_draft_general");
     localStorage.setItem(storageKey, JSON.stringify(formDataWithoutFiles));
-  }, [formData, providerId]);
+  }, [formData, providerId, taskId]);
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -393,9 +454,9 @@ const TaskCreationApp = () => {
                 options={categories}
                 value={formData.taskCategory}
                 onChange={(e) => handleInputChange("taskCategory", e.target.value)}
-                placeholder={isLoading ? "Loading categories..." : "Select Category"}
+                placeholder={categoriesLoading ? "Loading categories..." : "Select Category"}
                 required
-                disabled={isLoading}
+                disabled={categoriesLoading}
               />
               {formErrors.taskCategory && (
                 <p className="text-red-500 text-sm mt-1">{formErrors.taskCategory}</p>
@@ -598,28 +659,44 @@ const TaskCreationApp = () => {
         {/* Page Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {providerId ? "Submit Your Offer" : "Create New Task"}
+            {taskId ? "Edit Your Task" : (providerId ? "Submit Your Offer" : "Create New Task")}
           </h1>
           <p className="text-gray-600">
-            {providerId
-              ? "Submit a personalized offer to this specific provider"
-              : "Post your task and get offers from multiple providers"
+            {taskId
+              ? "Update your task details and requirements"
+              : (providerId
+                ? "Submit a personalized offer to this specific provider"
+                : "Post your task and get offers from multiple providers"
+              )
             }
           </p>
         </div>
 
         {/* Main Form */}
         <MultiStepForm steps={steps} currentStep={currentStep} showTimelineBorder>
-          {renderStepContent()}
-          <FormNavigation
-            onPrevious={handlePrevious}
-            onNext={handleNext}
-            currentStep={currentStep}
-            totalSteps={steps.length}
-            finalLabel={isCreating ? "Creating..." : providerId ? "Submit Offer" : "Post Task"}
-            handleSubmit={handleSubmit}
-            disabled={isCreating}
-          />
+          {taskLoading ? (
+            <div className="flex flex-col items-center justify-center py-20 space-y-4">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-800"></div>
+              <p className="text-gray-500 animate-pulse">Loading task data...</p>
+            </div>
+          ) : (
+            <>
+              {renderStepContent()}
+              <FormNavigation
+                onPrevious={handlePrevious}
+                onNext={handleNext}
+                currentStep={currentStep}
+                totalSteps={steps.length}
+                finalLabel={
+                  isCreating || isUpdating
+                    ? (taskId ? "Updating..." : "Creating...")
+                    : (taskId ? "Update Task" : (providerId ? "Submit Offer" : "Post Task"))
+                }
+                handleSubmit={handleSubmit}
+                disabled={isCreating || isUpdating}
+              />
+            </>
+          )}
         </MultiStepForm>
       </div>
     </div>

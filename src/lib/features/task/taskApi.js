@@ -21,7 +21,6 @@ const taskApi = createApi({
       query: (taskData) => ({
         url: "/task/create-task",
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: taskData,
       }),
       invalidatesTags: ["Task"],
@@ -96,8 +95,8 @@ const taskApi = createApi({
     }),
 
     updateTask: builder.mutation({
-      query: (formData) => ({
-        url: "/task/update-task",
+      query: ({ id, formData }) => ({
+        url: `/task/update-task/${id}`,
         method: "PATCH",
         body: formData,
       }),

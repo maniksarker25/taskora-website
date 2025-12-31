@@ -314,12 +314,12 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
               <p className="text-xl sm:text-2xl font-bold text-black">₦ {taskDetails?.budget}</p>
             </div>
             <div className="flex flex-col sm:flex-row lg:flex-col xl:flex-row gap-3 w-full">
-              {/* <button
+              <button
                 onClick={() => router.push(`/post_task?editId=${taskDetails?._id}`)}
                 className="px-4 py-2 border-2 border-[#115e59] rounded-md hover:bg-[#115e59] text-[#115e59] hover:text-white transition transform duration-300 cursor-pointer text-sm"
               >
                 Edit Task
-              </button> */}
+              </button>
               <button
                 onClick={handleDeleteTask}
                 disabled={isDeletingTask}
