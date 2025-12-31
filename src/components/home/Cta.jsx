@@ -1,7 +1,13 @@
+"use client"
 import Link from "next/link";
 import React from "react";
+import { useSelector } from "react-redux";
 
 const Cta = () => {
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+
+  const userRole = user?.role;
+
   return (
     <section className="pt-24 pb-24 gradiant-bg">
       <div className="max-w-[1240px] mx-auto px-4">
@@ -13,7 +19,7 @@ const Cta = () => {
             </h3>
             <p className="text-gray-700 text-base sm:text-lg md:text-xl">
               <span className="font-bold text-black">
-                Join as a Service Provider on Taskalley —
+                {userRole === "customer" ? "Join as a Freelancer" : "JJoin as a Tasker"} on Taskalley —
               </span>{" "}
               showcase your skills, reach more clients, and manage bookings with
               ease — all in one platform designed to help your business thrive.
@@ -26,7 +32,8 @@ const Cta = () => {
               href="/role"
               className="px-6 py-3 bg-[#115e59] text-white rounded-md hover:bg-teal-800 transition transform duration-300 hover:scale-105 text-lg font-medium"
             >
-              Join as a Provider
+              {userRole === "customer" ? "Join as a Freelancer" : "JJoin as a Tasker"}
+              
             </Link>
           </div>
         </div>

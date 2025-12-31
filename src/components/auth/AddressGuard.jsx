@@ -5,28 +5,32 @@ import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/components/auth/useAuth";
 
 const AddressGuard = ({ children }) => {
-    const { isAuthenticated, isAddressProvided, isLoading, user } = useAuth();
+    const {
+        isAuthenticated,
+        isAddressProvided,
+        isLoading: isAuthLoading,
+        isProfileLoading,
+        user
+    } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
 
     useEffect(() => {
-        // If loading, do nothing yet
-        if (isLoading) return;
+        // If auth or profile is loading, do nothing yet
+        if (isAuthLoading || isProfileLoading) return;
 
-        // If user is authenticated
+        // If user is authenticated and not admin
         if (isAuthenticated && user?.role !== 'admin') {
-            // If address is NOT provided
+            // If address is NOT provided in Redux (which is now synced by useAuth/getMyProfile)
             if (!isAddressProvided) {
-                // If currently on a page that is NOT the verify page (and not in public allowed list that might be part of flow)
-                // Actually, we generally want to force them to /verify if they are logged in and unverified.
-                // But we must allow them to be ON /verify.
-
-                if (pathname !== "/verify" && pathname !== "/logout" && pathname !== "/verify_register_user") {
+                // If currently on a page that is NOT the verify page (and not in public allowed list)
+                if (pathname !== "/verify" && pathname !== "/logout" && pathname !== "/verify_register_user" && pathname !== "/login") {
+                    console.log("AddressGuard: Redirecting to /verify because isAddressProvided is false");
                     router.push("/verify");
                 }
             }
         }
-    }, [isAuthenticated, isAddressProvided, isLoading, pathname, router, user]);
+    }, [isAuthenticated, isAddressProvided, isAuthLoading, isProfileLoading, pathname, router, user]);
 
     return <>{children}</>;
 };

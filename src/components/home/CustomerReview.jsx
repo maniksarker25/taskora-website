@@ -18,7 +18,7 @@ const CustomerReview = () => {
     <section className="max-w-[1240px] mx-auto px-4 pt-36 pb-36">
       <div className="flex flex-col gap-6 justify-center items-center text-center py-12">
         <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold ">
-          Our Customers Reviews
+          Our Tasker Reviews
         </h1>
         <p className="text-gray-600 text-base font-medium">
           Here are a few sample traveler reviews that you can feature on our

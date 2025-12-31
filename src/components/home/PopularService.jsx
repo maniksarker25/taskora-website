@@ -51,7 +51,7 @@ const PopularService = () => {
               </p>
             </div>
             <h3 className="font-semibold text-2xl md:text-4xl flex flex-col gap-6">
-              Popular Service Provider
+              Popular Service
             </h3>
           </div>
 
