@@ -10,7 +10,7 @@ export default function RootLayout({ children }) {
           position="top-right"
           expand={true}
           richColors
-          closeButton
+        
         />
       {children}
       <Footer />

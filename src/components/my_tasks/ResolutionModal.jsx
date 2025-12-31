@@ -34,7 +34,7 @@ const timeRef = useRef(null);
 
   const options = [
     {
-      title: `Ask ${role === "customer" ?"Service Provider" : "Customer" }  to Change Completion Date`,
+      title: `Ask ${role === "customer" ?"Freelancer" : "Tasker" }  to Change Completion Date`,
       icon: <Calendar className="w-6 h-6 text-color" />,
       action: () => setOpenModal("date"),
     },

@@ -22,6 +22,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   console.log("taskDetails", taskDetails);
 
   const info = bidsData?.data.result
+  console.log("info", info);
   const role = useSelector((state) => state?.auth?.user?.role);
 
   const [activeTab, setActiveTab] = useState("bids");
@@ -368,7 +369,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                   <div className="flex flex-col sm:flex-row lg:flex-col items-center sm:items-start lg:items-center xl:flex-row xl:items-center gap-4">
                     <div className="w-16 h-16 sm:w-20 sm:h-20  rounded-full overflow-clip border-2 border-white shadow-sm flex-shrink-0">
                       <Image
-                        src={srvcporvider}
+                        src={bid?.provider?.profile_image ||srvcporvider}
                         alt={bid?.provider?.name || "Provider"}
                         width={500}
                         height={500}
@@ -399,10 +400,10 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                         onClick={() => openConfirmModal(bid)}
                         disabled={isAcceptingBid}
                         className={`w-full px-4 py-2.5 rounded-lg font-medium transition-colors text-sm ${isAcceptingBid && loadingBidId === (bid._id || bid.id)
-                            ? "bg-[#115E59] text-white opacity-80 cursor-wait" // Processing state
+                            ? "bg-[#115E59] text-white opacity-80 cursor-wait" 
                             : !isAcceptingBid
-                              ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer" // Normal state
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed" // Disabled state (other buttons)
+                              ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer" 
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed" 
                           }`}
                       >
                         {isAcceptingBid && loadingBidId === (bid._id || bid.id) ? (
