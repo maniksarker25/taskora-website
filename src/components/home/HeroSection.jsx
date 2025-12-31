@@ -19,35 +19,35 @@ const HeroSection = () => {
   const userRole = user?.role;
 
   const handlePostTaskClick = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!isAuthenticated) {
-    toast.error("Please login first to post a task");
-    return;
-  }
+    if (!isAuthenticated) {
+      toast.error("Please login first to post a task");
+      return;
+    }
 
-  if (userRole !== "customer") {
-    toast.error("You need to upgrade your account to post a task")
-    return;
-  }
+    if (userRole !== "customer") {
+      toast.error("Please switch or upgrade your account to Tasker to post a task");
+      return;
+    }
 
-  router.push("/post_task");
-};
+    router.push("/post_task");
+  };
   const handleBrowseServiceClick = (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!isAuthenticated) {
-    toast.error("Please login first to post a task");
-    return;
-  }
+    if (!isAuthenticated) {
+      toast.error("Please login first to post a task");
+      return;
+    }
 
-  if (userRole !== "customer") {
-    toast.error("You need to upgrade your account to Browse Service")
-    return;
-  }
+    if (userRole !== "customer") {
+      toast.error("Please switch or upgrade your account to Tasker to Browse Service");
+      return;
+    }
 
-  router.push("/service-listing");
-};
+    router.push("/service-listing");
+  };
 
   return (
     <section className="max-w-[1240px] mx-auto px-4 pt-8">
