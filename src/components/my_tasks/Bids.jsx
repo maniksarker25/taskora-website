@@ -365,7 +365,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                 className="flex flex-col lg:flex-row gap-4 p-4 border rounded-lg bg-white"
               >
                 {/* left side */}
-                <div className="flex flex-col justify-between gap-6 sm:gap-10 bg-[#E6F4F1] rounded-xl p-4 lg:w-1/3 xl:w-1/4">
+                <div className="flex flex-col justify-between gap-6 sm:gap-10 bg-[#E6F4F1] rounded-xl p-4 ">
                   <div className="flex flex-col sm:flex-row lg:flex-col items-center sm:items-start lg:items-center xl:flex-row xl:items-center gap-4">
                     <div className="w-16 h-16 sm:w-20 sm:h-20  rounded-full overflow-clip border-2 border-white shadow-sm flex-shrink-0">
                       <Image

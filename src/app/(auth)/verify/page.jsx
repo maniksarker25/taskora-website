@@ -27,6 +27,7 @@ const VerifyReg = () => {
   const streetValue = watch("street") || "";
 
   const handleLocationSelect = (locationData) => {
+    console.log("location Data",locationData)
     if (locationData) {
       setValue("street", locationData.address);
       setValue("city", locationData.city || "");
@@ -68,6 +69,7 @@ const VerifyReg = () => {
       }
 
       const result = await updateProfile(formData).unwrap();
+      console.log(result)
 
       if (result.success) {
         toast.success("Address verified successfully!");

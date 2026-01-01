@@ -27,8 +27,9 @@ const LocationSearch = ({
 
   const handlePlaceSelect = (place) => {
     if (!place) return;
+    console.log('LocationSearch handlePlaceSelect', { place, pathname: typeof window !== 'undefined' ? window.location.pathname : null });
     
-    const address = place.formatted_address;
+    const address = place.formatted_address; 
     setInputValue(address);
     
     // Get coordinates from place geometry
@@ -59,11 +60,13 @@ const LocationSearch = ({
 
   const onLoad = (autocomplete) => {
     autocompleteRef.current = autocomplete;
-  };
+    console.log('LocationSearch onLoad', { pathname: typeof window !== 'undefined' ? window.location.pathname : null, autocompleteLoaded: !!autocomplete });
+  }; 
 
   const onPlaceChanged = () => {
     if (autocompleteRef.current) {
       const place = autocompleteRef.current.getPlace();
+      console.log('LocationSearch onPlaceChanged', { place, pathname: typeof window !== 'undefined' ? window.location.pathname : null });
       handlePlaceSelect(place);
     }
   };
