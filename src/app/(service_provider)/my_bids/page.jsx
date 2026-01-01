@@ -10,15 +10,25 @@ import BidCard from "@/components/Bids/BidCard";
 import { useGetMyBidsQuery } from "@/lib/features/bidApi/bidApi";
 
 const bidStatusCategories = [
-  {
-    name: "OPEN_FOR_BID",
-    displayName: "Open for Bid",
-    description: "Tasks that are currently open for bidding"
-  },
+  // {
+  //   name: "OPEN_FOR_BID",
+  //   displayName: "Open for Bid",
+  //   description: "Tasks that are currently open for bidding"
+  // },
   {
     name: "IN_PROGRESS", 
-    displayName: "In Progress",
+    displayName: "Ongoing Tasks",
     description: "Tasks that are currently being worked on"
+  },
+  {
+    name: "bidMade",
+    displayName: "Bids Made",
+    description: "Bids you have placed on tasks"
+  },
+  {
+    name: "bidReceived",
+    displayName: "Bids Received",
+    description: "Bids received on your tasks"
   },
   {
     name: "COMPLETED",
@@ -35,21 +45,13 @@ const bidStatusCategories = [
     displayName: "Dispute Tasks",
     description: "Tasks that are in dispute"
   },
-  {
-    name: "LATE",
-    displayName: "Late Tasks",
-    description: "Tasks that are running late"
-  },
-  {
-    name: "bidMade",
-    displayName: "Bids Made",
-    description: "Bids you have placed on tasks"
-  },
-  {
-    name: "bidReceived",
-    displayName: "Bids Received",
-    description: "Bids received on your tasks"
-  }
+  // {
+  //   name: "LATE",
+  //   displayName: "Late Tasks",
+  //   description: "Tasks that are running late"
+  // },
+  
+  
 ];
 
 const MyBids = () => {

@@ -57,14 +57,14 @@ const ConfirmBookingModal = ({ isOpen, onClose, onContinue, bidAmount, isLoading
                                 className="flex-1 border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-700 disabled:bg-gray-100 disabled:text-gray-500"
                                 disabled={isLoading}
                             />
-                            <button
+                            {/* <button
                                 type="button"
                                 className="bg-[#115e59] text-white px-6 py-2.5 rounded-lg hover:bg-teal-800 transition-colors font-medium cursor-default disabled:opacity-50"
                                 onClick={(e) => e.preventDefault()}
                                 disabled={isLoading}
                             >
                                 Apply
-                            </button>
+                            </button> */}
                         </div>
                     )}
 
