@@ -27,7 +27,7 @@ const VerifyReg = () => {
   const streetValue = watch("street") || "";
 
   const handleLocationSelect = (locationData) => {
-    console.log("location Data",locationData)
+    console.log("location Data", locationData)
     if (locationData) {
       setValue("street", locationData.address);
       setValue("city", locationData.city || "");
@@ -179,7 +179,7 @@ const VerifyReg = () => {
                     <form onSubmit={handleSubmit(onSubmit)} className="mt-12 space-y-6">
                       <div>
                         <label className="text-[#1F2937] text-sm font-medium mb-2 block">
-                          Street Address
+                          Street Address 
                         </label>
                         <LocationSearch
                           value={streetValue}
@@ -234,13 +234,14 @@ const VerifyReg = () => {
                                 data-original="#000000"
                               />
                             </svg>
-                            Upload Address Verification Document
+                            Upload Address Verification Document 
                             <input
                               type="file"
                               id="uploadFile1"
                               className="hidden"
                               accept=".png,.jpg,.jpeg,.svg,.webp,.pdf"
                               onChange={handleFileChange}
+
                             />
                             <p className="text-xs font-medium text-slate-400 mt-2">
                               PNG, JPG SVG, WEBP and PDF are Allowed.
@@ -350,7 +351,7 @@ const VerifyReg = () => {
                       <div className="mt-4 flex rounded-sm overflow-clip transition transform duration-300 hover:scale-101">
                         <button
                           type="submit"
-                          disabled={isLoading}
+                          disabled={isLoading || !streetValue || !selectedFile}
                           className="bg-[#115E59] text-center w-full py-2 text-white cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isLoading ? "Verifying..." : "Verify"}

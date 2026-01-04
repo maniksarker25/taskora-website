@@ -1,8 +1,7 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Mail, DollarSign, Loader2 } from 'lucide-react';
-import { CgProfile } from 'react-icons/cg';
-import { FaMoneyBillTransfer, FaNairaSign } from 'react-icons/fa6';
+import { ChevronLeft, ChevronRight, Mail,  Loader2 } from 'lucide-react';
+import { FaMoneyBillTransfer } from 'react-icons/fa6';
 import { TbCurrencyNaira } from 'react-icons/tb';
 import { useGetProviderTransactionsQuery } from '@/lib/features/transactionApi/transactionApi';
 
@@ -18,7 +17,7 @@ const Earningpage = () => {
     refetch
   } = useGetProviderTransactionsQuery(filterParams);
 
-  console.log("transactionsData",transactionsData);
+  console.log("transactionsData", transactionsData);
 
   useEffect(() => {
     const updateFilterParams = () => {
