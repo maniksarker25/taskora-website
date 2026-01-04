@@ -11,6 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "../../../../src/components/ui/breadcrumb";
 import Image from 'next/image';
+import { useGetFaqQuery } from '@/lib/features/web/faqApi';
 
 const faqs = [
   {
@@ -64,6 +65,9 @@ const faqs = [
 const Faq = () => {
 
   const [openIndex, setOpenIndex] = useState(null);
+  const { data: faqs, isLoading } = useGetFaqQuery();
+  const faqData = faqs?.data;
+  console.log("faqqq=>", faqData)
 
   const toggleFAQ = (index) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -125,7 +129,7 @@ const Faq = () => {
       <section className="project_container p-6">
       <h2 className="text-2xl font-bold mb-6 text-center">Frequently Asked Questions</h2>
       <div className="space-y-10 ">
-        {faqs.map((faq, index) => (
+        {faqData?.map((faq, index) => (
           <div
             key={index}
             className="border-b-1  border-black bg-white"

@@ -16,6 +16,7 @@ import feedbackApi from './features/feedback/feedbackApi';
 import notificationApi from './features/notification/notificationApi';
 import { transactionApi } from './features/transactionApi/transactionApi';
 import bankVerificationApi from './features/bankVerificationApi/bankVerificationApi';
+import faqApi from './features/web/faqApi';
 
 export const makeStore = () =>
   configureStore({
@@ -36,7 +37,8 @@ export const makeStore = () =>
       [feedbackApi.reducerPath]: feedbackApi.reducer,
       [notificationApi.reducerPath]: notificationApi.reducer,
       [transactionApi.reducerPath]: transactionApi.reducer,
-      [bankVerificationApi.reducerPath]:bankVerificationApi.reducer
+      [bankVerificationApi.reducerPath]:bankVerificationApi.reducer,
+      [faqApi.reducerPath]:faqApi.reducer
     },
     middleware:(getDefaultMiddleware) => getDefaultMiddleware()
     .concat(
@@ -55,7 +57,8 @@ export const makeStore = () =>
       feedbackApi.middleware,
       notificationApi.middleware,
       transactionApi.middleware,
-      bankVerificationApi.middleware
+      bankVerificationApi.middleware,
+      faqApi.middleware
     ),
     devTools: process.env.NODE_ENV !== 'production',
   });
