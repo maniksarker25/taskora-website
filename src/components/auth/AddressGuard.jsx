@@ -21,11 +21,20 @@ const AddressGuard = ({ children }) => {
 
         // If user is authenticated and not admin
         if (isAuthenticated && user?.role !== 'admin') {
+            // Define public routes that don't require address verification
+            const publicRoutes = ["/", "/about", "/contact", "/faq", "/sitesmap", "/privacy", "/terms"];
+
             // If address is NOT provided in Redux (which is now synced by useAuth/getMyProfile)
             if (!isAddressProvided) {
                 // If currently on a page that is NOT the verify page (and not in public allowed list)
-                if (pathname !== "/verify" && pathname !== "/logout" && pathname !== "/verify_register_user" && pathname !== "/login") {
-                    console.log("AddressGuard: Redirecting to /verify because isAddressProvided is false");
+                if (
+                    pathname !== "/verify" &&
+                    pathname !== "/logout" &&
+                    pathname !== "/verify_register_user" &&
+                    pathname !== "/login" &&
+                    !publicRoutes.includes(pathname)
+                ) {
+                    // console.log("AddressGuard: Redirecting to /verify because isAddressProvided is false");
                     router.push("/verify");
                 }
             }
