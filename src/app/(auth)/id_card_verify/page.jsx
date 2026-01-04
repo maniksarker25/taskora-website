@@ -51,12 +51,6 @@ const IdCardVerification = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("=== Form submission started ===");
-    console.log("Selected doc:", selectedDoc);
-    console.log("Mapped type:", documentTypeMap[selectedDoc]);
-    console.log("ID Number:", idNumber);
-    console.log("Document file:", documentFile);
-
     if (!selectedDoc) {
       toast.error("Please select a document type");
       return;
@@ -75,13 +69,12 @@ const IdCardVerification = () => {
     }
 
     try {
-      console.log("=== Creating FormData ===");
 
       const formData = new FormData();
 
       // 1. File append
       formData.append("identification_document", documentFile);
-      console.log("File appended to FormData");
+    
 
       const jsonData = {
         first_name: firstName,
@@ -93,9 +86,6 @@ const IdCardVerification = () => {
 
       const jsonString = JSON.stringify(jsonData);
       formData.append("data", jsonString);
-
-      console.log("JSON Data:===>", jsonString);
-      console.log("FormData keys:");
       for (let [key, value] of formData.entries()) {
         if (value instanceof File) {
           console.log(`${key}: File - ${value.name}, ${value.type}, ${value.size} bytes`);
@@ -105,7 +95,7 @@ const IdCardVerification = () => {
       }
 
       const result = await completeIdentityVerification(formData).unwrap();
-      console.log("=== API Response Success ===", result);
+      console.log("API Response Success ===", result);
 
       toast.success("Identity verification completed successfully");
       setTimeout(() => {
