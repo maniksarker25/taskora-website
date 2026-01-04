@@ -17,6 +17,8 @@ import notificationApi from './features/notification/notificationApi';
 import { transactionApi } from './features/transactionApi/transactionApi';
 import bankVerificationApi from './features/bankVerificationApi/bankVerificationApi';
 import faqApi from './features/web/faqApi';
+import termsApi from './features/web/termsApi';
+import privacyApi from './features/web/privacyApi';
 
 export const makeStore = () =>
   configureStore({
@@ -37,29 +39,33 @@ export const makeStore = () =>
       [feedbackApi.reducerPath]: feedbackApi.reducer,
       [notificationApi.reducerPath]: notificationApi.reducer,
       [transactionApi.reducerPath]: transactionApi.reducer,
-      [bankVerificationApi.reducerPath]:bankVerificationApi.reducer,
-      [faqApi.reducerPath]:faqApi.reducer
+      [bankVerificationApi.reducerPath]: bankVerificationApi.reducer,
+      [faqApi.reducerPath]: faqApi.reducer,
+      [termsApi.reducerPath]: termsApi.reducer,
+      [privacyApi.reducerPath]: privacyApi.reducer
     },
-    middleware:(getDefaultMiddleware) => getDefaultMiddleware()
-    .concat(
-      authApi.middleware, 
-      authentication.middleware,
-      categoryApi.middleware,
-      taskApi.middleware,
-      serviceApi.middleware,
-      bidApi.middleware,
-      questionApi.middleware,
-      cancellationApi.middleware,
-      providerServiceApi.middleware,
-      chatApi.middleware,
-      extensionApi.middleware,
-      fileApi.middleware,
-      feedbackApi.middleware,
-      notificationApi.middleware,
-      transactionApi.middleware,
-      bankVerificationApi.middleware,
-      faqApi.middleware
-    ),
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware()
+      .concat(
+        authApi.middleware,
+        authentication.middleware,
+        categoryApi.middleware,
+        taskApi.middleware,
+        serviceApi.middleware,
+        bidApi.middleware,
+        questionApi.middleware,
+        cancellationApi.middleware,
+        providerServiceApi.middleware,
+        chatApi.middleware,
+        extensionApi.middleware,
+        fileApi.middleware,
+        feedbackApi.middleware,
+        notificationApi.middleware,
+        transactionApi.middleware,
+        bankVerificationApi.middleware,
+        faqApi.middleware,
+        termsApi.middleware,
+        privacyApi.middleware
+      ),
     devTools: process.env.NODE_ENV !== 'production',
   });
 
