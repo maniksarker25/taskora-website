@@ -19,6 +19,7 @@ import bankVerificationApi from './features/bankVerificationApi/bankVerification
 import faqApi from './features/web/faqApi';
 import termsApi from './features/web/termsApi';
 import privacyApi from './features/web/privacyApi';
+import promoApi from './features/promo/promoApi';
 
 export const makeStore = () =>
   configureStore({
@@ -42,7 +43,8 @@ export const makeStore = () =>
       [bankVerificationApi.reducerPath]: bankVerificationApi.reducer,
       [faqApi.reducerPath]: faqApi.reducer,
       [termsApi.reducerPath]: termsApi.reducer,
-      [privacyApi.reducerPath]: privacyApi.reducer
+      [privacyApi.reducerPath]: privacyApi.reducer,
+      [promoApi.reducerPath]: promoApi.reducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware()
       .concat(
@@ -64,7 +66,8 @@ export const makeStore = () =>
         bankVerificationApi.middleware,
         faqApi.middleware,
         termsApi.middleware,
-        privacyApi.middleware
+        privacyApi.middleware,
+        promoApi.middleware,
       ),
     devTools: process.env.NODE_ENV !== 'production',
   });
