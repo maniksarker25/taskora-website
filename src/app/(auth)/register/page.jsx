@@ -5,8 +5,6 @@ import main_logo from "../../../../public/main_logo_svg.svg";
 import React, { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
-import { FcGoogle } from "react-icons/fc";
-import { FaApple } from "react-icons/fa6";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
