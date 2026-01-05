@@ -1,4 +1,5 @@
 export const CancellationReason = ({ reason, additionalReason }) => {
+    console.log("CancellationReason", reason, additionalReason);
     return (
         <div className="mb-6">
             <h4 className="font-medium text-gray-900 mb-2">Cancellation Reason</h4>

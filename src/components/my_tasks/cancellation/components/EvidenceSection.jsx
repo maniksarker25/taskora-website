@@ -22,13 +22,13 @@ export const EvidenceSection = ({
                         onDownload={() => onDownload(evidence, `evidence-${index + 1}`)}
                     />
                 ))}
-                {rejectEvidence && (
+                {/* {rejectEvidence && (
                     <FilePreview
                         url={rejectEvidence}
                         name="Rejection Evidence"
                         onDownload={() => onDownload(rejectEvidence, "reject-evidence")}
                     />
-                )}
+                )} */}
             </div>
         </div>
     );
