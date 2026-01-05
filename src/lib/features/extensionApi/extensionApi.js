@@ -76,6 +76,14 @@ const extensionApi = createApi({
       }),
       invalidatesTags: ["Extension"],
     }),
+
+    makeExtensionDispute: builder.mutation({
+      query: (id) => ({
+        url: `/extension-request/make-dispute-for-admin/${id}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["Extension"],
+    }),
   }),
 });
 
@@ -83,7 +91,8 @@ export const {
   useCreateExtensionRequestMutation,
   useGetExtensionRequestsByTaskIdQuery,
   useRejectExtensionRequestMutation,
-  useAcceptExtensionRequestMutation
+  useAcceptExtensionRequestMutation,
+  useMakeExtensionDisputeMutation
 } = extensionApi;
 
 export default extensionApi;

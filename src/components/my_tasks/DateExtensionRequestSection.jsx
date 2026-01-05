@@ -11,19 +11,31 @@ import Image from "next/image";
 import { useSelector } from "react-redux";
 
 import RejectModal from "../extention/RejectModal";
-import { useAcceptExtensionRequestMutation, useRejectExtensionRequestMutation } from "@/lib/features/extensionApi/extensionApi";
+import { useAcceptExtensionRequestMutation, useRejectExtensionRequestMutation, useMakeExtensionDisputeMutation } from "@/lib/features/extensionApi/extensionApi";
 import { toast } from "sonner";
 
 const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
+  console.log("ex",extentionData._id)
   const user = useSelector((state) => state.auth.user);
   const [showRejectModal, setShowRejectModal] = useState(false);
-  
+
   const [acceptExtensionRequest, { isLoading: isAccepting }] = useAcceptExtensionRequestMutation();
   const [rejectExtensionRequest, { isLoading: isRejecting }] = useRejectExtensionRequestMutation();
+  const [makeExtensionDispute, { isLoading: isDisputing }] = useMakeExtensionDisputeMutation();
 
-  const isLoading = isAccepting || isRejecting;
+  const isLoading = isAccepting || isRejecting || isDisputing;
 
-  const currentUserRole = user?.role?.toLowerCase(); 
+  const currentUserRole = user?.role?.toLowerCase();
+
+  const isRequestSender = (
+    (currentUserRole === "customer" && extentionData?.requestedFromModel === "Customer") ||
+    (currentUserRole === "provider" && extentionData?.requestedFromModel === "Provider")
+  );
+
+  const isRequestReceiver = (
+    (currentUserRole === "customer" && extentionData?.requestToModel === "Customer") ||
+    (currentUserRole === "provider" && extentionData?.requestToModel === "Provider")
+  );
 
 
   const getExtensionContent = () => {
@@ -39,7 +51,7 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
           currentUserRole === "provider"
         ) {
           showButtons = true;
-          
+
         }
         else if (
           extentionData?.requestedFromModel === "Provider" &&
@@ -47,10 +59,10 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
           currentUserRole === "customer"
         ) {
           showButtons = true;
-          
+
         }
-        
-       
+
+
 
         return {
           statusText: "In Progress",
@@ -73,8 +85,8 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
         };
       case "ACCEPTED":
         return {
-          statusText: extentionData?.requestToModel === "Provider" 
-            ? "Approved By Service Provider" 
+          statusText: extentionData?.requestToModel === "Provider"
+            ? "Approved By Service Provider"
             : "Approved By Customer",
           statusColor: "text-[#115e59]",
           statusIcon: <Check className="w-4 h-4 text-white" />,
@@ -84,15 +96,40 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
         };
       case "REJECTED":
         return {
-          statusText: extentionData?.requestToModel === "Provider" 
-            ? "Rejected By Service Provider" 
+          statusText: extentionData?.requestToModel === "Provider"
+            ? "Rejected By Service Provider"
             : "Rejected By Customer",
           statusColor: "text-red-600",
           statusIcon: <X className="w-4 h-4 text-white" />,
           statusBgColor: "bg-red-600",
-          buttons: null,
+          buttons: isRequestSender ? [
+            {
+              text: "Dispute",
+              color: "bg-[#115e59] hover:bg-[#115e59]/80",
+              action: "dispute",
+            }
+          ] : null,
           showMarkComplete: false,
-          rejectionReason: extentionData?.rejectDetails || 
+          rejectionReason: extentionData?.rejectDetails ||
+            "The proposed extension cannot be granted due to project deadlines and client commitments.",
+        };
+      case "DISPUTED":
+        return {
+          statusText: extentionData?.requestToModel === "Provider"
+            ? "Disputed By Service Provider"
+            : "Disputed By Customer",
+          statusColor: "text-red-600",
+          statusIcon: <X className="w-4 h-4 text-white" />,
+          statusBgColor: "bg-red-600",
+          // buttons: isRequestSender ? [
+          //   {
+          //     text: "Accept Dispute",
+          //     color: "bg-[#115e59] hover:bg-[#115e59]/80",
+          //     action: "dispute",
+          //   }
+          // ] : null,
+          showMarkComplete: false,
+          rejectionReason: extentionData?.rejectDetails ||
             "The proposed extension cannot be granted due to project deadlines and client commitments.",
         };
       default:
@@ -109,33 +146,74 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
       setShowRejectModal(true);
     } else if (action === "accept") {
       handleAcceptRequest();
+    } else if (action === "dispute") {
+      handleDisputeRequest();
     }
   };
 
   // Handle accept request using RTK Query
   const handleAcceptRequest = async () => {
     try {
-    const acceptExt =   await acceptExtensionRequest(extentionData._id).unwrap();
-       if(acceptExt.success){
+      const acceptExt = await acceptExtensionRequest(extentionData._id).unwrap();
+      if (acceptExt.success) {
         toast.success("Extension request accepted successfully", {
+          style: {
+            backgroundColor: "#d1fae5",
+            color: "#065f46",
+            borderLeft: "6px solid #10b981",
+          },
+        });
+      }
+
+    } catch (error) {
+      console.error("Error accepting request:", error);
+      toast.error(error?.data?.message || "Failed to accept extension request. Please try again.", {
+        style: {
+          backgroundColor: "#fee2e2",
+          color: "#991b1b",
+          borderLeft: "6px solid #dc2626",
+        },
+      });
+    }
+  };
+
+  // Handle dispute request with confirmation
+  const handleDisputeRequest = async () => {
+    toast("Are you sure you want to request a dispute ruling?", {
+      action: {
+        label: 'Confirm',
+        onClick: async () => {
+          try {
+            const result = await makeExtensionDispute(extentionData._id).unwrap();
+            if (result.success) {
+              toast.success(result.message || "Dispute request submitted successfully!", {
                 style: {
                   backgroundColor: "#d1fae5",
                   color: "#065f46",
                   borderLeft: "6px solid #10b981",
                 },
               });
-    }
-      
-    } catch (error) {
-      console.error("Error accepting request:", error);
-      toast.error(error?.data?.message || "Failed to accept extension request. Please try again.", {
+            }
+          } catch (error) {
+            console.error("Dispute action failed:", error);
+            toast.error(error?.data?.message || "Failed to submit dispute request", {
               style: {
                 backgroundColor: "#fee2e2",
                 color: "#991b1b",
                 borderLeft: "6px solid #dc2626",
               },
             });
-    }
+          }
+        },
+      },
+      cancel: {
+        label: 'Cancel',
+        onClick: () => {
+          toast.dismiss();
+        }
+      },
+      duration: 10000,
+    });
   };
 
   // Handle reject submission from modal using RTK Query
@@ -145,46 +223,37 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
         requestId: extentionData._id,
         rejectDetails: reason,
       };
-      
+
       if (file) {
         rejectData.reject_evidence = file;
       }
 
-    const rejectExt =   await rejectExtensionRequest(rejectData).unwrap();
+      const rejectExt = await rejectExtensionRequest(rejectData).unwrap();
 
-    if(rejectExt.success){
+      if (rejectExt.success) {
         toast.success("Extension request rejected successfully", {
-                style: {
-                  backgroundColor: "#d1fae5",
-                  color: "#065f46",
-                  borderLeft: "6px solid #10b981",
-                },
-              });
-    }
-       setShowRejectModal(false);
+          style: {
+            backgroundColor: "#d1fae5",
+            color: "#065f46",
+            borderLeft: "6px solid #10b981",
+          },
+        });
+      }
+      setShowRejectModal(false);
 
-      
+
     } catch (error) {
       console.error("Error rejecting request:", error);
-       toast.error("Failed to reject extension request. Please try again.", {
-              style: {
-                backgroundColor: "#fee2e2",
-                color: "#991b1b",
-                borderLeft: "6px solid #dc2626",
-              },
-            });
+      toast.error("Failed to reject extension request. Please try again.", {
+        style: {
+          backgroundColor: "#fee2e2",
+          color: "#991b1b",
+          borderLeft: "6px solid #dc2626",
+        },
+      });
     }
   };
 
-  const isRequestSender = (
-    (currentUserRole === "customer" && extentionData?.requestedFromModel === "Customer") ||
-    (currentUserRole === "provider" && extentionData?.requestedFromModel === "Provider")
-  );
-  
-  const isRequestReceiver = (
-    (currentUserRole === "customer" && extentionData?.requestToModel === "Customer") ||
-    (currentUserRole === "provider" && extentionData?.requestToModel === "Provider")
-  );
 
   const getHeadingText = () => {
     if (isRequestSender) {
@@ -248,7 +317,7 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
               <div className="flex flex-col gap-1">
                 <p className="font-medium text-gray-900">Request To</p>
                 <p className="text-gray-600 text-sm">
-                  {extentionData?.requestTo?.name} 
+                  {extentionData?.requestTo?.name}
                   {isRequestReceiver && " (You)"}
                 </p>
                 <p className="text-xs text-gray-400">
@@ -358,7 +427,7 @@ const DateExtensionRequestSection = ({ extensionStatus, extentionData }) => {
               </div>
             )}
 
-           
+
           </div>
         </div>
       </div>

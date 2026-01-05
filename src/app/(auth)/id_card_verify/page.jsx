@@ -74,7 +74,7 @@ const IdCardVerification = () => {
 
       // 1. File append
       formData.append("identification_document", documentFile);
-    
+
 
       const jsonData = {
         first_name: firstName,
@@ -100,7 +100,7 @@ const IdCardVerification = () => {
       toast.success("Identity verification completed successfully");
       setTimeout(() => {
         if (user?.role === 'provider') {
-          router.push('/');
+          router.push('/referalcode');
 
         }
         // else {

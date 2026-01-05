@@ -65,7 +65,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
         const reference = result?.data?.reference;
 
         if (paymentLink && typeof window !== "undefined") {
-          window.location.href = paymentLink;
+         window.open(paymentLink, "_blank");
         }
 
         if (reference) {
