@@ -16,17 +16,17 @@ const AddressGuard = ({ children }) => {
     const pathname = usePathname();
 
     useEffect(() => {
-        // If auth or profile is loading, do nothing yet
+       
         if (isAuthLoading || isProfileLoading) return;
 
-        // If user is authenticated and not admin
+        
         if (isAuthenticated && user?.role !== 'admin') {
-            // Define public routes that don't require address verification
+            
             const publicRoutes = ["/", "/about", "/contact", "/faq", "/sitesmap", "/privacy", "/terms"];
 
-            // If address is NOT provided in Redux (which is now synced by useAuth/getMyProfile)
+            
             if (!isAddressProvided) {
-                // If currently on a page that is NOT the verify page (and not in public allowed list)
+                
                 if (
                     pathname !== "/verify" &&
                     pathname !== "/logout" &&
@@ -34,8 +34,8 @@ const AddressGuard = ({ children }) => {
                     pathname !== "/login" &&
                     !publicRoutes.includes(pathname)
                 ) {
-                    // console.log("AddressGuard: Redirecting to /verify because isAddressProvided is false");
-                    router.push("/verify");
+                    
+                    // router.push("/");
                 }
             }
         }

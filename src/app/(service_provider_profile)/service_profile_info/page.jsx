@@ -165,7 +165,7 @@ const ServiceProfileInfo = () => {
                         Location
                       </h3>
                       <p className="text-gray-600 text-lg bg-gray-50 p-3 rounded-lg leading-relaxed">
-                        {userData?.address ? (
+                        {/* {userData?.address ? (
                           <>
                             {userData.address.street && <>{userData.address.street}<br /></>}
                             {userData.address.city && <>{userData.address.city}, </>}
@@ -184,7 +184,13 @@ const ServiceProfileInfo = () => {
                           ) : (
                             "Not provided"
                           )
-                        )}
+                        )} */}
+
+                        {
+                          userData?.street && userData?.city
+                            ? `${userData.street}, ${userData.city}`
+                            : userData?.address?.split("|")[0]
+                        }
                       </p>
                     </div>
 
@@ -282,7 +288,7 @@ const ServiceProfileInfo = () => {
                     Location
                   </h3>
                   <p className="text-gray-600 text-base ml-5 leading-relaxed">
-                    {userData?.address ? (
+                    {/* {userData?.address ? (
                       <>
                         {userData.address.street && <>{userData.address.street}<br /></>}
                         {userData.address.city && <>{userData.address.city}, </>}
@@ -301,7 +307,12 @@ const ServiceProfileInfo = () => {
                       ) : (
                         "Not provided"
                       )
-                    )}
+                    )} */}
+                    {
+                          userData?.street && userData?.city
+                            ? `${userData.street}, ${userData.city}`
+                            : userData?.address?.split("|")[0]
+                        }
                   </p>
                 </div>
 
