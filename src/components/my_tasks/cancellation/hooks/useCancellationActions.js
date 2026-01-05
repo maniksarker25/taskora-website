@@ -223,8 +223,8 @@ export const useCancellationActions = ({
       },
       DISPUTED: {
         statusText: "Under Dispute Resolution",
-        statusColor: "text-purple-600",
-        bgColor: "bg-purple-100",
+        statusColor: "text-[#115e59]",
+        bgColor: "bg-[#115e59]",
         actions: []
       }
     }[statusUpper] || {

@@ -14,9 +14,6 @@ import {
 import { useCancellationActions } from "./cancellation/hooks/useCancellationActions";
 
 // Import components
-import StatusIcon from "./cancellation/components/StatusIcon";
-import FilePreview from "./cancellation/components/FilePreview";
-import ActionButton from "./cancellation/components/ActionButton";
 import RequesterInfo from "./cancellation/components/RequesterInfo";
 import CancellationReason from "./cancellation/components/CancellationReason";
 import EvidenceSection from "./cancellation/components/EvidenceSection";
@@ -35,6 +32,7 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
     const [makeDispute] = useMakeCancellationDisputeMutation();
 
     const cancellationRequest = cancellationResponse?.data;
+    console.log("cancellationRequest", cancellationRequest);
 
     // Custom hook for all actions
     const {
@@ -95,7 +93,7 @@ const CancellationStatusComponent = ({ taskId, isServiceProvider = false }) => {
                             <RequesterInfo requestFrom={cancellationRequest.requestFrom} />
                         </div>
 
-                        <CancellationReason 
+                        <CancellationReason
                             reason={cancellationRequest.reason}
                             additionalReason={cancellationRequest.cancellationReason}
                         />

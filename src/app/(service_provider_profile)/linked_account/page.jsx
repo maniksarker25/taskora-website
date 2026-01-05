@@ -5,13 +5,22 @@ import { ChevronLeft, Edit, Plus, Shield, X, Loader2 } from "lucide-react";
 import { CgProfile } from "react-icons/cg";
 import { FaMoneyBillTransfer } from "react-icons/fa6";
 import { MdManageAccounts } from "react-icons/md";
-import { useGetMyProfileQuery } from "@/lib/features/auth/authApi";
+import { useGetMyProfileQuery, useUpdateProfileMutation } from "@/lib/features/auth/authApi";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const LinkdedAccount = () => {
   const router = useRouter();
 
   const { data, isLoading, refetch } = useGetMyProfileQuery();
+  const [updateProfile] = useUpdateProfileMutation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    accountName: "",
+    bankName: "",
+    bankAccountNumber: "",
+  });
 
   const userProfile = data?.data;
 
@@ -28,15 +37,54 @@ const LinkdedAccount = () => {
   }
 
   const handleEdit = () => {
-    router.push("/bank_verification?from=linked_account");
+    setEditFormData({
+      accountName: userProfile?.accountName || userProfile?.name || "",
+      bankName: userProfile?.bankName || "",
+      bankAccountNumber: userProfile?.bankAccountNumber || userProfile?.bankVerificationNumber || "",
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("accountName", editFormData.accountName);
+      formDataToSend.append("bankName", editFormData.bankName);
+      formDataToSend.append("bankAccountNumber", editFormData.bankAccountNumber);
+
+      const result = await updateProfile(formDataToSend).unwrap();
+
+      if (result?.success) {
+        toast.success("Account information updated successfully");
+        setIsModalOpen(false);
+        refetch();
+      } else {
+        toast.error(result?.message || "Failed to update account information");
+      }
+    } catch (error) {
+      toast.error(error?.data?.message || "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // derived data for display
   const accountInfo = {
     id: 1,
-    nickName: userProfile?.name || "N/A",
+    nickName: userProfile?.accountName || userProfile?.name || "N/A",
     account: userProfile?.bankName || "Bank Account",
-    accountNumber: userProfile?.bankVerificationNumber || "N/A",
+    accountNumber: userProfile?.bankAccountNumber || userProfile?.bankVerificationNumber || "N/A",
     status: userProfile?.isBankVerificationNumberApproved ? "Connected" : "Pending",
     isConnected: userProfile?.isBankVerificationNumberApproved,
   };
@@ -67,10 +115,10 @@ const LinkdedAccount = () => {
                   <thead className="bg-gray-50 text-center">
                     <tr>
                       <th className="px-6 py-4 text-center text-lg font-semibold text-gray-600 uppercase tracking-wider min-w-[180px] text-sm">
-                        Account Holder
+                        Account name
                       </th>
                       <th className="px-6 py-4 text-center text-lg font-semibold text-gray-600 uppercase tracking-wider min-w-[140px] text-sm">
-                        Type
+                        Bank Name
                       </th>
                       <th className="px-6 py-4 text-left text-lg font-semibold text-gray-600 uppercase tracking-wider min-w-[200px] text-sm">
                         Account Number
@@ -177,7 +225,7 @@ const LinkdedAccount = () => {
 
                   <div className="space-y-3 mb-4">
                     <div className="flex justify-between">
-                      <span className="text-lg text-gray-500">Provider</span>
+                      <span className="text-lg text-gray-500">Bank Name</span>
                       <span className="text-lg font-medium text-blue-600 capitalize">
                         {account.account}
                       </span>
@@ -206,6 +254,94 @@ const LinkdedAccount = () => {
             </div>
           </div>
         </div>
+
+        {/* Edit Modal */}
+        {isModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 bg-opacity-50">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+              <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                <h3 className="text-xl font-bold text-gray-800">Edit Account Details</h3>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                {/* <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Account name
+                  </label>
+                  <input
+                    type="text"
+                    name="accountName"
+                    value={editFormData.accountName}
+                    onChange={handleInputChange}
+                    placeholder="Enter account name"
+                    required
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#115e59] focus:border-[#115e59] transition-all outline-none"
+                  />
+                </div> */}
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Bank Name
+                  </label>
+                  <input
+                    type="text"
+                    name="bankName"
+                    value={editFormData.bankName}
+                    onChange={handleInputChange}
+                    placeholder="Enter bank name"
+                    required
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#115e59] focus:border-[#115e59] transition-all outline-none"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Account Number
+                  </label>
+                  <input
+                    type="text"
+                    name="bankAccountNumber"
+                    value={editFormData.bankAccountNumber}
+                    onChange={handleInputChange}
+                    placeholder="Enter account number"
+                    required
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#115e59] focus:border-[#115e59] transition-all outline-none"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-2.5 bg-[#115e59] text-white font-medium rounded-xl hover:bg-[#0d4a42] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -80,11 +80,17 @@ const TaskInfoSection = ({ assignedTo, location, taskDetails, bidsData }) => {
           <div>
             <p className="text-base md:text-xl font-semibold">To Be Done On</p>
             <p className="text-sm text-gray-600">
-              {taskDetails?.preferredDeliveryDateTime && (
+
+              {
+                taskDetails?.preferredDeliveryDateTime ? <>
+                {new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}
+                </> :
+                      <><p>Flexible</p></>              }
+              {/* {taskDetails?.preferredDeliveryDateTime && (
                 <span className="text-sm">
                   {new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}
                 </span>
-              )}
+              )} */}
             </p>
           </div>
         </div>
