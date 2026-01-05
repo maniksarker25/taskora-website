@@ -24,6 +24,7 @@ const categoryApi = createApi({
           searchTerm = "",
           category = "",
           sortBy = "",
+          popular = "",
         } = params;
 
         const queryParams = new URLSearchParams();
@@ -32,6 +33,7 @@ const categoryApi = createApi({
         if (searchTerm) queryParams.append("searchTerm", searchTerm);
         if (category) queryParams.append("category", category);
         if (sortBy) queryParams.append("sortBy", sortBy);
+        if (popular) queryParams.append("popular", popular);
 
         return {
           url: `/service/all-service?${queryParams.toString()}`,

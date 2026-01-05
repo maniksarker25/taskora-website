@@ -27,7 +27,8 @@ const PopularService = () => {
   const { data: serviceData, isLoading: isServiceLoading } = useGetDuplicateAllServicesQuery(
     {
       category: activeCategory,
-      limit: 3
+      limit: 3,
+      popular: true
     },
     { skip: !activeCategory }
   );
@@ -70,8 +71,8 @@ const PopularService = () => {
                   key={cat._id}
                   onClick={() => setActiveCategory(cat._id)}
                   className={`px-6 py-2 rounded-md text-sm font-medium transition cursor-pointer ${activeCategory === cat._id
-                      ? "bg-[#115e59] text-white"
-                      : "bg-[#e6f4f1]  hover:bg-brand_color"
+                    ? "bg-[#115e59] text-white"
+                    : "bg-[#e6f4f1]  hover:bg-brand_color"
                     }`}
                 >
                   {cat.name}
