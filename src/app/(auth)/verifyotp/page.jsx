@@ -2,13 +2,15 @@
 import registration_img from "../../../../public/login_page_image.png";
 import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import { useVerifyResetOtpMutation } from "@/lib/features/auth/authApi";
+import { useVerifyResetOtpMutation, useForgetPasswordMutation } from "@/lib/features/auth/authApi";
 import { useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { toast } from "sonner";
 
 const VerfiyOtp = () => {
   const [otp, setOtp] = useState(Array(6).fill(""));
+  const [phone, setPhone] = useState("");
   const inputRefs = useRef([]);
   const router = useRouter();
 
@@ -17,9 +19,14 @@ const VerfiyOtp = () => {
   const userEmail = user?.email;
 
   const [verifyResetOtp, { isLoading, isError, error, isSuccess }] = useVerifyResetOtpMutation();
+  const [forgetPassword, { isLoading: isResending }] = useForgetPasswordMutation();
 
 
   useEffect(() => {
+    const storedPhone = localStorage.getItem("forgetPasswordPhone");
+    if (storedPhone) {
+      setPhone(storedPhone);
+    }
     console.log("Logged in user:", user);
   }, [user, userEmail, isAuthenticated]);
 
@@ -97,14 +104,19 @@ const VerfiyOtp = () => {
     e.preventDefault();
 
     const resetCode = Number(otp.join(""));
-    const forgetPasswordEmail = typeof window !== "undefined" ? localStorage.getItem("forgetPasswordEmail") : null;
+
+    if (!phone) {
+      toast.error("Phone number not found. Please try again.");
+      return;
+    }
 
     try {
       const result = await verifyResetOtp({
-        email: forgetPasswordEmail || userEmail,
+        phone: phone,
         resetCode: resetCode
       }).unwrap();
 
+      localStorage.setItem("forgetPasswordOtp", resetCode);
       toast.success("OTP verified successfully!", {
         style: {
           backgroundColor: "#d1fae5",
@@ -113,7 +125,7 @@ const VerfiyOtp = () => {
         },
       });
 
-      // router.push("/reset-password");
+      router.push("/reset-password");
 
     } catch (err) {
       console.error("Failed to verify OTP:", err);
@@ -124,6 +136,20 @@ const VerfiyOtp = () => {
           borderLeft: "6px solid #dc2626",
         },
       });
+    }
+  };
+
+  const handleResend = async () => {
+    if (!phone) {
+      toast.error("Phone number not found. Please try again.");
+      return;
+    }
+
+    try {
+      await forgetPassword({ phone }).unwrap();
+      toast.success("OTP resent successfully!");
+    } catch (err) {
+      toast.error(err?.data?.message || "Failed to resend OTP.");
     }
   };
 
@@ -151,14 +177,10 @@ const VerfiyOtp = () => {
                     <h1 className="text-[#394352] text-3xl font-semibold my-4 text-center">
                       Verify your OTP
                     </h1>
-                    {/* <p className="text-[#1F2937]">
+                    <p className="text-[#1F2937] text-center">
                       Please enter the code we've sent to your phone number
-                      {userEmail && (
-                        <span className="block text-sm text-gray-600 mt-1">
-                          (Verifying for: {userEmail})
-                        </span>
-                      )}
-                    </p> */}
+
+                    </p>
 
 
 
@@ -187,10 +209,20 @@ const VerfiyOtp = () => {
                         ))}
                       </form>
 
-                      <p className="text-sm text-gray-500 mt-3">Didn't receive a code? <button type="button" className="text-[#115E59] underline ml-1">Resend</button></p>
+                      <p className="text-sm text-gray-500 mt-3">
+                        Didn't receive a code?{" "}
+                        <button
+                          type="button"
+                          onClick={handleResend}
+                          disabled={isResending}
+                          className="text-[#115E59] underline ml-1 disabled:text-gray-400"
+                        >
+                          {isResending ? "Sending..." : "Resend"}
+                        </button>
+                      </p>
                     </div>
 
-                    <div className="mt-4 flex w-full text-center rounded-sm overflow-clip transition transform duration-300 hover:scale-101">
+                    <div className="mt-4 flex flex-col items-center gap-4 w-full">
                       <button
                         onClick={handleVerify}
                         disabled={isLoading || otp.some(digit => digit === "")}
@@ -198,6 +230,13 @@ const VerfiyOtp = () => {
                       >
                         {isLoading ? "Verifying..." : "Verify"}
                       </button>
+
+                      <Link
+                        href="/login"
+                        className="text-sm text-[#115E59] hover:underline font-semibold"
+                      >
+                        Back to Login
+                      </Link>
                     </div>
                   </div>
                 </div>

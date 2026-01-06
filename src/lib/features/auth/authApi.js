@@ -306,6 +306,15 @@ const authApi = createApi({
       }),
       invalidatesTags: ["Auth"],
     }),
+    resetPassword: builder.mutation({
+      query: (resetData) => ({
+        url: "/auth/reset-password",
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: resetData,
+      }),
+      invalidatesTags: ["Auth"],
+    }),
 
   }),
 });
@@ -321,6 +330,7 @@ export const {
   useGetMyReferralsQuery,
   useGetMyProfileQuery,
   useUpgradeAccountMutation,
-  useChangePasswordMutation
+  useChangePasswordMutation,
+  useResetPasswordMutation
 } = authApi;
 export default authApi;
