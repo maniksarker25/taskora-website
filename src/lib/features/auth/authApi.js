@@ -1,11 +1,11 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import baseUrl from "../../../../utils/baseUrl";
-import { getTokens, storeTokens, removeTokens } from "@/utils/auth";
 import {
-  setCredentials,
   logout,
+  setCredentials,
   updateAddressStatus,
 } from "@/lib/features/auth/authSlice";
+import { getTokens, storeTokens } from "@/utils/auth";
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import baseUrl from "../../../../utils/baseUrl";
 
 const rawBaseQuery = fetchBaseQuery({
   baseUrl: `${baseUrl()}`,
@@ -14,7 +14,6 @@ const rawBaseQuery = fetchBaseQuery({
     const state = getState();
     const accessToken = state?.auth?.accessToken || getTokens().accessToken;
     if (accessToken) {
-      // Add Bearer prefix for backend compatibility
       const authHeader = accessToken.startsWith('Bearer ')
         ? accessToken
         : `Bearer ${accessToken}`;
