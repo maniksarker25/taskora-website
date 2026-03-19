@@ -1,74 +1,89 @@
-import Image from "next/image";
-import React from "react";
-import popularcateIcon from "../../../public/popularcate.svg";
-import bgline from "../../../public/bg-line.svg";
-import cateimg1 from "../../../public/Frame (8).svg";
-import cateimg2 from "../../../public/hand.svg";
-import service3 from "../../../public/hand.svg";
-import HowWorkCard from "@/sharred/HowWorkCard";
+"use client";
 
-const data = [
+import HowWorkCard from "@/sharred/HowWorkCard";
+import Image from "next/image";
+
+// Assets
+import connectorLine from "../../../public/bg-line.svg";
+import stepIcon1 from "../../../public/Frame (8).svg";
+import { default as stepIcon2, default as stepIcon3 } from "../../../public/hand.svg";
+import sectionIcon from "../../../public/popularcate.svg";
+
+const STEPS_DATA = [
   {
     id: 1,
-    cateName: "Create Your Account",
-    providers:
-      "Sign up as a tasker or freelancer directly on our website.",
-    icon: cateimg1,
+    title: "Create Your Account",
+    description: "Sign up as a tasker or freelancer directly on our website.",
+    icon: stepIcon1,
   },
   {
     id: 2,
-    cateName: "Find or List a Service",
-    providers: "Tasker can browse services by category, location, or price.",
-    icon: cateimg2,
+    title: "Find or List a Service",
+    description: "Taskers can browse services by category, location, or price.",
+    icon: stepIcon2,
   },
   {
     id: 3,
-    cateName: "Book & Connect Securely",
-    providers: "Confirm bookings, chat in real-time, and make secure payments.",
-    icon: service3,
+    title: "Book & Connect Securely",
+    description: "Confirm bookings, chat in real-time, and make secure payments.",
+    icon: stepIcon3,
   },
 ];
 
 const HowWorks = () => {
   return (
-    <section className="max-w-[1240px] mx-auto px-4 mb-20 md:mb-20 lg:mb-0 ">
-      <div className="flex flex-col gap-16">
-        <div className="mt-16 md:mt-20 flex flex-col gap-5 md:flex-row justify-between md:items-center">
-          {/* top header */}
-          <div>
-            <div className="flex items-center gap-4 ">
-              <Image
-                src={popularcateIcon}
-                alt="Popular Category "
-                height={24}
-              />
-              <p className="font-semibold text-md md:text-xl text-color pb-3">
-                Taskalley
-              </p>
+    <section className="relative max-w-[1240px] mx-auto px-6 py-16 md:py-24 overflow-hidden">
+      <div className="flex flex-col gap-12 md:gap-20">
+        {/* Section Header */}
+        <header className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-teal-50 rounded-lg">
+              <Image src={sectionIcon} alt="" width={20} height={20} className="opacity-90" />
             </div>
-            <h3 className="font-semibold text-2xl md:text-4xl flex flex-col gap-6">
-              How It Works
-            </h3>
+            <span className="text-[#115E59] font-bold tracking-[0.2em] text-xs uppercase">
+              How it works
+            </span>
+          </div>
+          <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900 tracking-tight">
+            Getting Started is <span className="text-[#115E59]">Easy</span>
+          </h2>
+        </header>
+
+        {/* Process Flow Container */}
+        <div className="relative">
+          {/* Decorative Background Line - Only visible on Desktop */}
+          {/* Senior Tip: Use pointer-events-none so the image doesn't block clicks */}
+          <div className="absolute top-1/2 left-0 w-full -translate-y-1/2 hidden lg:block pointer-events-none z-0">
+            <Image src={connectorLine} alt="" className="w-full object-contain opacity-60" />
           </div>
 
-          
-        </div>
+          {/* Steps Grid - Using <ol> for semantic sequential steps */}
+          <ol className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-16">
+            {STEPS_DATA.map((step, index) => (
+              <li key={step.id} className="list-none">
+                <div className="relative group">
+                  {/* Optional: Step Number Badge (Very Senior Design Touch) */}
+                  <div className="absolute -top-4 -left-2 w-8 h-8 bg-white border-2 border-[#115E59] text-[#115E59] rounded-full flex items-center justify-center font-bold text-sm shadow-sm z-20 group-hover:bg-[#115E59] group-hover:text-white transition-colors duration-300">
+                    {index + 1}
+                  </div>
 
-        {/* gradient color */}
-        <div className="relative w-full min-h-[500px] md:min-h-[600px]">
-          {/* Background Line Image */}
-          <div className="absolute -top-32 left-0 right-0 mx-auto w-full h-full hidden lg:flex items-center justify-center z-0">
-            <Image src={bgline} alt="Background Line" />
-          </div>
-
-          {/* Cards Grid */}
-          <div className="relative z-10 w-full px-4 md:px-0 md:pt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 xl:gap-24">
-            {data.map((item, index) => (
-              <HowWorkCard key={index} item={item} />
+                  <HowWorkCard
+                    item={{
+                      ...step,
+                      // Mapping our clean data keys to the component's expected props
+                      cateName: step.title,
+                      providers: step.description,
+                    }}
+                  />
+                </div>
+              </li>
             ))}
-          </div>
+          </ol>
         </div>
       </div>
+
+      {/* Visual background blob for professional feel */}
+      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-teal-50/50 rounded-full blur-3xl -z-10" />
     </section>
   );
 };

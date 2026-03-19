@@ -1,149 +1,131 @@
 "use client";
-import React, { useRef, useState } from "react";
-// Import Swiper React components
+
+import Image from "next/image";
+import { FaStar } from "react-icons/fa";
+import { Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
-// Import Swiper styles
+// Styles
 import "swiper/css";
 import "swiper/css/pagination";
-import { FaStar } from "react-icons/fa";
-// import required modules
-import { Pagination } from "swiper/modules";
-import Image from "next/image";
-import Ellipse from "../../../public/Ellipse.svg";
-import Ellipse27 from "../../../public/Ellipse 27.svg";
+
+// Assets
+import userImg2 from "../../../public/Ellipse 27.svg";
+import userImg1 from "../../../public/Ellipse.svg";
+
+const REVIEWS = [
+  {
+    id: 1,
+    name: "Holland Canals",
+    image: userImg1,
+    rating: 5,
+    comment:
+      "I found a skilled plumber within hours. The bidding process was transparent, and the escrow payment gave me total peace of mind.",
+  },
+  {
+    id: 2,
+    name: "Tolman Panels",
+    image: userImg2,
+    rating: 5,
+    comment:
+      "Listing my services as a developer was seamless. I've already connected with three quality clients in my local area this week.",
+  },
+  {
+    id: 3,
+    name: "Kalian Sandals",
+    image: userImg1,
+    rating: 4,
+    comment:
+      "The real-time chat feature made it easy to negotiate the project details. Highly recommend for anyone looking for reliable experts.",
+  },
+  {
+    id: 4,
+    name: "Sarah Jenkins",
+    image: userImg2,
+    rating: 5,
+    comment:
+      "The interface is very intuitive. I love how I can switch between being a customer and a provider on a single account.",
+  },
+];
+
+const ReviewCard = ({ review }) => (
+  <div className="h-full border border-gray-100 p-8 rounded-3xl shadow-sm bg-white flex flex-col items-center text-center group hover:border-[#115E59]/30 transition-all duration-300">
+    <div className="relative mb-4">
+      <Image
+        src={review.image}
+        alt={review.name}
+        width={80}
+        height={80}
+        className="rounded-full border-4 border-teal-50"
+      />
+      <div className="absolute -bottom-2 -right-2 bg-[#115E59] text-white p-1.5 rounded-full">
+        <FaStar size={10} />
+      </div>
+    </div>
+
+    <h5 className="font-bold text-gray-900 text-lg">{review.name}</h5>
+
+    <div className="flex text-yellow-400 gap-1 my-3">
+      {[...Array(5)].map((_, i) => (
+        <FaStar
+          key={i}
+          className={`w-3.5 h-3.5 ${i < review.rating ? "text-yellow-400" : "text-gray-200"}`}
+        />
+      ))}
+    </div>
+
+    <p className="text-gray-600 leading-relaxed italic">"{review.comment}"</p>
+  </div>
+);
 
 const CustomerReview = () => {
   return (
-    <section className="max-w-[1240px] mx-auto px-4 pt-36 pb-36">
-      <div className="flex flex-col gap-6 justify-center items-center text-center py-12">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-bold ">
-          Our Tasker Reviews
-        </h1>
-        <p className="text-gray-600 text-base font-medium">
-          Here are a few sample traveler reviews that you can feature on our
-          website
+    <section className="max-w-[1240px] mx-auto px-6 py-24 md:py-32">
+      <div className="flex flex-col gap-4 justify-center items-center text-center mb-16">
+        <h2 className="text-3xl md:text-5xl font-extrabold text-gray-900">
+          Trusted by <span className="text-[#115E59]">Thousands</span>
+        </h2>
+        <p className="text-gray-500 text-lg max-w-2xl font-medium">
+          Hear from the service seekers and providers who are growing their businesses and solving
+          tasks every day.
         </p>
       </div>
 
-      {/* swiper slider  */}
-      <>
+      <div className="relative pb-12">
         <Swiper
           slidesPerView={1}
-          spaceBetween={10}
+          spaceBetween={24}
           grabCursor={true}
+          autoplay={{
+            delay: 4000,
+            disableOnInteraction: false,
+          }}
           pagination={{
             clickable: true,
+            dynamicBullets: true,
           }}
           breakpoints={{
-            640: {
-              slidesPerView: 2,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 2,
-              spaceBetween: 40,
-            },
-            1024: {
-              slidesPerView: 3,
-              spaceBetween: 50,
-            },
+            768: { slidesPerView: 2 },
+            1024: { slidesPerView: 3 },
           }}
-          modules={[Pagination]}
-          className="mySwiper"
+          modules={[Pagination, Autoplay]}
+          className="review-swiper !pb-14"
         >
-          <SwiperSlide>
-            <div className="border border-[#E5E7EB] p-6 rounded-lg shadow-lg bg-[#E6F4F1] flex flex-col gap-2 justify-center items-center text-center">
-              <Image src={Ellipse} alt="Ellipse" />
-              <h5 className="font-semibold text-xl">Holiand Canals</h5>
-              <div className="flex text-yellow-400 gap-1">
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-              </div>
-              <p className="mt-4">
-                "I found my rental condo within two days of browsing
-                EasyRent.sg. The inquiry process was so simple, and I got a
-                response from the agent almost instantly!"
-              </p>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="border border-[#E5E7EB] p-6 rounded-lg shadow-lg bg-[#E6F4F1] flex flex-col gap-2 justify-center items-center text-center">
-              <Image src={Ellipse27} alt="Ellipse" />
-              <h5 className="font-semibold text-xl">Tolman Panels</h5>
-              <div className="flex text-yellow-400 gap-1">
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-              </div>
-              <p className="mt-4">
-                "Listing my unit was incredibly easy. I received quality tenant
-                inquiries without any hassle. Highly recommended for any
-                landlord looking to rent fast."
-              </p>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="border border-[#E5E7EB] p-6 rounded-lg shadow-lg bg-[#E6F4F1] flex flex-col gap-2 justify-center items-center text-center">
-              <Image src={Ellipse} alt="Ellipse" />
-              <h5 className="font-semibold text-xl">kalian Sandals</h5>
-              <div className="flex text-yellow-400 gap-1">
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-              </div>
-              <p className="mt-4">
-                "EasyRent.sg has helped me connect with serious tenants. The
-                platform is well-organized, and I love receiving email inquiries
-                from potential renters directly."
-              </p>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="border border-[#E5E7EB] p-6 rounded-lg shadow-lg bg-[#E6F4F1] flex flex-col gap-2 justify-center items-center text-center">
-              <Image src={Ellipse} alt="Ellipse" />
-              <h5 className="font-semibold text-xl">Holiand Canals</h5>
-              <div className="flex text-yellow-400 gap-1">
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-              </div>
-              <p className="mt-4">
-                "I found my rental condo within two days of browsing
-                EasyRent.sg. The inquiry process was so simple, and I got a
-                response from the agent almost instantly!"
-              </p>
-            </div>
-          </SwiperSlide>
-          <SwiperSlide>
-            <div className="border border-[#E5E7EB] p-6 rounded-lg shadow-lg bg-[#E6F4F1] flex flex-col gap-2 justify-center items-center text-center">
-              <Image src={Ellipse} alt="Ellipse" />
-              <h5 className="font-semibold text-xl">Holiand Canals</h5>
-              <div className="flex text-yellow-400 gap-1">
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-                <FaStar className="w-3" />
-              </div>
-              <p className="mt-4">
-                "I found my rental condo within two days of browsing
-                EasyRent.sg. The inquiry process was so simple, and I got a
-                response from the agent almost instantly!"
-              </p>
-            </div>
-          </SwiperSlide>
+          {REVIEWS.map((review) => (
+            <SwiperSlide key={review.id}>
+              <ReviewCard review={review} />
+            </SwiperSlide>
+          ))}
         </Swiper>
-      </>
+
+        <style jsx global>{`
+          .review-swiper .swiper-pagination-bullet-active {
+            background: #115e59 !important;
+            width: 24px;
+            border-radius: 4px;
+          }
+        `}</style>
+      </div>
     </section>
   );
 };
