@@ -1,5 +1,7 @@
 "use client";
-import React, { useState, useEffect } from "react";
+
+import { RotateCcw, Search } from "lucide-react";
+import { useCallback, useState } from "react";
 import CategorySelect from "./CategorySelect";
 import Location from "./Location";
 import PriceRange from "./PriceRange";
@@ -12,70 +14,104 @@ const Filter = ({ onFilterChange }) => {
     location: "",
     minPrice: "",
     maxPrice: "",
-    sort: ""
+    sort: "",
   });
 
-  const handleFilterChange = (key, value) => {
-    const newFilters = {
-      ...filters,
-      [key]: value
+  // Debounced-like state update to avoid heavy parent re-renders on every keystroke
+  const updateFilters = useCallback(
+    (updatedFields) => {
+      const newFilters = { ...filters, ...updatedFields };
+      setFilters(newFilters);
+      onFilterChange(newFilters);
+    },
+    [filters, onFilterChange]
+  );
+
+  const handleReset = () => {
+    const resetState = {
+      search: "",
+      category: "",
+      location: "",
+      minPrice: "",
+      maxPrice: "",
+      sort: "",
     };
-    setFilters(newFilters);
-    onFilterChange(newFilters);
+    setFilters(resetState);
+    onFilterChange(resetState);
   };
 
+  const hasActiveFilters = Object.values(filters).some((val) => val !== "");
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 items-center mb-6 gap-3 md:gap-10">
-      {/* Search Bar */}
-      <div>
-        <div className="flex items-center px-4 py-3 rounded-md border border-[#6B7280] overflow-hidden max-w-md mx-auto">
-          <div className="border-r mr-2">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 192.904 192.904"
-              width="16px"
-              className="fill-gray-600 mr-3 rotate-90"
-            >
-              <path d="m190.707 180.101-47.078-47.077c11.702-14.072 18.752-32.142 18.752-51.831C162.381 36.423 125.959 0 81.191 0 36.422 0 0 36.423 0 81.193c0 44.767 36.422 81.187 81.191 81.187 19.688 0 37.759-7.049 51.831-18.751l47.079 47.078a7.474 7.474 0 0 0 5.303 2.197 7.498 7.498 0 0 0 5.303-12.803zM15 81.193C15 44.694 44.693 15 81.191 15c36.497 0 66.189 29.694 66.189 66.193 0 36.496-29.692 66.187-66.189 66.187C44.693 147.38 15 117.689 15 81.193z"></path>
-            </svg>
+    <div className="w-full bg-white py-4 mb-6">
+      <div className="flex flex-col gap-4">
+        {/* Top Row: Search & Reset */}
+        <div className="flex flex-col md:flex-row items-center gap-3">
+          <div className="relative flex-1 group">
+            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400 group-focus-within:text-[#115E59] transition-colors" />
+            </div>
+            <input
+              type="text"
+              placeholder="What are you looking for?"
+              className="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent rounded-xl focus:bg-white focus:ring-2 focus:ring-[#115E59]/20 focus:border-[#115E59] outline-none transition-all text-sm font-medium text-gray-700"
+              value={filters.search}
+              onChange={(e) => updateFilters({ search: e.target.value })}
+            />
           </div>
-          <input
-            type="text"
-            placeholder="Search for a task"
-            className="w-full outline-none bg-transparent text-gray-600 text-sm"
-            value={filters.search}
-            onChange={(e) => handleFilterChange("search", e.target.value)}
-          />
+
+          {hasActiveFilters && (
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Reset Filters
+            </button>
+          )}
+        </div>
+
+        {/* Bottom Row: Selectors Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 items-center gap-3">
+          <div className="relative">
+            <label className="text-[10px] uppercase tracking-wider font-bold text-gray-400 absolute -top-2 left-3 bg-white px-1 z-10">
+              Category
+            </label>
+            <CategorySelect
+              value={filters.category}
+              onChange={(value) => updateFilters({ category: value })}
+            />
+          </div>
+
+          <div className="relative cursor-pointer">
+            <label className="text-[10px] uppercase tracking-wider font-bold text-gray-400 absolute -top-2 left-3 bg-white px-1 z-10">
+              Location
+            </label>
+            <Location
+              value={filters.location}
+              onChange={(value) => updateFilters({ location: value })}
+            />
+          </div>
+
+          <div className="relative">
+            <label className="text-[10px] uppercase tracking-wider font-bold text-gray-400 absolute -top-2 left-3 bg-white px-1 z-10">
+              Budget
+            </label>
+            <PriceRange
+              minPrice={filters.minPrice}
+              maxPrice={filters.maxPrice}
+              onChange={(min, max) => updateFilters({ minPrice: min, maxPrice: max })}
+            />
+          </div>
+
+          <div className="relative">
+            <label className="text-[10px] uppercase tracking-wider font-bold text-gray-400 absolute -top-2 left-3 bg-white px-1 z-10">
+              Sort
+            </label>
+            <Sort value={filters.sort} onChange={(value) => updateFilters({ sort: value })} />
+          </div>
         </div>
       </div>
-
-      {/* Filter Components */}
-      <CategorySelect
-        value={filters.category}
-        onChange={(value) => handleFilterChange("category", value)}
-      />
-      <Location
-        value={filters.location}
-        onChange={(value) => handleFilterChange("location", value)}
-      />
-
-      <PriceRange
-        minPrice={filters.minPrice}
-        maxPrice={filters.maxPrice}
-        onChange={(min, max) => {
-          const newFilters = {
-            ...filters,
-            minPrice: min,
-            maxPrice: max
-          };
-          setFilters(newFilters);
-          onFilterChange(newFilters);
-        }}
-      />
-      <Sort
-        value={filters.sort}
-        onChange={(value) => handleFilterChange("sort", value)}
-      />
     </div>
   );
 };
