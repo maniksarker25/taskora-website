@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useRef, useState, useCallback } from "react";
-import { useGetAllTasksQuery } from '@/lib/features/task/taskApi';
+import { useGetAllTasksQuery } from "@/lib/features/task/taskApi";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 
 const GoogleMap = ({ filters = {} }) => {
   const mapRef = useRef(null);
@@ -27,7 +27,7 @@ const GoogleMap = ({ filters = {} }) => {
 
     // Price filter
     if (filters.minPrice || filters.maxPrice) {
-      filteredTasks = filteredTasks.filter(task => {
+      filteredTasks = filteredTasks.filter((task) => {
         const taskBudget = task.budget || 0;
         const minPrice = parseInt(filters.minPrice) || 0;
         const maxPrice = parseInt(filters.maxPrice) || Infinity;
@@ -39,8 +39,8 @@ const GoogleMap = ({ filters = {} }) => {
     // Location filter
     if (filters.location) {
       const searchLocation = filters.location.toLowerCase();
-      filteredTasks = filteredTasks.filter(task => {
-        const taskLocation = (task.city + ' ' + task.address).toLowerCase();
+      filteredTasks = filteredTasks.filter((task) => {
+        const taskLocation = (task.city + " " + task.address).toLowerCase();
         return taskLocation.includes(searchLocation);
       });
     }
@@ -75,19 +75,21 @@ const GoogleMap = ({ filters = {} }) => {
       return;
     }
 
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places`;
     script.async = true;
     script.defer = true;
     script.onload = () => setIsScriptLoaded(true);
-    script.onerror = () => console.error('Failed to load Google Maps script');
+    script.onerror = () => console.error("Failed to load Google Maps script");
     document.head.appendChild(script);
   }, []);
 
   // Create custom yellow pin icon
   const createYellowPinIcon = () => {
     return {
-      url: 'data:image/svg+xml;base64,' + btoa(`
+      url:
+        "data:image/svg+xml;base64," +
+        btoa(`
         <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M20 2C12.268 2 6 8.268 6 16C6 28 20 38 20 38C20 38 34 28 34 16C34 8.268 27.732 2 20 2Z" fill="#FBBF24"/>
           <path d="M20 22C23.3137 22 26 19.3137 26 16C26 12.6863 23.3137 10 20 10C16.6863 10 14 12.6863 14 16C14 19.3137 16.6863 22 20 22Z" fill="#FFFFFF"/>
@@ -95,7 +97,7 @@ const GoogleMap = ({ filters = {} }) => {
         </svg>
       `),
       scaledSize: { width: 40, height: 40 },
-      anchor: { x: 20, y: 40 }
+      anchor: { x: 20, y: 40 },
     };
   };
 
@@ -109,9 +111,10 @@ const GoogleMap = ({ filters = {} }) => {
     const bounds = new google.maps.LatLngBounds();
 
     // Set default center if no tasks with location
-    const defaultCenter = tasksWithLocation.length > 0
-      ? { lat: tasksWithLocation[0].lat, lng: tasksWithLocation[0].lng }
-      : { lat: 23.8103, lng: 90.4125 };
+    const defaultCenter =
+      tasksWithLocation.length > 0
+        ? { lat: tasksWithLocation[0].lat, lng: tasksWithLocation[0].lng }
+        : { lat: 23.8103, lng: 90.4125 };
 
     // Initialize map
     const mapInstance = new google.maps.Map(mapRef.current, {
@@ -121,9 +124,9 @@ const GoogleMap = ({ filters = {} }) => {
         {
           featureType: "poi",
           elementType: "labels",
-          stylers: [{ visibility: "on" }]
-        }
-      ]
+          stylers: [{ visibility: "on" }],
+        },
+      ],
     });
 
     // Initialize info window
@@ -149,17 +152,28 @@ const GoogleMap = ({ filters = {} }) => {
       const content = `
         <div class="p-3 max-w-xs">
           <h3 class="font-semibold text-gray-900 text-sm">${task.title}</h3>
-          ${task.category ? `<p class="text-xs text-gray-600 mt-1">Category: ${task.category}</p>` : ''}
-          ${task.budget ? `<p class="text-sm text-green-600 font-medium mt-1">Budget: ₦${task.budget}</p>` : ''}
-          ${task.address ? `<p class="text-xs text-gray-500 mt-1">📍 ${task.address}</p>` : ''}
+          ${
+            task.category
+              ? `<p class="text-xs text-gray-600 mt-1">Category: ${task.category}</p>`
+              : ""
+          }
+          ${
+            task.budget
+              ? `<p class="text-sm text-green-600 font-medium mt-1">Budget: ₦${task.budget}</p>`
+              : ""
+          }
+          ${task.address ? `<p class="text-xs text-gray-500 mt-1">📍 ${task.address}</p>` : ""}
           <div class="mt-2 flex justify-between items-center">
-            <span class="text-xs px-2 py-1 rounded ${task.status === 'OPEN_FOR_BID'
-          ? 'bg-green-100 text-green-800'
-          : 'bg-gray-100 text-gray-800'
-        }">
-              ${task.status === 'OPEN_FOR_BID' ? 'Open for Bid' : 'In Progress'}
+            <span class="text-xs px-2 py-1 rounded ${
+              task.status === "OPEN_FOR_BID"
+                ? "bg-green-100 text-green-800"
+                : "bg-gray-100 text-gray-800"
+            }">
+              ${task.status === "OPEN_FOR_BID" ? "Open for Bid" : "In Progress"}
             </span>
-            <a href="/browseservice/${task.id}" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
+            <a href="/browseservice/${
+              task.id
+            }" class="text-xs text-blue-600 hover:text-blue-800 font-medium">
               View Details →
             </a>
           </div>
@@ -167,7 +181,7 @@ const GoogleMap = ({ filters = {} }) => {
       `;
 
       // Add click listener to marker
-      marker.addListener('click', () => {
+      marker.addListener("click", () => {
         infoWindowInstance.setContent(content);
         infoWindowInstance.open(mapInstance, marker);
       });
@@ -203,7 +217,7 @@ const GoogleMap = ({ filters = {} }) => {
   // Cleanup markers on unmount
   useEffect(() => {
     return () => {
-      markers.forEach(marker => {
+      markers.forEach((marker) => {
         if (marker && marker.setMap) {
           marker.setMap(null);
         }
@@ -238,7 +252,9 @@ const GoogleMap = ({ filters = {} }) => {
       <div className="w-full h-full bg-yellow-50 rounded-lg flex items-center justify-center">
         <div className="text-center">
           <p className="text-yellow-600">No tasks with location data found</p>
-          <p className="text-sm text-yellow-500 mt-1">Tasks need location coordinates to appear on map</p>
+          <p className="text-sm text-yellow-500 mt-1">
+            Tasks need location coordinates to appear on map
+          </p>
         </div>
       </div>
     );
@@ -246,28 +262,35 @@ const GoogleMap = ({ filters = {} }) => {
 
   return (
     <div className="w-full h-full rounded-lg overflow-hidden shadow-lg border border-gray-200">
-      <div
-        ref={mapRef}
-        className="w-full h-full min-h-[500px]"
-      />
+      <div ref={mapRef} className="w-full h-full min-h-[500px]" />
 
       {/* Map Legend */}
       <div className="bg-white p-3 border-t border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-6 h-6">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z" fill="#FBBF24" />
-                <path d="M12 11.5C13.3807 11.5 14.5 10.3807 14.5 9C14.5 7.61929 13.3807 6.5 12 6.5C10.6193 6.5 9.5 7.61929 9.5 9C9.5 10.3807 10.6193 11.5 12 11.5Z" fill="white" />
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2C8.13 2 5 5.13 5 9C5 14.25 12 22 12 22C12 22 19 14.25 19 9C19 5.13 15.87 2 12 2Z"
+                  fill="#FBBF24"
+                />
+                <path
+                  d="M12 11.5C13.3807 11.5 14.5 10.3807 14.5 9C14.5 7.61929 13.3807 6.5 12 6.5C10.6193 6.5 9.5 7.61929 9.5 9C9.5 10.3807 10.6193 11.5 12 11.5Z"
+                  fill="white"
+                />
               </svg>
             </div>
             <span className="text-sm text-gray-600">
               Task Locations ({tasksWithLocation.length})
             </span>
           </div>
-          <span className="text-xs text-gray-500">
-            Click on pins for details
-          </span>
+          <span className="text-xs text-gray-500">Click on pins for details</span>
         </div>
       </div>
     </div>
