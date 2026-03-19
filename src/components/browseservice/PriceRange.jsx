@@ -1,6 +1,6 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
 import { Slider } from "antd";
+import { useEffect, useRef, useState } from "react";
 
 const PriceRange = ({ minPrice, maxPrice, onChange }) => {
   const [localMin, setLocalMin] = useState(minPrice || "");
@@ -53,7 +53,7 @@ const PriceRange = ({ minPrice, maxPrice, onChange }) => {
       {/* Price Range Button */}
       <button
         onClick={() => setShowSlider(!showSlider)}
-        className="w-full px-4 py-2 pr-10 border border-[#6B7280] rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#6B7280] focus:border-[#6B7280] text-[#6B7280] bg-white text-left"
+        className="w-full cursor-pointer px-4 py-2 pr-10 border border-[#6B7280] rounded-lg shadow-sm focus:outline-none focus:ring-1 focus:ring-[#6B7280] focus:border-[#6B7280] text-[#6B7280] bg-white text-left"
       >
         {minPrice || maxPrice ? `$${minPrice || "0"} - $${maxPrice || "Any"}` : "Price Range"}
       </button>
@@ -62,9 +62,7 @@ const PriceRange = ({ minPrice, maxPrice, onChange }) => {
       {showSlider && (
         <div className="absolute top-full left-0 mt-2 w-80 bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50">
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Price Range
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Price Range</label>
 
             {/* Min and Max Inputs */}
             <div className="flex gap-3 mb-4">
@@ -98,18 +96,15 @@ const PriceRange = ({ minPrice, maxPrice, onChange }) => {
                 range
                 min={0}
                 max={100000}
-                value={[
-                  parseInt(localMin) || 0,
-                  parseInt(localMax) || 100000
-                ]}
+                value={[parseInt(localMin) || 0, parseInt(localMax) || 100000]}
                 onChange={(values) => {
                   setLocalMin(values[0]);
                   setLocalMax(values[1]);
                 }}
-                trackStyle={[{ backgroundColor: '#115E59' }]}
+                trackStyle={[{ backgroundColor: "#115E59" }]}
                 handleStyle={[
-                  { borderColor: '#115E59', backgroundColor: '#115E59' },
-                  { borderColor: '#115E59', backgroundColor: '#115E59' }
+                  { borderColor: "#115E59", backgroundColor: "#115E59" },
+                  { borderColor: "#115E59", backgroundColor: "#115E59" },
                 ]}
               />
               <div className="flex justify-between text-xs text-gray-500 mt-2">
@@ -123,13 +118,13 @@ const PriceRange = ({ minPrice, maxPrice, onChange }) => {
           <div className="flex gap-2">
             <button
               onClick={clearPriceFilter}
-              className="flex-1 px-4 py-2 text-sm border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50"
+              className="flex-1 px-4 py-2 text-sm border border-gray-300 rounded-md text-gray-600 hover:bg-gray-50 cursor-pointer"
             >
               Clear
             </button>
             <button
               onClick={applyPriceFilter}
-              className="flex-1 px-4 py-2 text-sm bg-[#115E59] text-white rounded-md hover:bg-[#0F504C] transition-colors"
+              className="flex-1 cursor-pointer px-4 py-2 text-sm bg-[#115E59] text-white rounded-md hover:bg-[#0F504C] transition-colors"
             >
               Apply
             </button>
