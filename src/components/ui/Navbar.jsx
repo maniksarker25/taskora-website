@@ -788,7 +788,7 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <div className="flex items-center gap-3">
-              {/* Notification Bell (Visual Only) */}
+              {/* Notification button */}
               <button className="p-2 text-gray-400 hover:bg-gray-100 rounded-full hidden sm:block">
                 <MdNotificationsNone size={24} />
               </button>
@@ -797,7 +797,7 @@ const Navbar = () => {
               <div className="relative">
                 <button
                   onClick={() => setIsProfileOpen(!isProfileOpen)}
-                  className="flex items-center gap-2 p-1 pr-3 rounded-full border border-gray-200 hover:border-[#115E59] transition-all bg-white"
+                  className="flex items-center gap-2 p-1 pr-3 rounded-full border border-gray-200 hover:border-[#115E59] transition-all bg-white cursor-pointer"
                 >
                   <div className="w-9 h-9 rounded-full overflow-hidden border border-gray-100">
                     <img
@@ -842,11 +842,11 @@ const Navbar = () => {
                       </NavLink>
                     </div>
 
-                    <div className="mt-3 pt-3 border-t border-gray-50 px-2 space-y-1">
+                    <div className="mt-3 pt-3 border-t border-gray-50 px-2 space-y-1 ">
                       <button
                         onClick={handleUpgradeOrSwitch}
                         disabled={isUpgrading}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-[#115E59] hover:bg-teal-50 rounded-lg transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-[#115E59] hover:bg-teal-50 rounded-lg transition-colors cursor-pointer"
                       >
                         {isUpgrading ? (
                           <div className="h-4 w-4 border-2 border-[#115E59] border-t-transparent animate-spin rounded-full" />
@@ -858,7 +858,7 @@ const Navbar = () => {
 
                       <button
                         onClick={handleLogout}
-                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                       >
                         <PiSignOutBold size={18} />
                         Logout
@@ -908,7 +908,7 @@ const Navbar = () => {
               </div>
             )}
             {isAuthenticated && (
-              <div className="bg-gray-50 p-4 rounded-2xl mb-4">
+              <div className="bg-gray-50 p-4 rounded-2xl mb-4 ">
                 <div className="flex items-center gap-3 mb-4">
                   <img
                     src={userData?.profile_image || defaultAvatar.src}
@@ -931,7 +931,7 @@ const Navbar = () => {
                     href="/profile_info"
                     className="flex flex-col items-center p-3 bg-white rounded-xl text-[10px] font-bold text-gray-600"
                   >
-                    <RiUserSettingsFill className="mb-1 text-[#115E59]" /> Profile
+                    <RiUserSettingsFill className="mb-1 text-[#115E59] " /> Profile
                   </Link>
                 </div>
               </div>
