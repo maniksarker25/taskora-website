@@ -41,6 +41,7 @@ const Navbar = () => {
   const userData = profileData?.data;
   const isMultiRole = userData?.user?.isMultiRole;
   const currentRole = isAuthenticated ? user?.role : "guest";
+  console.log("current role===============>", currentRole);
   useEffect(() => {
     setMounted(true);
   }, []);
