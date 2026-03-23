@@ -1,63 +1,83 @@
-import { MapPin, Star } from "lucide-react";
+"use client";
+import { ArrowRight, ImageIcon, ShieldCheck, Star } from "lucide-react";
 import Image from "next/image";
 
 const ServiceCard = ({ service }) => {
+  // 1. Better approach for default images
+  const serviceImage = service?.images?.[0] || null;
+
+  // 2. Clean HTML stripping for description
+  const cleanDescription = service?.description
+    ? service.description.replace(/<[^>]*>/g, "").substring(0, 60) + "..."
+    : "Professional service available for booking.";
+
   return (
-    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden cursor-pointer">
-      {/* Image */}
-      <div className="relative">
-        <Image
-          src={service.images?.[0] || "/default-service.jpg"}
-          width={600}
-          height={400}
-          alt={service.title}
-          className="w-full h-48 object-cover"
-        />
+    <div className="group bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-teal-900/5 transition-all duration-300 overflow-hidden flex flex-col h-full">
+      {/* Image Section */}
+      <div className="relative h-52 w-full overflow-hidden bg-slate-100">
+        {serviceImage ? (
+          <Image
+            src={serviceImage}
+            alt={service?.title || "Service"}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center text-slate-300">
+            <ImageIcon className="w-10 h-10 mb-2 opacity-20" />
+            <span className="text-[10px] font-black uppercase tracking-widest opacity-40">
+              No Image Available
+            </span>
+          </div>
+        )}
+
         {/* Category Badge */}
-        <div className="absolute top-3 left-3">
-          <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-            {service.category?.name || "Service"}
+        <div className="absolute top-4 left-4">
+          <span className="bg-white/90 backdrop-blur-md text-teal-700 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm">
+            {service?.category?.name || "Premium Service"}
           </span>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="p-4">
-        {/* Location and Rating */}
+      {/* Content Section */}
+      <div className="p-6 flex flex-col flex-1">
         <div className="flex items-center justify-between mb-3">
-          {/* <div className="flex items-center gap-1 text-gray-500 text-sm">
-            <MapPin className="w-4 h-4 text-[#115E59]" />
-            <span className="text-black">{service.city || service.address}</span>
-          </div> */}
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-medium">{service.averageRating || "New"}</span>
+          <div className="flex items-center gap-1.5 bg-amber-50 px-2 py-1 rounded-lg">
+            <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+            <span className="text-xs font-bold text-amber-700">
+              {service?.averageRating ? Number(service.averageRating).toFixed(1) : "New"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1 text-slate-400">
+            <ShieldCheck className="w-4 h-4 text-teal-500" />
+            <span className="text-[10px] font-bold uppercase tracking-tighter">Verified</span>
           </div>
         </div>
 
-        {/* Title */}
-        <h3 className="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
-          {service.title}
+        <h3 className="text-lg font-bold text-slate-900 mb-2 line-clamp-1 group-hover:text-teal-600 transition-colors">
+          {service?.title || "Untitled Service"}
         </h3>
 
-        {/* Description */}
-        <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-          {service.description 
-            ? service.description.replace(/<[^>]*>/g, '').substring(0, 50) + (service.description.length > 50 ? '...' : '')
-            : 'No description available'}
+        <p className="text-slate-500 text-xs leading-relaxed mb-6 line-clamp-2">
+          {cleanDescription}
         </p>
 
-        {/* Price */}
-        {service.price && (
-          <p className="text-gray-800 font-semibold text-lg mb-3">
-            ₦ {service.price}
-          </p>
-        )}
+        {/* Footer Section: Price & Button */}
+        <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-50">
+          <div>
+            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">
+              Price From
+            </p>
+            <p className="text-xl font-black text-slate-900 tracking-tight">
+              ₦{service?.price?.toLocaleString() || "Negotiable"}
+            </p>
+          </div>
 
-        {/* Book Now Button */}
-        <button className="w-full bg-[#E6F4F1] text-[#115E59] px-4 py-2 rounded-md font-medium transition transform duration-300 hover:scale-105">
-          Book Now
-        </button>
+          <div className="h-10 w-10 bg-slate-50 rounded-xl flex items-center justify-center text-teal-600 group-hover:bg-[#115E59] group-hover:text-white transition-all duration-300 shadow-sm">
+            <ArrowRight className="w-5 h-5" />
+          </div>
+        </div>
       </div>
     </div>
   );
