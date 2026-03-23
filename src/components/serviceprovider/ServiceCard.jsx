@@ -3,16 +3,14 @@ import { ArrowRight, ImageIcon, ShieldCheck, Star } from "lucide-react";
 import Image from "next/image";
 
 const ServiceCard = ({ service }) => {
-  // 1. Better approach for default images
   const serviceImage = service?.images?.[0] || null;
 
-  // 2. Clean HTML stripping for description
   const cleanDescription = service?.description
     ? service.description.replace(/<[^>]*>/g, "").substring(0, 60) + "..."
     : "Professional service available for booking.";
 
   return (
-    <div className="group bg-white rounded-[2rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-teal-900/5 transition-all duration-300 overflow-hidden flex flex-col h-full">
+    <div className="group bg-white rounded-[2rem] border border-slate-100  hover:shadow-sm hover:shadow-teal-900/5 transition-all duration-300 overflow-hidden flex flex-col h-full">
       {/* Image Section */}
       <div className="relative h-52 w-full overflow-hidden bg-slate-100">
         {serviceImage ? (
