@@ -1,6 +1,7 @@
-'use client'
-import React, { createContext, useContext, useEffect, useState } from "react";
+"use client";
+import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import baseUrl from "../../../utils/baseUrl";
 
 const SocketContext = createContext(null);
 
@@ -20,7 +21,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("accessToken") || "";
 
-    const socketInstance = io("https://rnj64vmh-9000.inc1.devtunnels.ms", {
+    const socketInstance = io(`${baseUrl}`, {
       auth: { token },
       query: { token },
     });
@@ -66,7 +67,7 @@ export const SocketProvider = ({ children }) => {
   const seenMessage = (messageData) => {
     if (!socket) return;
     socket.emit("seen", messageData);
-  }
+  };
 
   const onMessageReceived = (callback) => {
     if (!socket) return;
@@ -82,7 +83,19 @@ export const SocketProvider = ({ children }) => {
   };
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, sendMessageSoket, seenMessage, getMessage, newMessage, setNewMessage, onMessageReceived, onMessageReceivedForUser }}>
+    <SocketContext.Provider
+      value={{
+        socket,
+        isConnected,
+        sendMessageSoket,
+        seenMessage,
+        getMessage,
+        newMessage,
+        setNewMessage,
+        onMessageReceived,
+        onMessageReceivedForUser,
+      }}
+    >
       {children}
     </SocketContext.Provider>
   );
