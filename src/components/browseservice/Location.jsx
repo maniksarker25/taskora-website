@@ -1,12 +1,12 @@
 "use client";
-import React, { useRef, useEffect, useState } from "react";
 import { useLoadScript } from "@react-google-maps/api";
-import { Loader2, MapPin, X, Search } from "lucide-react";
+import { Loader2, MapPin, Search, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
-const libraries = ['places'];
+const libraries = ["places"];
 
 const Location = ({ value, onChange }) => {
-  const [inputValue, setInputValue] = useState(value || '');
+  const [inputValue, setInputValue] = useState(value || "");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,8 +33,8 @@ const Location = ({ value, onChange }) => {
         setShowSuggestions(false);
       }
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   if (!isLoaded) {
@@ -87,11 +87,11 @@ const Location = ({ value, onChange }) => {
       {
         input,
         // componentRestrictions: { country: 'ng' },
-        types: ['(regions)'],
+        types: ["(regions)"],
       },
       (predictions, status) => {
         setIsLoading(false);
-        if (status === 'OK' && predictions) {
+        if (status === "OK" && predictions) {
           setSuggestions(predictions.slice(0, 5));
           setShowSuggestions(true);
         } else {
@@ -111,8 +111,8 @@ const Location = ({ value, onChange }) => {
 
   const handleClear = (e) => {
     e.stopPropagation();
-    setInputValue('');
-    onChange('');
+    setInputValue("");
+    onChange("");
     setSuggestions([]);
     setShowSuggestions(false);
     setHasSearched(false);
@@ -180,10 +180,13 @@ const Location = ({ value, onChange }) => {
                 </li>
               ))}
             </ul>
-          ) : hasSearched && !isLoading && (
-            <div className="px-4 py-3 text-center text-sm text-gray-500">
-              No locations found. Try a different search.
-            </div>
+          ) : (
+            hasSearched &&
+            !isLoading && (
+              <div className="px-4 py-3 text-center text-sm text-gray-500">
+                No locations found. Try a different search.
+              </div>
+            )
           )}
         </div>
       )}
