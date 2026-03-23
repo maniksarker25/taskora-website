@@ -110,6 +110,7 @@ const Navbar = () => {
               <NavLink href="/browseservice">Browse Tasks</NavLink>
               <NavLink href="/service-listing">Services</NavLink>
               <NavLink href="/contact">Help</NavLink>
+              <NavLink href="/about">About Us</NavLink>
             </>
           )}
           {currentRole === "customer" && (
@@ -117,6 +118,7 @@ const Navbar = () => {
               <NavLink href="/post_task">Post a Task</NavLink>
               <NavLink href="/browseservice">Find Tasks</NavLink>
               <NavLink href="/service-listing">Hire Experts</NavLink>
+              <NavLink href="/about">About Us</NavLink>
             </>
           )}
           {currentRole === "provider" && (
@@ -126,6 +128,7 @@ const Navbar = () => {
               <NavLink href="/chat" icon={FaMessage}>
                 Messages
               </NavLink>
+              <NavLink href="/about">About Us</NavLink>
             </>
           )}
         </div>
