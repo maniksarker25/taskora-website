@@ -1,103 +1,184 @@
-import Image from 'next/image'
-import React from 'react'
-import FooterBg from '../../../public/Ellipse_footer.svg'
+"use client";
+import Image from "next/image";
+import Link from "next/link";
+
+// Assets
+import FooterBg from "../../../public/Ellipse_footer.svg";
 import taskalleyLogo from "../../../public/Group (4).svg";
+import behanch from "../../../public/behanch.svg";
 import facebook from "../../../public/facebook.svg";
 import twitter from "../../../public/twitter.svg";
 import youtube from "../../../public/youtube.svg";
-import behanch from "../../../public/behanch.svg";
-import Link from 'next/link';
+
+// Icons (Lucide-react for a cleaner feel, optional but recommended)
+import { ArrowUpRight, Mail, Phone } from "lucide-react";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+
+  const footerLinks = {
+    resources: [
+      { name: "About Us", href: "/about" },
+      { name: "Contact Us", href: "/contact" },
+      { name: "FAQ", href: "/faq" },
+      { name: "Sitemap", href: "/sitesmap" },
+    ],
+    quickLinks: [
+      { name: "Home", href: "/" },
+      { name: "Browse Services", href: "/browseservice" },
+      { name: "Privacy Policy", href: "/privacy" },
+      { name: "Terms of Condition", href: "/terms" },
+    ],
+    socials: [
+      { icon: facebook, alt: "Facebook", href: "https://facebook.com" },
+      { icon: twitter, alt: "Twitter", href: "https://twitter.com" },
+      { icon: youtube, alt: "YouTube", href: "https://youtube.com" },
+      { icon: behanch, alt: "Behance", href: "https://behance.net" },
+    ],
+  };
+
   return (
-    <footer className="bg-black pt-20 pb-20 px-10 tracking-wide relative">
-      <div className="max-w-[1240px] mx-auto">
-        <div className="flex flex-wrap flex-col md:flex-row gap-16 justify-between">
-          {/* first row */}
-          <div className=" flex lg:flex flex-col lg:items-left gap-2 md:gap-5">
-            <Link href="/">
-              <Image src={taskalleyLogo} alt="logo"  />
+    <footer className="bg-[#020617] pt-24 pb-12 px-6 lg:px-12 relative overflow-hidden border-t border-slate-900">
+      {/* Abstract Background Glow */}
+      <div className="absolute top-0 right-0 opacity-40 pointer-events-none -translate-y-1/2 translate-x-1/4">
+        <Image src={FooterBg} alt="Glow Effect" className="w-[600px]" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8 mb-20">
+          {/* Brand Column */}
+          <div className="space-y-6">
+            <Link href="/" className="inline-block transition-transform hover:scale-105">
+              <Image src={taskalleyLogo} alt="TaskAlley Logo" className="w-44" />
             </Link>
-            <a href="" className='text-white'>Phone: +012 (345) 678 99</a>
-            <a href="" className='text-white'>Email: support@taskalley.com</a>
+            <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
+              The leading marketplace for verified local service providers and taskers.
+            </p>
+            <div className="space-y-3">
+              <a
+                href="tel:+01234567899"
+                className="flex items-center gap-3 text-slate-300 hover:text-teal-500 transition-colors text-sm group"
+              >
+                <div className="p-2 bg-slate-900 rounded-lg group-hover:bg-teal-500/10 transition-colors">
+                  <Phone size={16} />
+                </div>
+                +012 (345) 678 99
+              </a>
+              <a
+                href="mailto:support@taskalley.com"
+                className="flex items-center gap-3 text-slate-300 hover:text-teal-500 transition-colors text-sm group"
+              >
+                <div className="p-2 bg-slate-900 rounded-lg group-hover:bg-teal-500/10 transition-colors">
+                  <Mail size={16} />
+                </div>
+                support@taskalley.com
+              </a>
+            </div>
           </div>
 
-          {/* second row */}
-
+          {/* Resources Column */}
           <div>
-            <h4 className="text-xl mb-4 text-white">Resources</h4>
-            <ul className="space-y-2 md:space-y-4">
-              <li>
-                <Link href="/about" className="hover:text-slate-400 text-white text-sm">About Us</Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-slate-400 text-white text-sm">Contact Us</Link>
-              </li>
-              <li>
-                <Link href="/faq" className="hover:text-slate-400 text-white text-sm">FAQ</Link>
-                
-              </li>
-              <li>
-                <Link href="/sitesmap" className="hover:text-slate-400 text-white text-sm">Sitemap</Link>
-                
-              </li>
+            <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-8">
+              Resources
+            </h4>
+            <ul className="space-y-4">
+              {footerLinks.resources.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-slate-300 hover:text-white transition-all text-sm flex items-center group"
+                  >
+                    <span className="w-0 group-hover:w-4 h-[1px] bg-teal-500 mr-0 group-hover:mr-2 transition-all opacity-0 group-hover:opacity-100"></span>
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-           {/* third row */}
+          {/* Quick Links Column */}
           <div>
-            <h4 className="text-base mb-4 text-white">Quick Links</h4>
-            <ul className="space-y-2 md:space-y-4">
-              <li>
-                <Link href="/" className="hover:text-slate-400 text-white text-sm">Home</Link>
-              </li>
-              <li>
-                <Link href="/browseservice" className="hover:text-slate-400 text-white text-sm">Browse Services</Link>
-              </li>
-              <li>
-                <Link href="/privacy" className="hover:text-slate-400 text-white text-sm">Privacy Policy</Link>
-              </li>
-              <li>
-                <Link href="/terms" className="hover:text-slate-400 text-white text-sm">Terms of Condition</Link>
-              </li>
-              
+            <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-8">
+              Quick Links
+            </h4>
+            <ul className="space-y-4">
+              {footerLinks.quickLinks.map((link) => (
+                <li key={link.name}>
+                  <Link
+                    href={link.href}
+                    className="text-slate-300 hover:text-white transition-all text-sm flex items-center group"
+                  >
+                    <span className="w-0 group-hover:w-4 h-[1px] bg-teal-500 mr-0 group-hover:mr-2 transition-all opacity-0 group-hover:opacity-100"></span>
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
-           {/* fourth row */}
-          <div className="lg:flex lg:flex-col">
-            <ul className="flex space-x-6">
-           
-            <li>
-              <a href='https://www.facebook.com/' className='transition transform duration-300 hover:scale-105'>
-                <Image src={facebook} alt="Facebook" />
-              </a>
-            </li>
-            <li>
-              <a href='https://twitter.com/' className='transition transform duration-300 hover:scale-105'>
-                <Image src={twitter} alt="Twitter" />
-              </a>
-            </li>
-            <li>
-              <a href='https://www.youtube.com/' className='transition transform duration-300 hover:scale-105'>
-                <Image src={youtube} alt="YouTube" />
-              </a>
-            </li>
-            <li>
-              <a href='https://www.behance.net/' className='transition transform duration-300 hover:scale-105'>
-                <Image src={behanch} alt="Behance" />
-              </a>
-            </li>
-          </ul>
-           {/* <p className="text-white text-sm mt-10">© 2023 Invitte.com
-        </p> */}
+
+          {/* Social & Newsletter Column */}
+          <div>
+            <h4 className="text-xs font-black text-slate-500 uppercase tracking-[0.2em] mb-8">
+              Connect With Us
+            </h4>
+            <div className="flex space-x-4 mb-8">
+              {footerLinks.socials.map((social) => (
+                <a
+                  key={social.alt}
+                  href={social.href}
+                  target="_blank"
+                  className="w-10 h-10 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-center transition-all hover:bg-[#115E59] hover:border-teal-400 hover:-translate-y-1"
+                >
+                  <Image src={social.icon} alt={social.alt} className="w-5 h-5" />
+                </a>
+              ))}
+            </div>
+            <div className="p-4 bg-slate-900/50 rounded-2xl border border-slate-800 backdrop-blur-sm">
+              <p className="text-xs font-bold text-white mb-2">Join the waitlist</p>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="Email"
+                  className="bg-black text-xs p-2 rounded-lg w-full border border-slate-800 outline-none focus:border-teal-500"
+                />
+                <button className="bg-[#115E59] p-2 rounded-lg">
+                  <ArrowUpRight size={14} className="text-white" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-slate-500 text-xs font-medium">
+            © {currentYear} TaskAlley. All rights reserved. Built by{" "}
+            <span className="text-slate-300">Ahamic Solution</span>.
+          </p>
+          <div className="flex gap-6">
+            <Link
+              href="/privacy"
+              className="text-slate-500 hover:text-white text-[10px] uppercase tracking-widest transition-colors font-black"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/terms"
+              className="text-slate-500 hover:text-white text-[10px] uppercase tracking-widest transition-colors font-black"
+            >
+              Terms
+            </Link>
+            <Link
+              href="/cookies"
+              className="text-slate-500 hover:text-white text-[10px] uppercase tracking-widest transition-colors font-black"
+            >
+              Cookies
+            </Link>
           </div>
         </div>
       </div>
-      <div className='absolute top-8 right-20'>
-        <Image src={FooterBg} alt="Footer Background" />
-      </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

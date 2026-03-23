@@ -705,7 +705,7 @@ const RegisterContent = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-[#115E59] hover:bg-teal-800 text-white font-black uppercase tracking-[0.2em] py-4 rounded-2xl shadow-xl shadow-teal-900/10 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-3 text-xs"
+                className="w-full cursor-pointer bg-[#115E59] hover:bg-teal-800 text-white font-black uppercase tracking-[0.2em] py-4 rounded-2xl shadow-xl shadow-teal-900/10 transition-all active:scale-[0.98] disabled:opacity-70 flex items-center justify-center gap-3 text-xs"
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Create Account"}
               </button>
