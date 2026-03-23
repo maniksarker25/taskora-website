@@ -120,35 +120,41 @@ body {
 
 .project_container {
   max-width: 1240px;
-  margin: 0 auto;      
-  
+  margin: 0 auto;
 }
-.brand_color{
+.brand_color {
   background-color: #115e59;
 }
-.text-color{
+.text-color {
   color: #115e59;
 }
-.border-color{
-   border-color: #115e59;
+.border-color {
+  border-color: #115e59;
 }
-.hover-white:hover { color: #fff !important; } 
+.hover-white:hover {
+  color: #fff !important;
+}
 
 .bg-color {
-  background-color: #115e59; 
+  background-color: #115e59;
 }
 
-.gradiant-bg{
-background: #85ACAA;
-background: linear-gradient(90deg, rgba(133, 172, 170, 1) 0%, rgba(155, 188, 186, 1) 50%, rgba(253, 253, 253, 1) 100%);
+.gradiant-bg {
+  background: #85acaa;
+  background: linear-gradient(
+    90deg,
+    rgba(133, 172, 170, 1) 0%,
+    rgba(155, 188, 186, 1) 50%,
+    rgba(253, 253, 253, 1) 100%
+  );
 }
 
 .mySwiper .swiper-pagination-bullet {
-  background-color: #DCFCE7 !important; 
+  background-color: #dcfce7 !important;
   opacity: 1 !important;
 }
 .mySwiper .swiper-pagination-bullet-active {
-  background-color: #115E59 !important;
+  background-color: #115e59 !important;
 }
 .mySwiper .swiper-pagination {
   position: relative !important;
@@ -168,20 +174,20 @@ background: linear-gradient(90deg, rgba(133, 172, 170, 1) 0%, rgba(155, 188, 186
 /* scroll start */
 
 :root {
-  --sb-thumb: #115E59;   
-  --sb-thumb-hover: #0e4c47; 
-  --sb-track: #E6F4F1;  
+  --sb-thumb: #115e59;
+  --sb-thumb-hover: #0e4c47;
+  --sb-track: #e6f4f1;
 }
 
 /* Firefox */
 * {
-  scrollbar-width: thin;                         
+  scrollbar-width: thin;
 }
 
 /* WebKit (Chrome, Edge, Safari, etc.) */
 *::-webkit-scrollbar {
-  width: 10px;         
-  height: 10px;      
+  width: 10px;
+  height: 10px;
 }
 
 *::-webkit-scrollbar-track {
@@ -190,25 +196,27 @@ background: linear-gradient(90deg, rgba(133, 172, 170, 1) 0%, rgba(155, 188, 186
 
 *::-webkit-scrollbar-thumb {
   background-color: var(--sb-thumb);
-  border-radius: 9999px;               
-  border: 2px solid var(--sb-track); 
+  border-radius: 9999px;
+  border: 2px solid var(--sb-track);
 }
 
 *::-webkit-scrollbar-thumb:hover {
   background-color: var(--sb-thumb-hover);
 }
 
-
 .dark {
-  --sb-thumb: #0EA5E9;     
+  --sb-thumb: #0ea5e9;
   --sb-thumb-hover: #0286c7;
-  --sb-track: #0b1413;     
+  --sb-track: #0b1413;
 }
 
-
-
-.scroll-thin::-webkit-scrollbar { width: 6px; height: 6px; }
-.scroll-thin { scrollbar-width: thin; }
+.scroll-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scroll-thin {
+  scrollbar-width: thin;
+}
 
 /* scroll end */
 
@@ -293,10 +301,9 @@ background: linear-gradient(90deg, rgba(133, 172, 170, 1) 0%, rgba(155, 188, 186
   margin: 1rem 0;
 }
 
-
-.PhoneInputInput{
-   border: none !important;
-   outline: none !important;
+.PhoneInputInput {
+  border: none !important;
+  outline: none !important;
   /* :focus { outline: none !important; box-shadow: none !important; } */
 }
 
@@ -307,7 +314,6 @@ background: linear-gradient(90deg, rgba(133, 172, 170, 1) 0%, rgba(155, 188, 186
   display: block;
   cursor: pointer;
 } */
-
 
 @layer base {
   * {

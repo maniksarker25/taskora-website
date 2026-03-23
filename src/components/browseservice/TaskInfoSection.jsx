@@ -114,7 +114,7 @@ const TaskInfoSection = ({ task }) => {
       {/* 1. Category Badge & Title */}
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
-          <span className="bg-teal-50 text-teal-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-teal-100">
+          <span className="bg-teal-50 text-teal-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-teal-100 mt-3">
             {taskData.category}
           </span>
         </div>
@@ -171,14 +171,14 @@ const TaskInfoSection = ({ task }) => {
       </div>
 
       {/* 3. Detailed Description */}
-      <div className="relative p-6 rounded-[2rem] bg-slate-50 border border-slate-100 overflow-hidden">
+      <div className="relative p-6 rounded-[2rem] bg-slate-50 border border-slate-100 overflow-hidden mb-10">
         <div className="flex items-center gap-2 mb-4">
           <div className="w-1 h-4 bg-teal-500 rounded-full" />
-          <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest">
+          <h2 className="text-sm font-black text-slate-800 uppercase tracking-widest ">
             Task Description
           </h2>
         </div>
-        <p className="text-sm text-slate-600 leading-relaxed break-words whitespace-pre-wrap">
+        <p className="text-sm text-slate-600 leading-relaxed break-words whitespace-pre-wrap ">
           {taskData.description}
         </p>
 

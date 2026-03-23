@@ -1,15 +1,11 @@
-import React from 'react'
-import TaskDetailsPage from './TaskDetailsPage'
+import TaskDetailsPage from "./TaskDetailsPage";
 
-const TaskDetails = ({task}) => {
-  console.log("taskDetails==>",task)
+const TaskDetails = ({ task }) => {
   return (
     <div>
-      <TaskDetailsPage 
-      task={task}
-      />
+      <TaskDetailsPage task={task} />
     </div>
-  )
-}
+  );
+};
 
-export default TaskDetails
+export default TaskDetails;

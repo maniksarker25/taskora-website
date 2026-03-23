@@ -1,9 +1,10 @@
 // hooks/useSocket.js
 "use client";
 
-import { useEffect, useState, useRef } from "react";
-import { io } from "socket.io-client";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { io } from "socket.io-client";
+import baseUrl from "../../../../utils/baseUrl";
 
 export const useSocket = () => {
   const socketRef = useRef(null);
@@ -23,7 +24,7 @@ export const useSocket = () => {
     }
 
     // Create socket instance
-    socketRef.current = io("https://rnj64vmh-9000.inc1.devtunnels.ms", {
+    socketRef.current = io(`${baseUrl}`, {
       auth: { token: accessToken },
       transports: ["websocket"],
       autoConnect: true,
