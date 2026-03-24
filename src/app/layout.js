@@ -1,28 +1,28 @@
-import { Geist, Geist_Mono, Poppins } from "next/font/google";
-import StoreProvider from "@/app/StoreProvider";
-import "./globals.css";
-import { SocketProvider } from "./context/SocketProvider";
-import AddressGuard from "@/components/auth/AddressGuard";
+import StoreProvider from '@/app/StoreProvider';
+import AddressGuard from '@/components/auth/AddressGuard';
+import { Geist, Geist_Mono, Poppins } from 'next/font/google';
+import { SocketProvider } from './context/SocketProvider';
+import './globals.css';
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
 });
 
 const poppins = Poppins({
-  subsets: ["latin"],
-  variable: "--font-poppins",
-  weight: ["400", "500", "600", "700"],
+  subsets: ['latin'],
+  variable: '--font-poppins',
+  weight: ['400', '500', '600', '700'],
 });
 
 export const metadata = {
-  title: "TaskAlley",
-  description: "Your trusted platform for tasks and services",
+  title: 'TaskAlley',
+  description: 'Your trusted platform for tasks and services',
 };
 
 export default function RootLayout({ children }) {
@@ -33,9 +33,7 @@ export default function RootLayout({ children }) {
       >
         <StoreProvider>
           <SocketProvider>
-            <AddressGuard>
-              {children}
-            </AddressGuard>
+            <AddressGuard>{children}</AddressGuard>
           </SocketProvider>
         </StoreProvider>
       </body>

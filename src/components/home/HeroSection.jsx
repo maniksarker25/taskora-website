@@ -1,23 +1,23 @@
-"use client";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
-import { toast } from "sonner";
+'use client';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
 
 // Assets
-import image1 from "../../../public/image-1.svg";
-import image2 from "../../../public/image-2.svg";
-import image3 from "../../../public/image-3.svg";
-import bg_image from "../../../public/shadow bg.svg";
+import image1 from '../../../public/image-1.svg';
+import image2 from '../../../public/image-2.svg';
+import image3 from '../../../public/image-3.svg';
+import bg_image from '../../../public/shadow bg.svg';
 
 const HeroSection = () => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const router = useRouter();
 
   // Senior Practice: Extracting guard logic to a single function
-  const protectedNavigation = (path, requiredRole = "customer") => {
+  const protectedNavigation = (path, requiredRole = 'customer') => {
     if (!isAuthenticated) {
-      toast.error("Please login to continue");
+      toast.error('Please login to continue');
       return;
     }
     if (user?.role !== requiredRole) {
@@ -45,13 +45,13 @@ const HeroSection = () => {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
             <button
-              onClick={() => protectedNavigation("/service-listing")}
+              onClick={() => protectedNavigation('/service-listing')}
               className="px-8 py-4 bg-[#115E59] text-white font-semibold rounded-xl hover:bg-[#0d4a46] transition-all duration-300 shadow-lg shadow-teal-900/20 active:scale-95"
             >
               Browse Services
             </button>
             <button
-              onClick={() => protectedNavigation("/post_task")}
+              onClick={() => protectedNavigation('/post_task')}
               className="px-8 py-4 border-2 border-[#115E59] text-[#115E59] font-semibold rounded-xl hover:bg-teal-50 transition-all duration-300 active:scale-95"
             >
               Post a Task
