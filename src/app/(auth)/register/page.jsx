@@ -437,7 +437,7 @@
 // export default Register;
 "use client";
 import { useRegisterMutation } from "@/lib/features/auth/authApi";
-import { Eye, EyeOff, Loader2, Lock, Mail, User } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2, Lock, Mail, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -454,6 +454,8 @@ const RegisterContent = () => {
   const role = searchParams.get("role") || "customer";
   const router = useRouter();
   const [phoneValue, setPhoneValue] = useState("");
+  const [serverError, setServerError] = useState(null);
+
   const {
     register,
     handleSubmit,
@@ -506,9 +508,8 @@ const RegisterContent = () => {
         router.push("/verify_register_user");
       }
     } catch (err) {
-      toast.error(err?.data?.message || "Registration failed.", {
-        style: { backgroundColor: "#fee2e2", color: "#991b1b", borderLeft: "6px solid #dc2626" },
-      });
+      const errorMessage = err?.data?.message || "Something went wrong. Please try again.";
+      setServerError(errorMessage);
     }
   };
 
@@ -702,6 +703,16 @@ const RegisterContent = () => {
                 </Link>
               </p>
 
+              {serverError && (
+                <div className="bg-red-50 border border-red-100 p-4 rounded-2xl flex items-center gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="bg-red-500 p-1 rounded-full">
+                    <AlertCircle className="w-3 h-3 text-white" />
+                  </div>
+                  <p className="text-red-600 text-xs font-bold uppercase tracking-tight">
+                    {serverError}
+                  </p>
+                </div>
+              )}
               <button
                 type="submit"
                 disabled={isLoading}
