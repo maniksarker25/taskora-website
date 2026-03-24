@@ -237,7 +237,6 @@ const BackendStatusModal = ({ isLoading }) => {
 
               <button
                 onClick={() => setIsOpen(false)}
-                disabled={isLoading}
                 className={`w-full cursor-pointer py-5 rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-2 transition-all active:scale-95 shadow-xl group bg-[#115E59] hover:bg-teal-700 text-white shadow-teal-900/20`}
               >
                 Understand, Continue to Site
