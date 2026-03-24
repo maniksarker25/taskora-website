@@ -1,16 +1,16 @@
-'use client';
-import React, { useState, useRef, useEffect } from 'react';
-import { Search, X, Loader2 } from 'lucide-react';
-import { useLoadScript, Autocomplete } from '@react-google-maps/api';
+"use client";
+import { Autocomplete, useLoadScript } from "@react-google-maps/api";
+import { Loader2, Search, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
-const libraries = ['places'];
+const libraries = ["places"];
 
-const LocationSearch = ({ 
-  value = '', 
-  onChange, 
+const LocationSearch = ({
+  value = "",
+  onChange,
   onSelect,
   placeholder = "Search for your location...",
-  required = false 
+  required = false,
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const autocompleteRef = useRef(null);
@@ -27,46 +27,55 @@ const LocationSearch = ({
 
   const handlePlaceSelect = (place) => {
     if (!place) return;
-    console.log('LocationSearch handlePlaceSelect', { place, pathname: typeof window !== 'undefined' ? window.location.pathname : null });
-    
-    const address = place.formatted_address; 
+    console.log("LocationSearch handlePlaceSelect", {
+      place,
+      pathname: typeof window !== "undefined" ? window.location.pathname : null,
+    });
+
+    const address = place.formatted_address;
     setInputValue(address);
-    
+
     // Get coordinates from place geometry
-    const coordinates = place.geometry?.location 
+    const coordinates = place.geometry?.location
       ? [place.geometry.location.lng(), place.geometry.location.lat()]
       : null;
 
     // Get city name from address components
     let city = "";
     if (place.address_components) {
-      const cityComponent = place.address_components.find(component =>
-        component.types.includes('locality')
+      const cityComponent = place.address_components.find((component) =>
+        component.types.includes("locality")
       );
       city = cityComponent?.long_name || "";
     }
 
     // Call onChange with address only
     onChange?.(address);
-    
+
     // Call onSelect with complete location data
     onSelect?.({
       address,
       coordinates,
       city,
-      placeId: place.place_id
+      placeId: place.place_id,
     });
   };
 
   const onLoad = (autocomplete) => {
     autocompleteRef.current = autocomplete;
-    console.log('LocationSearch onLoad', { pathname: typeof window !== 'undefined' ? window.location.pathname : null, autocompleteLoaded: !!autocomplete });
-  }; 
+    console.log("LocationSearch onLoad", {
+      pathname: typeof window !== "undefined" ? window.location.pathname : null,
+      autocompleteLoaded: !!autocomplete,
+    });
+  };
 
   const onPlaceChanged = () => {
     if (autocompleteRef.current) {
       const place = autocompleteRef.current.getPlace();
-      console.log('LocationSearch onPlaceChanged', { place, pathname: typeof window !== 'undefined' ? window.location.pathname : null });
+      console.log("LocationSearch onPlaceChanged", {
+        place,
+        pathname: typeof window !== "undefined" ? window.location.pathname : null,
+      });
       handlePlaceSelect(place);
     }
   };
@@ -74,9 +83,9 @@ const LocationSearch = ({
   const handleInputChange = (e) => {
     const newValue = e.target.value;
     setInputValue(newValue);
-    
+
     if (!newValue.trim()) {
-      onChange?.('');
+      onChange?.("");
       onSelect?.(null);
     }
   };
@@ -84,8 +93,8 @@ const LocationSearch = ({
   const handleClear = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    setInputValue('');
-    onChange?.('');
+    setInputValue("");
+    onChange?.("");
     onSelect?.(null);
     if (inputRef.current) {
       inputRef.current.focus();
@@ -120,8 +129,8 @@ const LocationSearch = ({
           onPlaceChanged={onPlaceChanged}
           options={{
             // componentRestrictions: { country: 'ng' },
-            fields: ['formatted_address', 'geometry', 'name', 'place_id', 'address_components'],
-            types: ['establishment', 'geocode']
+            fields: ["formatted_address", "geometry", "name", "place_id", "address_components"],
+            types: ["establishment", "geocode"],
           }}
         >
           <input
@@ -135,7 +144,7 @@ const LocationSearch = ({
             autoComplete="off"
           />
         </Autocomplete>
-        
+
         {inputValue && (
           <button
             type="button"
