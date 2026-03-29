@@ -1,35 +1,31 @@
-import React, { useState } from 'react'
-import { FaMapMarkerAlt } from "react-icons/fa";
-import { MdDateRange } from "react-icons/md";
-import { useRouter } from "next/navigation";
-import { FaStar } from "react-icons/fa6";
-import srvcporvider from "../../../public/profile_image.jpg";
-import Image from 'next/image';
-import { toast } from "sonner";
+import { useSocketContext } from '@/app/context/SocketProvider';
+import { useAuth } from '@/components/auth/useAuth';
 import { useAcceptBidMutation } from '@/lib/features/bidApi/bidApi';
 import { useDeleteTaskMutation } from '@/lib/features/task/taskApi';
-import { useAuth } from '@/components/auth/useAuth';
+import { MessageCircle, User } from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { FaMapMarkerAlt } from 'react-icons/fa';
+import { FaStar } from 'react-icons/fa6';
+import { MdDateRange } from 'react-icons/md';
 import { useSelector } from 'react-redux';
+import { toast } from 'sonner';
+import { default as client, default as srvcporvider } from '../../../public/profile_image.jpg';
 import ConfirmBookingModal from './ConfirmBookingModal';
-import client from "../../../public/profile_image.jpg";
-import { useSocketContext } from "@/app/context/SocketProvider";
-import { MessageCircle, User } from "lucide-react";
-
-
 
 const Bids = ({ taskDetails, bidsData, questionsData }) => {
+  console.log('taskDetails', taskDetails);
 
-  console.log("taskDetails", taskDetails);
-
-  const info = bidsData?.data.result
-  console.log("info", info);
+  const info = bidsData?.data.result;
+  console.log('info', info);
   const role = useSelector((state) => state?.auth?.user?.role);
 
-  const [activeTab, setActiveTab] = useState("bids");
+  const [activeTab, setActiveTab] = useState('bids');
   const [acceptBid, { isLoading: isAcceptingBid }] = useAcceptBidMutation();
   const [deleteTask, { isLoading: isDeletingTask }] = useDeleteTaskMutation();
 
-  const [taskStatus, setTaskStatus] = useState(taskDetails?.status || "OPEN_FOR_BID");
+  const [taskStatus, setTaskStatus] = useState(taskDetails?.status || 'OPEN_FOR_BID');
   const { user } = useAuth();
   const router = useRouter();
 
@@ -38,15 +34,15 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
   // Chat from Question State
   const [isChatModalOpen, setIsChatModalOpen] = useState(false);
-  const [chatMessage, setChatMessage] = useState("");
+  const [chatMessage, setChatMessage] = useState('');
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const { sendMessageSoket } = useSocketContext();
 
   const [loadingBidId, setLoadingBidId] = useState(null);
 
   const executeAcceptBid = async (bidId, couponCode) => {
-    if ((taskStatus || taskDetails?.status) !== "OPEN_FOR_BID") {
-      toast.error("Task is no longer open for bids.");
+    if ((taskStatus || taskDetails?.status) !== 'OPEN_FOR_BID') {
+      toast.error('Task is no longer open for bids.');
       return;
     }
 
@@ -64,30 +60,26 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
         const paymentLink = result?.data?.paymentLink;
         const reference = result?.data?.reference;
 
-        if (paymentLink && typeof window !== "undefined") {
-         window.open(paymentLink, "_blank");
+        if (paymentLink && typeof window !== 'undefined') {
+          window.open(paymentLink, '_blank');
         }
 
         if (reference) {
-          console.log("Payment reference:", reference);
+          console.log('Payment reference:', reference);
         }
 
-        setTaskStatus(result?.data?.status || "IN_PROGRESS");
-
+        setTaskStatus(result?.data?.status || 'IN_PROGRESS');
       }
     } catch (error) {
-      console.error("Failed to accept bid:", error);
-      toast.error(
-        error?.data?.message || "Failed to accept bid. Please try again.",
-        {
-          style: {
-            backgroundColor: "#fee2e2",
-            color: "#991b1b",
-            borderLeft: "6px solid #ef4444",
-          },
-          duration: 3000,
-        }
-      );
+      console.error('Failed to accept bid:', error);
+      toast.error(error?.data?.message || 'Failed to accept bid. Please try again.', {
+        style: {
+          backgroundColor: '#fee2e2',
+          color: '#991b1b',
+          borderLeft: '6px solid #ef4444',
+        },
+        duration: 3000,
+      });
     } finally {
       setLoadingBidId(null);
     }
@@ -148,7 +140,6 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
   // };
 
   const handleChatClick = (bid) => {
-
     // if ((taskStatus || taskDetails?.status) !== "IN_PROGRESS") {
     //   toast.info("Chat is available only while the task is In Progress.");
     //   return;
@@ -156,18 +147,20 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
     // Determine receiverId - pick the other participant (not the current user)
     const providerId = bid?.provider?._id || bid?.provider || bid?.providerId;
-    const customerId = taskDetails?.customer?._id || taskDetails?.customer || taskDetails?.customerId;
+    const customerId =
+      taskDetails?.customer?._id || taskDetails?.customer || taskDetails?.customerId;
     let resolvedReceiverId = null;
     // If both exist, prefer the other user
     if (providerId && customerId) {
-      resolvedReceiverId = (providerId === user?._id || providerId === user?.id) ? customerId : providerId;
+      resolvedReceiverId =
+        providerId === user?._id || providerId === user?.id ? customerId : providerId;
     } else {
       resolvedReceiverId = providerId || customerId;
     }
     const receiverId = resolvedReceiverId;
 
     if (!receiverId) {
-      toast.error("Unable to find user to chat with");
+      toast.error('Unable to find user to chat with');
       return;
     }
 
@@ -180,72 +173,73 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
     const now = new Date();
     const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
 
-    if (diffInHours < 1) return "Just now";
-    if (diffInHours === 1) return "1 hour ago";
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours === 1) return '1 hour ago';
     if (diffInHours < 24) return `${diffInHours} hours ago`;
 
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays === 1) return "1 day ago";
+    if (diffInDays === 1) return '1 day ago';
     return `${diffInDays} days ago`;
   };
 
   const handleOpenChatModal = (q) => {
     setSelectedQuestion(q);
-    setChatMessage("");
+    setChatMessage('');
     setIsChatModalOpen(true);
   };
 
   const handleSendQuestionChat = async () => {
-    const receiverId = selectedQuestion?.provider?._id || selectedQuestion?.provider?.profileId || selectedQuestion?.user?._id;
+    const receiverId =
+      selectedQuestion?.provider?._id ||
+      selectedQuestion?.provider?.profileId ||
+      selectedQuestion?.user?._id;
 
     if (!chatMessage.trim()) {
-      toast.error("Message cannot be empty");
+      toast.error('Message cannot be empty');
       return;
     }
     if (!receiverId) {
-      toast.error("Unable to identify the recipient.");
+      toast.error('Unable to identify the recipient.');
       return;
     }
 
     try {
       const data = {
         text: chatMessage,
-        imageUrl: [""],
-        pdfUrl: [""],
-        receiver: receiverId
-      }
+        imageUrl: [''],
+        pdfUrl: [''],
+        receiver: receiverId,
+      };
 
       sendMessageSoket(data);
-      setChatMessage("");
+      setChatMessage('');
       setIsChatModalOpen(false);
 
-      toast.success("Message sent! Redirecting to chat...");
+      toast.success('Message sent! Redirecting to chat...');
 
       setTimeout(() => {
         if (typeof window !== 'undefined') {
           router.push(`/chat/${receiverId}`);
         }
       }, 1000);
-
     } catch (error) {
-      console.error("Failed to start chat:", error);
-      toast.error("Failed to send message via socket.");
+      console.error('Failed to start chat:', error);
+      toast.error('Failed to send message via socket.');
     }
   };
 
   const handleDeleteTask = async () => {
     if (!taskDetails?._id) return;
 
-
     try {
       const result = await deleteTask(taskDetails._id).unwrap();
       if (result.success) {
-        toast.success("Task removed successfully!");
-        router.push("/my_task");
+        toast.success('Task removed successfully!');
+        router.push('/my_task');
       }
     } catch (error) {
-      console.error("Failed to delete task:", error);
-      toast.error(error?.data?.message || "Failed to remove task. Please try again.");
+      console.error('Failed to delete task:', error);
+      toast.error(error?.data?.message || 'Failed to remove task. Please try again.');
     }
   };
 
@@ -269,7 +263,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
             </div>
             <div>
               <p className="text-lg font-semibold text-black">Posted By</p>
-              <p className="text-sm text-gray-600">{taskDetails?.customer?.name || "N/A"}</p>
+              <p className="text-sm text-gray-600">{taskDetails?.customer?.name || 'N/A'}</p>
             </div>
           </div>
           {/* Location */}
@@ -277,9 +271,9 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
             <div className="p-3 rounded-full bg-[#E6F4F1] text-[#115E59] flex-shrink-0 flex items-center justify-center">
               <FaMapMarkerAlt size={20} />
             </div>
-            <div className=''>
+            <div className="">
               <p className="text-base sm:text-lg font-semibold text-black">Location</p>
-              <p className="text-xs sm:text-sm text-gray-600">{taskDetails?.address || "Online"}</p>
+              <p className="text-xs sm:text-sm text-gray-600">{taskDetails?.address || 'Online'}</p>
             </div>
           </div>
 
@@ -289,21 +283,22 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
               <MdDateRange size={20} />
             </div>
             <div>
-              <p className="text-base sm:text-lg font-semibold text-black">
-                To Be Done On
-              </p>
+              <p className="text-base sm:text-lg font-semibold text-black">To Be Done On</p>
               <div className="text-xs sm:text-sm text-gray-600">
-                {taskDetails?.preferredDeliveryDateTime && (
+                {(taskDetails?.preferredDeliveryDateTime && (
                   <div className="flex items-center gap-2 text-gray-700">
-                    <span>{new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}</span>
+                    <span>
+                      {new Date(taskDetails.preferredDeliveryDateTime).toLocaleDateString()}
+                    </span>
                   </div>
-                ) || "Flexible"}
+                )) ||
+                  'Flexible'}
               </div>
             </div>
           </div>
           <div>
-            <p className='text-xl font-bold pb-4'>Details</p>
-            <p>{taskDetails?.description || "No description available"}</p>
+            <p className="text-xl font-bold pb-4">Details</p>
+            <p>{taskDetails?.description || 'No description available'}</p>
           </div>
         </div>
 
@@ -326,7 +321,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                 disabled={isDeletingTask}
                 className=" px-4 py-2.5 bg-red-500 text-white rounded-md hover:bg-red-600 transition transform duration-300 hover:scale-105 cursor-pointer text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                {isDeletingTask ? "Removing..." : "Remove Task"}
+                {isDeletingTask ? 'Removing...' : 'Remove Task'}
               </button>
             </div>
           </div>
@@ -336,20 +331,22 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
       {/* Tabs */}
       <div className="mt-6 flex flex-wrap gap-2 sm:gap-3">
         <button
-          onClick={() => setActiveTab("bids")}
-          className={`px-4 sm:px-6 py-2 rounded-md transition-colors cursor-pointer text-sm sm:text-base ${activeTab === "bids"
-            ? "bg-[#115E59] text-white"
-            : "text-black bg-[#E6F4F1] hover:bg-gray-200"
-            }`}
+          onClick={() => setActiveTab('bids')}
+          className={`px-4 sm:px-6 py-2 rounded-md transition-colors cursor-pointer text-sm sm:text-base ${
+            activeTab === 'bids'
+              ? 'bg-[#115E59] text-white'
+              : 'text-black bg-[#E6F4F1] hover:bg-gray-200'
+          }`}
         >
           Bids
         </button>
         <button
-          onClick={() => setActiveTab("questions")}
-          className={`px-4 sm:px-6 py-2 rounded-md transition-colors cursor-pointer text-sm sm:text-base ${activeTab === "questions"
-            ? "bg-[#115E59] text-white"
-            : "text-black bg-[#E6F4F1] hover:bg-gray-200"
-            }`}
+          onClick={() => setActiveTab('questions')}
+          className={`px-4 sm:px-6 py-2 rounded-md transition-colors cursor-pointer text-sm sm:text-base ${
+            activeTab === 'questions'
+              ? 'bg-[#115E59] text-white'
+              : 'text-black bg-[#E6F4F1] hover:bg-gray-200'
+          }`}
         >
           Questions
         </button>
@@ -357,8 +354,8 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
       {/* Bids / Questions */}
       <div className="mt-4 space-y-4">
-        {activeTab === "bids" && (
-          info && info.length > 0 ? (
+        {activeTab === 'bids' &&
+          (info && info.length > 0 ? (
             info.map((bid) => (
               <div
                 key={bid._id || bid.id}
@@ -369,8 +366,8 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                   <div className="flex flex-col sm:flex-row lg:flex-col items-center sm:items-start lg:items-center xl:flex-row xl:items-center gap-4">
                     <div className="w-16 h-16 sm:w-20 sm:h-20  rounded-full overflow-clip border-2 border-white shadow-sm flex-shrink-0">
                       <Image
-                        src={bid?.provider?.profile_image ||srvcporvider}
-                        alt={bid?.provider?.name || "Provider"}
+                        src={bid?.provider?.profile_image || srvcporvider}
+                        alt={bid?.provider?.name || 'Provider'}
                         width={500}
                         height={500}
                         className="w-full h-full object-cover"
@@ -387,35 +384,35 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                       </p>
                     </div>
                     <div className="hidden sm:block lg:hidden xl:block ml-auto sm:ml-0 lg:ml-auto xl:ml-auto">
-                      <p className="font-bold text-xl">
-                        ₦ {bid.price}
-                      </p>
+                      <p className="font-bold text-xl">₦ {bid.price}</p>
                     </div>
                   </div>
 
                   {/* accept button */}
                   <div className="flex flex-col gap-3">
-                    {role === "customer" && (taskStatus || taskDetails?.status) === "OPEN_FOR_BID" && (
-                      <button
-                        onClick={() => openConfirmModal(bid)}
-                        disabled={isAcceptingBid}
-                        className={`w-full px-4 py-2.5 rounded-lg font-medium transition-colors text-sm ${isAcceptingBid && loadingBidId === (bid._id || bid.id)
-                            ? "bg-[#115E59] text-white opacity-80 cursor-wait" 
-                            : !isAcceptingBid
-                              ? "bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer" 
-                              : "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                    {role === 'customer' &&
+                      (taskStatus || taskDetails?.status) === 'OPEN_FOR_BID' && (
+                        <button
+                          onClick={() => openConfirmModal(bid)}
+                          disabled={isAcceptingBid}
+                          className={`w-full px-4 py-2.5 rounded-lg font-medium transition-colors text-sm ${
+                            isAcceptingBid && loadingBidId === (bid._id || bid.id)
+                              ? 'bg-[#115E59] text-white opacity-80 cursor-wait'
+                              : !isAcceptingBid
+                                ? 'bg-[#115E59] text-white hover:bg-teal-700 cursor-pointer'
+                                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                           }`}
-                      >
-                        {isAcceptingBid && loadingBidId === (bid._id || bid.id) ? (
-                          <div className="flex items-center justify-center gap-2">
-                            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                            <span>Accepting...</span>
-                          </div>
-                        ) : (
-                          "Accept Bid"
-                        )}
-                      </button>
-                    )}
+                        >
+                          {isAcceptingBid && loadingBidId === (bid._id || bid.id) ? (
+                            <div className="flex items-center justify-center gap-2">
+                              <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                              <span>Accepting...</span>
+                            </div>
+                          ) : (
+                            'Accept Bid'
+                          )}
+                        </button>
+                      )}
                   </div>
                 </div>
 
@@ -423,7 +420,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
                     <p className="text-gray-600 text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
-                      {bid?.details || "No details provided"}
+                      {bid?.details || 'No details provided'}
                     </p>
                   </div>
                   <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
@@ -439,14 +436,17 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
               <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                 <FaStar className="w-8 h-8 text-gray-300" />
               </div>
-              <p className="text-gray-500 font-medium text-center">No bids have been placed on this task yet.</p>
-              <p className="text-gray-400 text-sm mt-1 text-center">Once providers start bidding, they will appear here.</p>
+              <p className="text-gray-500 font-medium text-center">
+                No bids have been placed on this task yet.
+              </p>
+              <p className="text-gray-400 text-sm mt-1 text-center">
+                Once providers start bidding, they will appear here.
+              </p>
             </div>
-          )
-        )}
+          ))}
 
-        {activeTab === "questions" && (
-          questionsData?.data && questionsData?.data.length > 0 ? (
+        {activeTab === 'questions' &&
+          (questionsData?.data && questionsData?.data.length > 0 ? (
             questionsData?.data?.map((q) => (
               <div
                 key={q._id}
@@ -455,7 +455,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                 <div className="flex md:justify-center sm:justify-start">
                   <Image
                     src={q?.provider?.profile_image || q?.user?.profileImage || client}
-                    alt={q?.user?.name || "User"}
+                    alt={q?.user?.name || 'User'}
                     width={64}
                     height={64}
                     className="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover border border-gray-100"
@@ -464,7 +464,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="font-medium text-gray-900 text-sm sm:text-base">
-                      {q?.provider?.name || "Anonymous"}
+                      {q?.provider?.name || 'Anonymous'}
                     </h3>
                     <span className="text-[10px] sm:text-xs text-gray-400">
                       {formatTimeAgo(q.createdAt)}
@@ -473,7 +473,9 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
 
                   {/* Question */}
                   <div className="mb-3">
-                    <p className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-tighter mb-1">Question</p>
+                    <p className="text-[10px] sm:text-xs font-semibold text-gray-500 uppercase tracking-tighter mb-1">
+                      Question
+                    </p>
                     <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
                       {q.details}
                     </p>
@@ -510,7 +512,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
                   )}
 
                   {/* Chat button for customer */}
-                  {role === "customer" && (
+                  {role === 'customer' && (
                     <div className="flex justify-end mt-4">
                       <button
                         onClick={() => handleOpenChatModal(q)}
@@ -529,11 +531,14 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
               <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
                 <MessageCircle className="w-8 h-8 text-gray-300" />
               </div>
-              <p className="text-gray-500 font-medium text-center">No questions have been asked yet.</p>
-              <p className="text-gray-400 text-sm mt-1 text-center">Providers can ask questions to clarify task details.</p>
+              <p className="text-gray-500 font-medium text-center">
+                No questions have been asked yet.
+              </p>
+              <p className="text-gray-400 text-sm mt-1 text-center">
+                Providers can ask questions to clarify task details.
+              </p>
             </div>
-          )
-        )}
+          ))}
       </div>
 
       {/* QUESTION CHAT MODAL */}
@@ -542,8 +547,13 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
           <div className="bg-white w-full max-w-md p-5 rounded-xl shadow-xl animate-in fade-in zoom-in duration-200">
             {/* Header */}
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-bold text-gray-900">Message {selectedQuestion?.provider?.name || "Provider"}</h2>
-              <button onClick={() => setIsChatModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors text-2xl">
+              <h2 className="text-lg font-bold text-gray-900">
+                Message {selectedQuestion?.provider?.name || 'Provider'}
+              </h2>
+              <button
+                onClick={() => setIsChatModalOpen(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors text-2xl"
+              >
                 ✕
               </button>
             </div>
@@ -569,10 +579,11 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
               <button
                 onClick={handleSendQuestionChat}
                 disabled={!chatMessage.trim()}
-                className={`px-6 py-2 rounded-lg font-bold text-white transition-all transform hover:scale-105 flex items-center gap-2 ${!chatMessage.trim()
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-[#115E59] hover:bg-teal-800 shadow-md"
-                  }`}
+                className={`px-6 py-2 rounded-lg font-bold text-white transition-all transform hover:scale-105 flex items-center gap-2 ${
+                  !chatMessage.trim()
+                    ? 'bg-gray-300 cursor-not-allowed'
+                    : 'bg-[#115E59] hover:bg-teal-800 shadow-md'
+                }`}
               >
                 <MessageCircle className="w-4 h-4" />
                 Send Message
@@ -582,7 +593,7 @@ const Bids = ({ taskDetails, bidsData, questionsData }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Bids
+export default Bids;
