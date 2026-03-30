@@ -9,7 +9,8 @@ const nextConfig = {
     domains: [
       'di0kc6glg2cji.cloudfront.net',
       'img.daisyui.com',
-      "d48eox0ne7o48.cloudfront.net"
+      'd48eox0ne7o48.cloudfront.net',
+      'https://res.cloudinary.com',
     ],
     remotePatterns: [
       {
@@ -24,6 +25,6 @@ const nextConfig = {
       },
     ],
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;
