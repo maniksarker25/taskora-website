@@ -10,7 +10,7 @@ const nextConfig = {
       'di0kc6glg2cji.cloudfront.net',
       'img.daisyui.com',
       'd48eox0ne7o48.cloudfront.net',
-      'https://res.cloudinary.com',
+      'res.cloudinary.com',
     ],
     remotePatterns: [
       {
